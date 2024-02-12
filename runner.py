@@ -7,6 +7,7 @@ from motion_spec_gen.utility import resolver, loader
 from motion_spec_gen.namespaces import MOTION_SPEC, CONTROLLER_OUTPUT
 
 from motion_spec_gen.something import PIDControllerStep
+from motion_spec_gen.ir_gen.translators import PIDControllerTranslator
 
 
 def main():
@@ -62,10 +63,18 @@ def main():
             for step in steps:
                 step().emit(g, qb[0]["controller"])
 
-    # add prefix for the graph
-    
+            # intermediate representation generator
+            ir = PIDControllerTranslator().translate(g, qb[0]["controller"])
 
-    print(g.serialize(format="turtle"))
+            print(json.dumps(ir, indent=2))
+            
+
+    # print(g.serialize(format="turtle"))
+
+    # print("==" * 20)
+
+    
+    
 
 
 

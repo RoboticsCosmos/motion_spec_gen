@@ -1,5 +1,5 @@
 from motion_spec_gen.namespaces import (
-    CONTROLLER,
+    PIDController,
     THRESHOLD,
     CONSTRAINT,
     CONTROLLER_OUTPUT,
@@ -8,16 +8,16 @@ import rdflib
 from rdflib.collection import Collection
 
 
-class PIDController:
+class PIDControllerTranslator:
 
-    def to_json(self, g: rdflib.Graph, node) -> dict:
+    def translate(self, g: rdflib.Graph, node) -> dict:
 
-        p_gain = g.value(node, CONTROLLER["p-gain"])
-        i_gain = g.value(node, CONTROLLER["i-gain"])
-        d_gain = g.value(node, CONTROLLER["d-gain"])
-        time_step = g.value(node, CONTROLLER["time-step"])
+        p_gain = g.value(node, PIDController["p-gain"])
+        i_gain = g.value(node, PIDController["i-gain"])
+        d_gain = g.value(node, PIDController["d-gain"])
+        time_step = g.value(node, PIDController["time-step"])
 
-        constraint = g.value(node, CONTROLLER["constraint"])
+        constraint = g.value(node, PIDController.constraint)
         threshold = g.value(constraint, CONSTRAINT["threshold"])
         threshold_value = g.value(threshold, THRESHOLD["threshold-value"])
 
@@ -34,7 +34,7 @@ class PIDController:
             state["last_error"] = [0.0]  # TODO: should depend on constraint
 
         # controller output
-        output = g.value(node, CONTROLLER.output)
+        output = g.value(node, PIDController.output)
 
         if output is None:
             raise ValueError("Controller output is not defined")
