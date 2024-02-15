@@ -7,23 +7,38 @@ from motion_spec_gen.namespaces import (
     CONSTRAINT,
     GEOM_COORD,
     ACHD_SOLVER,
-    CONTROLLER_OUTPUT,
+    EMBED_MAP,
 )
 
-vector_type_to_num = {
-    GEOM_COORD.VectorX: [1, 0, 0],
-    GEOM_COORD.VectorY: [0, 1, 0],
-    GEOM_COORD.VectorZ: [0, 0, 1],
-    GEOM_COORD.VectorXY: [1, 1, 0],
-    GEOM_COORD.VectorXZ: [1, 0, 1],
-    GEOM_COORD.VectorYZ: [0, 1, 1],
-    GEOM_COORD.VectorXYZ: [1, 1, 1],
+vector_components = {
+    "X": (1, 0, 0),
+    "Y": (0, 1, 0),
+    "Z": (0, 0, 1),
+    "XY": (1, 1, 0),
+    "XZ": (1, 0, 1),
+    "YZ": (0, 1, 1),
+    "XYZ": (1, 1, 1),
+}
+
+
+linear_vector_type_to_num = {
+    **{
+        getattr(GEOM_COORD, f"LinearVelocityVector{suffix}"): vector
+        for suffix, vector in vector_components.items()
+    }
+}
+
+angular_vector_type_to_num = {
+    **{
+        getattr(GEOM_COORD, f"AngularVelocityVector{suffix}"): vector
+        for suffix, vector in vector_components.items()
+    }
 }
 
 
 class PIDControllerStep:
 
-    def emit(self, g: rdflib.Graph, node) -> dict:
+    def emit(self, g: rdflib.Graph, node: rdflib.URIRef, **kwargs) -> dict:
         """
         Add an output node to the graph for pid controller
         """
@@ -34,61 +49,79 @@ class PIDControllerStep:
 
         output_data = {}
 
-        # chceck if coordinate is of type GEOM_COORD
-        if coordinate.startswith(GEOM_COORD):
+        qname = g.compute_qname(node)
+        prefix = qname[1]
+        name = qname[2]
+
+        # get achd_solver from kwargs
+        achd_solver = kwargs["achd_solver"]
+
+        # TOOD: check for a better way
+        is_geom_coord = (
+            g[coordinate : rdflib.RDF.type : GEOM_COORD.PositionCoordinate]
+            or g[coordinate : rdflib.RDF.type : GEOM_COORD.DistanceCoordinate]
+            or g[coordinate : rdflib.RDF.type : GEOM_COORD.VelocityTwistCoordinate]
+            or g[coordinate : rdflib.RDF.type : GEOM_COORD.AccelerationTwistCoordinate]
+        )
+
+        # *Assumption: one controller signal can be mapped to only one type of output
+        if is_geom_coord:
             # type = AccelerationEnergy
-            output_data["interface_type"] = CONTROLLER_OUTPUT.AccelerationEnergy
+            output_data["output"] = {
+                "type": "output-acceleration-energy",
+                "var_name": rdflib.URIRef(f"{prefix}{name}_output_acceleration_energy"),
+            }
+
+            g.add(
+                (
+                    achd_solver,
+                    ACHD_SOLVER["acceleration-energy"],
+                    output_data["output"]["var_name"],
+                )
+            )
 
         else:
             # type = ExternalWrench
-            output_data["interface_type"] = CONTROLLER_OUTPUT.ExternalWrench
+            output_data["output"] = {
+                "type": "output-external-wrench",
+                "var_name": rdflib.URIRef(f"{prefix}{name}_output_external_wrench"),
+            }
 
-        for vector_type, vector in vector_type_to_num.items():
+            g.add(
+                (
+                    achd_solver,
+                    ACHD_SOLVER["external-wrench"],
+                    (output_data["output"]["var_name"]),
+                )
+            )
+
+        for vector_type, vector in linear_vector_type_to_num.items():
             if (coordinate, rdflib.RDF.type, vector_type) in g:
                 output_data["vector"] = vector
                 break
 
-        # check linear or angular
-        for type in [
-            GEOM_COORD.LinearVelocityVector,
-            GEOM_COORD.LinearAccelerationVector,
-            GEOM_COORD.PositionCoordinate,
-        ]:
-            if (coordinate, rdflib.RDF.type, type) in g:
-                output_data["coord_type"] = CONTROLLER_OUTPUT.Linear
+        for vector_type, vector in angular_vector_type_to_num.items():
+            if (coordinate, rdflib.RDF.type, vector_type) in g:
+                output_data["vector"] += vector
                 break
 
-        for type in [
-            GEOM_COORD.AngularVelocityVector,
-            GEOM_COORD.AngularAccelerationVector,
-            GEOM_COORD.OrientationCoordinate,
-        ]:
-            if (coordinate, rdflib.RDF.type, type) in g:
-                output_data["coord_type"] = CONTROLLER_OUTPUT.Angular
-                break
-
-        # Assumption: when specified as Pose, Twist, or Wrench alone,
-        # the vector is assumed to be in 6D
-        for type in [
-            GEOM_COORD.PoseCoordinate,
-            GEOM_COORD.VelocityTwistCoordinate,
-            GEOM_COORD.AccelerationTwistCoordinate,
-        ]:
-            if (coordinate, rdflib.RDF.type, type) in g:
-                output_data["vector"] = [1, 1, 1, 1, 1, 1]
-                output_data["coord_type"] = CONTROLLER_OUTPUT["6D"]
-                break
+        signal = g.value(node, PIDController.signal)
 
         # add the output node to the graph
         id_ = rdflib.URIRef(uuid.uuid4().urn)
-        g.add((id_, rdflib.RDF.type, CONTROLLER_OUTPUT.ControllerOutput))
-        g.add((id_, rdflib.RDF.type, output_data["coord_type"]))
-        g.add((id_, rdflib.RDF.type, output_data["interface_type"]))
+        g.add((id_, rdflib.RDF.type, EMBED_MAP.EmbeddingMap))
         # add vector as a collection
         vector_collection = rdflib.BNode()
         l = [rdflib.Literal(i) for i in output_data["vector"]]
         Collection(g, vector_collection, l)
-        g.add((id_, CONTROLLER_OUTPUT.vector, vector_collection))
-
-        # add the output node to the controller node
-        g.add((node, PIDController.output, id_))
+        g.add((id_, EMBED_MAP.vector, vector_collection))
+        # add input
+        g.add((id_, EMBED_MAP.input, signal))
+        # add the output data
+        g.add(
+            (
+                id_,
+                EMBED_MAP[output_data["output"]["type"]],
+                output_data["output"]["var_name"],
+            )
+        )

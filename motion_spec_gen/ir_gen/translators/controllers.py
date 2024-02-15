@@ -2,59 +2,93 @@ from motion_spec_gen.namespaces import (
     PIDController,
     THRESHOLD,
     CONSTRAINT,
-    CONTROLLER_OUTPUT,
+    EMBED_MAP,
 )
 import rdflib
 from rdflib.collection import Collection
+
+from motion_spec_gen.ir_gen.translators.coordinates import CoordinatesTranslator
 
 
 class PIDControllerTranslator:
 
     def translate(self, g: rdflib.Graph, node) -> dict:
 
+        state = []
+        variables = []
+
+        id = g.compute_qname(node)[2]
+
         p_gain = g.value(node, PIDController["p-gain"])
         i_gain = g.value(node, PIDController["i-gain"])
         d_gain = g.value(node, PIDController["d-gain"])
         time_step = g.value(node, PIDController["time-step"])
 
+        signal = g.value(node, PIDController.signal)
+
+        # find a embedded_map associated with the signal
+        for s in g.subjects(EMBED_MAP.input, signal):
+            embedded_map = s
+
+        embed_map_vector_collec = g.value(embedded_map, EMBED_MAP.vector)
+        embed_map_vector = list(Collection(g, embed_map_vector_collec))
+        embed_map_vector = [float(q) for q in embed_map_vector]
+
+        # append singal to variables
+        variables.append(
+            {
+                "type": f"Vector{len(embed_map_vector)}",
+                "name": g.compute_qname(signal)[2],
+            }
+        )
+
         constraint = g.value(node, PIDController.constraint)
         threshold = g.value(constraint, CONSTRAINT["threshold"])
         threshold_value = g.value(threshold, THRESHOLD["threshold-value"])
 
+        coord = g.value(constraint, CONSTRAINT.coordinate)
+        coord_trans_ir = CoordinatesTranslator().translate(g, coord)
+        # extend state and variables with the ones from coord
+        state.extend(coord_trans_ir["state"])
+        variables.extend(coord_trans_ir["variables"])
+
         # skip any of p, i and d gains if they are not present
         gains = {}
-        state = {}
+        state = []
+        controller_type = []
         if p_gain:
-            gains["p"] = p_gain
+            gains["kp"] = p_gain
+            controller_type.append("p_controller")
         if i_gain:
-            gains["i"] = i_gain
-            state["error_sum"] = [0.0]  # TODO: should depend on constraint
+            gains["ki"] = i_gain
+            controller_type.append("i_controller")
+            state.append(
+                {
+                    "type": f"Vector{len(embed_map_vector)}",
+                    "name": f"{id}_error_sum",
+                }
+            )
         if d_gain:
-            gains["d"] = d_gain
-            state["last_error"] = [0.0]  # TODO: should depend on constraint
-
-        # controller output
-        output = g.value(node, PIDController.output)
-
-        if output is None:
-            raise ValueError("Controller output is not defined")
-
-        # get types of output
-        output_types = list(g.objects(output, rdflib.RDF.type))
-        if len(output_types) == 0:
-            raise ValueError("Controller output type is not defined")
-
-        output_vector_collec = g.value(output, CONTROLLER_OUTPUT.vector)
-
-        output_vector_list = list(Collection(g, output_vector_collec))
-        output_vector_list = [float(q) for q in output_vector_list]
+            gains["kd"] = d_gain
+            controller_type.append("d_controller")
+            state.append(
+                {
+                    "type": f"Vector{len(embed_map_vector)}",
+                    "name": "prev_error",
+                }
+            )
 
         return {
-            "type": "PIDController",
-            "timeStep": time_step,
-            "gains": gains if len(gains) > 0 else None,
-            "threshold_value": threshold_value,
+            "data": {
+                "id": id,
+                "type": controller_type,
+                "dt": time_step,
+                "gains": gains if len(gains) > 0 else None,
+                "threshold_value": threshold_value,
+                "current": coord_trans_ir["data"]["velocity-of"],
+                "target": coord_trans_ir["data"]["velocity-wrt"],
+                "signal": g.compute_qname(signal)[2]
+            },
             "state": state if len(state) > 0 else None,
-            "output_types": output_types,
-            "output_vector": output_vector_list,
+            "variables": variables if len(variables) > 0 else None,
         }

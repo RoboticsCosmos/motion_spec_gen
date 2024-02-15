@@ -1,0 +1,12 @@
+
+p_controller(data) ::= <<
+computeProportionalTerm(<data.current>, <data.target>, <data.gains.kp>)
+>>
+
+i_controller(data) ::= <<
+computeIntegralTerm(<data.current>, <data.target>, <data.gains.ki>, <data.dt>, error_sum)
+>>
+
+d_controller(data) ::= <<
+computeDerivativeTerm(<data.current>, <data.target>, <data.gains.kd>, <data.dt>, last_error)
+>>

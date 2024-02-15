@@ -8,7 +8,7 @@ class PIDController(DefinedNamespace):
 
     constraint: URIRef
 
-    output: URIRef
+    signal: URIRef
 
     _extras = [
         "p-gain",
@@ -17,7 +17,9 @@ class PIDController(DefinedNamespace):
         "time-step",
     ]
 
-    _NS = Namespace("https://roboticscosmos.github.io/metamodels/controllers/pid_controller#")
+    _NS = Namespace(
+        "https://roboticscosmos.github.io/metamodels/controllers/pid_controller#"
+    )
 
 
 class THRESHOLD(DefinedNamespace):
@@ -36,6 +38,8 @@ class CONSTRAINT(DefinedNamespace):
     Constraint: URIRef
     DistanceConstraint: URIRef
     VelocityConstraint: URIRef
+    VelocityTwistConstraint: URIRef
+    AccelerationConstraint: URIRef
     ForceConstraint: URIRef
 
     LessThan: URIRef
@@ -50,7 +54,9 @@ class CONSTRAINT(DefinedNamespace):
     operator: URIRef
     coordinate: URIRef
 
-    _NS = Namespace("https://roboticscosmos.github.io/metamodels/relations/constraints#")
+    _NS = Namespace(
+        "https://roboticscosmos.github.io/metamodels/relations/constraints#"
+    )
 
 
 class GEOM_COORD(DefinedNamespace):
@@ -61,21 +67,30 @@ class GEOM_COORD(DefinedNamespace):
     OrientationCoordinate: URIRef
     PoseCoordinate: URIRef
 
+    DistanceCoordinate: URIRef
+
     VelocityTwistCoordinate: URIRef
-    AngularVelocityVector: URIRef
-    LinearVelocityVector: URIRef
+    
+    LinearVelocityVectorX: URIRef
+    LinearVelocityVectorY: URIRef
+    LinearVelocityVectorZ: URIRef
+    LinearVelocityVectorXY: URIRef
+    LinearVelocityVectorXZ: URIRef
+    LinearVelocityVectorYZ: URIRef
+    LinearVelocityVectorXYZ: URIRef
+
+    AngularVelocityVectorX: URIRef
+    AngularVelocityVectorY: URIRef
+    AngularVelocityVectorZ: URIRef
+    AngularVelocityVectorXY: URIRef
+    AngularVelocityVectorXZ: URIRef
+    AngularVelocityVectorYZ: URIRef
+    AngularVelocityVectorXYZ: URIRef
 
     AccelerationTwistCoordinate: URIRef
     AngularAccelerationVector: URIRef
     LinearAccelerationVector: URIRef
 
-    VectorX: URIRef
-    VectorY: URIRef
-    VectorZ: URIRef
-
-    VectorXY: URIRef
-    VectorXZ: URIRef
-    VectorYZ: URIRef
 
     VectorXYZ: URIRef
 
@@ -86,39 +101,75 @@ class GEOM_COORD(DefinedNamespace):
         "linear-velocity",
         "angular-acceleration",
         "linear-acceleration",
+        "as-seen-by",
     ]
 
     _NS = Namespace("https://comp-rob2b.github.io/metamodels/geometry/coordinates#")
+
+
+class GEOM_REL(DefinedNamespace):
+    Pose: URIRef
+
+    EuclideanDistance: URIRef
+    PointToPointDistance: URIRef
+    LinearDistance: URIRef
+    AngularDistance: URIRef
+
+    VelocityTwist: URIRef
+
+    _extras = [
+        "of-entity",
+        "with-respect-to",
+        "between-entities",
+        "reference-point",
+    ]
+
+    _NS = Namespace("https://comp-rob2b.github.io/metamodels/geometry/spatial-relations#")
+
+
+class GEOM_ENT(DefinedNamespace):
+
+    Point: URIRef
+    Frame: URIRef
+
+    origin: URIRef
+
+    _NS = Namespace(
+        "https://comp-rob2b.github.io/metamodels/geometry/structural-entities#"
+    )
 
 
 class ACHD_SOLVER(DefinedNamespace):
 
     VereshchaginSolver: URIRef
 
-    AccelerationEnergy: URIRef
-    ExternalWrench: URIRef
+    _extras = [
+        "root-acceleration",
+        "alpha-constraints",
+        "acceleration-energy",
+        "external-wrench",
+    ]
 
     _NS = Namespace(
         "https://roboticscosmos.github.io/metamodels/solvers/vereshchagin_solver#"
     )
 
 
-class CONTROLLER_OUTPUT(DefinedNamespace):
+class EMBED_MAP(DefinedNamespace):
 
-    ControllerOutput: URIRef
+    EmbeddingMap: URIRef
 
-    AccelerationEnergy: URIRef
-    ExternalWrench: URIRef
-
-    Linear: URIRef
-    Angular: URIRef
+    input: URIRef
 
     vector: URIRef
 
-    _extras = ["6D"]
+    _extras = [
+        "output-external-wrench",
+        "output-acceleration-energy",
+    ]
 
     _NS = Namespace(
-        "https://roboticscosmos.github.io/metamodels/controllers/controller_output#"
+        "https://roboticscosmos.github.io/metamodels/controllers/embedding-map#"
     )
 
 
@@ -126,10 +177,6 @@ class MOTION_SPEC(DefinedNamespace):
 
     MotionSpec: URIRef
 
-    _extras = [
-        "pre-conditions",
-        "per-conditions",
-        "post-conditions"
-    ]
+    _extras = ["pre-conditions", "per-conditions", "post-conditions"]
 
     _NS = Namespace("https://roboticscosmos.github.io/metamodels/motion_specification#")
