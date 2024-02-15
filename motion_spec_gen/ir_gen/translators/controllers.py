@@ -27,8 +27,7 @@ class PIDControllerTranslator:
         signal = g.value(node, PIDController.signal)
 
         # find a embedded_map associated with the signal
-        for s in g.subjects(EMBED_MAP.input, signal):
-            embedded_map = s
+        embedded_map = g.value(predicate=EMBED_MAP.input, object=signal)
 
         embed_map_vector_collec = g.value(embedded_map, EMBED_MAP.vector)
         embed_map_vector = list(Collection(g, embed_map_vector_collec))

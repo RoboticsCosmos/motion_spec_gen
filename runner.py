@@ -54,30 +54,17 @@ def main():
     for motion_spec in g.subjects(rdflib.RDF.type, MOTION_SPEC.MotionSpec):
         per_conditions = g.objects(motion_spec, MOTION_SPEC["per-conditions"])
 
-        query = f"""
-        SELECT ?controller 
-        WHERE {{
-            ?constraint ^pidcontroller:constraint ?controller .
-        }}
-        """
-
         for per_condition in per_conditions:
 
-            init_bindings = {"constraint": per_condition}
-
-            qres = g.query(query, initBindings=init_bindings)
-
-            qb = qres.bindings
-
-            # print('qb:', qb)
-
-            # print(qb[0]['controller'])
+            controller = g.value(
+                predicate=PIDController.constraint, object=per_condition
+            )
 
             for step in steps:
-                step().emit(g, qb[0]["controller"], achd_solver=achd_solver)
+                step().emit(g, controller, achd_solver=achd_solver)
 
             # intermediate representation generator
-            ir = PIDControllerTranslator().translate(g, qb[0]["controller"])
+            ir = PIDControllerTranslator().translate(g, controller)
 
             json_obj = json.dumps(ir, indent=4)
 
