@@ -2,6 +2,7 @@ import uuid
 import rdflib
 from rdflib.collection import Collection
 from motion_spec_gen.namespaces import (
+    Controller,
     PIDController,
     THRESHOLD,
     CONSTRAINT,
@@ -43,7 +44,7 @@ class PIDControllerStep:
         Add an output node to the graph for pid controller
         """
 
-        constraint = g.value(node, PIDController.constraint)
+        constraint = g.value(node, Controller.constraint)
 
         coordinate = g.value(constraint, CONSTRAINT.coordinate)
 
@@ -53,8 +54,9 @@ class PIDControllerStep:
         prefix = qname[1]
         name = qname[2]
 
-        # get achd_solver from kwargs
-        achd_solver = kwargs["achd_solver"]
+        # get solver from embed map
+        embed_map = g.value(predicate=EMBED_MAP.controller, object=node)
+        solver = g.value(embed_map, EMBED_MAP.solver)
 
         # TOOD: check for a better way
         is_geom_coord = (
@@ -74,7 +76,7 @@ class PIDControllerStep:
 
             g.add(
                 (
-                    achd_solver,
+                    solver,
                     ACHD_SOLVER["acceleration-energy"],
                     output_data["output"]["var_name"],
                 )
@@ -89,7 +91,7 @@ class PIDControllerStep:
 
             g.add(
                 (
-                    achd_solver,
+                    solver,
                     ACHD_SOLVER["external-wrench"],
                     (output_data["output"]["var_name"]),
                 )
@@ -105,10 +107,11 @@ class PIDControllerStep:
                 output_data["vector"] += vector
                 break
 
-        signal = g.value(node, PIDController.signal)
+        signal = g.value(node, Controller.signal)
 
         # add the output node to the graph
-        id_ = rdflib.URIRef(uuid.uuid4().urn)
+        # id_ = rdflib.URIRef(uuid.uuid4().urn)
+        id_ = embed_map
         g.add((id_, rdflib.RDF.type, EMBED_MAP.EmbeddingMap))
         # add vector as a collection
         vector_collection = rdflib.BNode()

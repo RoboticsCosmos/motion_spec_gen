@@ -1,4 +1,5 @@
 from motion_spec_gen.namespaces import (
+    Controller,
     PIDController,
     THRESHOLD,
     CONSTRAINT,
@@ -14,8 +15,8 @@ class PIDControllerTranslator:
 
     def translate(self, g: rdflib.Graph, node) -> dict:
 
-        state = []
-        variables = []
+        state = {}
+        variables = {}
 
         id = g.compute_qname(node)[2]
 
@@ -24,7 +25,7 @@ class PIDControllerTranslator:
         d_gain = g.value(node, PIDController["d-gain"])
         time_step = g.value(node, PIDController["time-step"])
 
-        signal = g.value(node, PIDController.signal)
+        signal = g.value(node, Controller.signal)
 
         # find a embedded_map associated with the signal
         embedded_map = g.value(predicate=EMBED_MAP.input, object=signal)
@@ -33,61 +34,106 @@ class PIDControllerTranslator:
         embed_map_vector = list(Collection(g, embed_map_vector_collec))
         embed_map_vector = [float(q) for q in embed_map_vector]
 
-        # append singal to variables
-        variables.append(
-            {
-                "type": f"Vector{len(embed_map_vector)}",
-                "name": g.compute_qname(signal)[2],
-            }
-        )
+        # append signal to variables
+        variables[g.compute_qname(signal)[2]] = {
+            "type": "array",
+            "size": len(embed_map_vector),
+            "dtype": "double",
+            "value": None,
+        }
 
-        constraint = g.value(node, PIDController.constraint)
+        constraint = g.value(node, Controller.constraint)
         threshold = g.value(constraint, CONSTRAINT["threshold"])
         threshold_value = g.value(threshold, THRESHOLD["threshold-value"])
 
         coord = g.value(constraint, CONSTRAINT.coordinate)
-        coord_trans_ir = CoordinatesTranslator().translate(g, coord)
+        coord_trans_ir = CoordinatesTranslator().translate(g, coord, prefix=id)
         # extend state and variables with the ones from coord
-        state.extend(coord_trans_ir["state"])
-        variables.extend(coord_trans_ir["variables"])
+        state.update(coord_trans_ir["state"])
+        variables.update(coord_trans_ir["variables"])
+
+        # time-step
+        variables[f"{id}_time_step"] = {
+            "type": None,
+            "dtype": "double",
+            "value": time_step,
+        }
+
+        # threshold value
+        variables[f"{id}_threshold_value"] = {
+            "type": None,
+            "dtype": "double",
+            "value": threshold_value,
+        }
 
         # skip any of p, i and d gains if they are not present
-        gains = {}
-        state = []
-        controller_type = []
+        gains = {
+            "kp": None,
+            "ki": None,
+            "kd": None,
+        }
+        error_sum = None
+        prev_error = None
         if p_gain:
-            gains["kp"] = p_gain
-            controller_type.append("p_controller")
+            variables[f'{id}_kp'] = {
+                "type": None,
+                "dtype": "double",
+                "value": p_gain,
+            }
+            gains["kp"] = f'{id}_kp'
         if i_gain:
-            gains["ki"] = i_gain
-            controller_type.append("i_controller")
-            state.append(
-                {
-                    "type": f"Vector{len(embed_map_vector)}",
-                    "name": f"{id}_error_sum",
-                }
-            )
+            variables[f'{id}_ki'] = {
+                "type": None,
+                "dtype": "double",
+                "value": i_gain,
+            }
+            gains["ki"] = f'{id}_ki'
+            error_sum = f"{id}_error_sum"
+            variables[error_sum] = {
+                "type": "array",
+                "size": len(embed_map_vector),
+                "dtype": "double",
+                "value": None,
+            }
+
         if d_gain:
-            gains["kd"] = d_gain
-            controller_type.append("d_controller")
-            state.append(
-                {
-                    "type": f"Vector{len(embed_map_vector)}",
-                    "name": "prev_error",
-                }
-            )
+            variables[f'{id}_kd'] = {
+                "type": None,
+                "dtype": "double",
+                "value": d_gain,
+            }
+            gains["kd"] = f'{id}_kd'
+            prev_error = f"{id}_prev_error"
+            variables[prev_error] = {
+                "type": "array",
+                "size": len(embed_map_vector),
+                "dtype": "double",
+                "value": None,
+            }
+
+        # vector
+        vector_id = f'{g.compute_qname(embedded_map)[2]}_vector'
+        variables[vector_id] = {
+            "type": "array",
+            "size": len(embed_map_vector),
+            "dtype": "double",
+            "value": embed_map_vector,
+        }
 
         return {
+            "id": id,
             "data": {
-                "id": id,
-                "type": controller_type,
-                "dt": time_step,
+                "name": "pid_controller",
+                "dt": f'{id}_time_step',
                 "gains": gains if len(gains) > 0 else None,
-                "threshold_value": threshold_value,
-                "current": coord_trans_ir["data"]["velocity-of"],
-                "target": coord_trans_ir["data"]["velocity-wrt"],
-                "signal": g.compute_qname(signal)[2]
+                "threshold_value": f"{id}_threshold_value",
+                "measured": coord_trans_ir["data"]["of"],
+                "setpoint": coord_trans_ir["data"]["sp"],
+                "signal": g.compute_qname(signal)[2],
+                "vector": vector_id,
+                "error_sum": error_sum,
+                "last_error": prev_error,
             },
-            "state": state if len(state) > 0 else None,
-            "variables": variables if len(variables) > 0 else None,
+            "state": state,
+            "variables": variables,
         }

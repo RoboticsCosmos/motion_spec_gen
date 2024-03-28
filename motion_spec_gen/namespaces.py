@@ -2,13 +2,30 @@ from rdflib.namespace import DefinedNamespace, Namespace
 from rdflib.term import URIRef
 
 
-class PIDController(DefinedNamespace):
+class Monitor(DefinedNamespace):
 
-    PIDController: URIRef
+    Monitor: URIRef
 
     constraint: URIRef
 
+    _NS = Namespace("https://roboticscosmos.github.io/metamodels/monitors/monitor#")
+
+
+class Controller(DefinedNamespace):
+
+    Controller: URIRef
+
+    constraint: URIRef
     signal: URIRef
+
+    _NS = Namespace(
+        "https://roboticscosmos.github.io/metamodels/controllers/controller#"
+    )
+
+
+class PIDController(DefinedNamespace):
+
+    PIDController: URIRef
 
     _extras = [
         "p-gain",
@@ -70,7 +87,7 @@ class GEOM_COORD(DefinedNamespace):
     DistanceCoordinate: URIRef
 
     VelocityTwistCoordinate: URIRef
-    
+
     LinearVelocityVectorX: URIRef
     LinearVelocityVectorY: URIRef
     LinearVelocityVectorZ: URIRef
@@ -90,7 +107,6 @@ class GEOM_COORD(DefinedNamespace):
     AccelerationTwistCoordinate: URIRef
     AngularAccelerationVector: URIRef
     LinearAccelerationVector: URIRef
-
 
     VectorXYZ: URIRef
 
@@ -124,7 +140,9 @@ class GEOM_REL(DefinedNamespace):
         "reference-point",
     ]
 
-    _NS = Namespace("https://comp-rob2b.github.io/metamodels/geometry/spatial-relations#")
+    _NS = Namespace(
+        "https://comp-rob2b.github.io/metamodels/geometry/spatial-relations#"
+    )
 
 
 class GEOM_ENT(DefinedNamespace):
@@ -137,6 +155,13 @@ class GEOM_ENT(DefinedNamespace):
     _NS = Namespace(
         "https://comp-rob2b.github.io/metamodels/geometry/structural-entities#"
     )
+
+
+class SOLVER(DefinedNamespace):
+
+    Solver: URIRef
+
+    _NS = Namespace("https://roboticscosmos.github.io/metamodels/solvers/solver#")
 
 
 class ACHD_SOLVER(DefinedNamespace):
@@ -159,8 +184,9 @@ class EMBED_MAP(DefinedNamespace):
 
     EmbeddingMap: URIRef
 
+    controller: URIRef
+    solver: URIRef
     input: URIRef
-
     vector: URIRef
 
     _extras = [

@@ -1,13 +1,25 @@
 import os
 import json
+import pprint
 import rdflib
 
 from motion_spec_gen.utility import resolver, loader
 
-from motion_spec_gen.namespaces import MOTION_SPEC, EMBED_MAP, PIDController
+from motion_spec_gen.namespaces import (
+    MOTION_SPEC,
+    EMBED_MAP,
+    Controller,
+    Monitor,
+    SOLVER,
+)
 
 from motion_spec_gen.something import PIDControllerStep
-from motion_spec_gen.ir_gen.translators import PIDControllerTranslator
+from motion_spec_gen.ir_gen.translators import (
+    MonitorTranslator,
+    PIDControllerTranslator,
+    EmbedMapTranslator,
+    SolverTranslator,
+)
 
 
 def main():
@@ -37,46 +49,107 @@ def main():
 
     print("--" * 20)
 
-    query = f"""
-    SELECT ?achd_solver
-    WHERE {{
-        ?achd_solver a vereshchaginSolver:VereshchaginSolver .
-    }}
-    """
-
-    qres = g.query(query)
-    qb = qres.bindings
-
-    achd_solver = qb[0]["achd_solver"]
-
     steps = [PIDControllerStep]
 
+    data = {
+        "state": {},
+        "variables": {},
+        "d": {
+            "monitors": {
+                "pre": {},
+                "post": {},
+            },
+            "controllers": {},
+            "embed_maps": {},
+            "solvers": {},
+        },
+    }
+
     for motion_spec in g.subjects(rdflib.RDF.type, MOTION_SPEC.MotionSpec):
+        pre_conditions = g.objects(motion_spec, MOTION_SPEC["pre-conditions"])
         per_conditions = g.objects(motion_spec, MOTION_SPEC["per-conditions"])
+        post_conditions = g.objects(motion_spec, MOTION_SPEC["post-conditions"])
+
+        for pre_condition in pre_conditions:
+
+            monitor = g.value(predicate=Monitor.constraint, object=pre_condition)
+
+            ir = MonitorTranslator().translate(g, monitor)
+
+            ir["data"]["name"] = "monitor_pre"
+            ir["data"]["return"] = None
+
+            data["state"].update(ir["state"])
+            data["variables"].update(ir["variables"])
+            data["d"]["monitors"]["pre"][ir["id"]] = ir["data"]
 
         for per_condition in per_conditions:
 
-            controller = g.value(
-                predicate=PIDController.constraint, object=per_condition
-            )
+            controller = g.value(predicate=Controller.constraint, object=per_condition)
 
             for step in steps:
-                step().emit(g, controller, achd_solver=achd_solver)
+                # apply steps to suitable controller
+                step().emit(g, controller)
 
             # intermediate representation generator
             ir = PIDControllerTranslator().translate(g, controller)
 
-            json_obj = json.dumps(ir, indent=4)
+            data["state"].update(ir["state"])
+            data["variables"].update(ir["variables"])
+            data["d"]["controllers"][ir["id"]] = ir["data"]
 
-            print(json_obj)
+            embed_map = g.value(predicate=EMBED_MAP.controller, object=controller)
+            embed_map_ir = EmbedMapTranslator().translate(g, embed_map)
 
-            # write to file
-            # with open("pid_controller.json", "w") as f:
-            #     f.write(json_obj)
+            data["d"]["embed_maps"][embed_map_ir["id"]] = (
+                [embed_map_ir["data"]]
+                if embed_map_ir["id"] not in data["d"]["embed_maps"]
+                else data["d"]["embed_maps"][embed_map_ir["id"]]
+                + [embed_map_ir["data"]]
+            )
+            data["variables"].update(embed_map_ir["variables"])
+            data["state"].update(embed_map_ir["state"])
 
-    # print(g.serialize(format="turtle"))
+        # get solvers
+        solvers = g.subjects(rdflib.RDF.type, SOLVER.Solver)
 
-    # print("==" * 20)
+        for solver in solvers:
+            # solver translator
+            solver_ir = SolverTranslator().translate(
+                g,
+                solver,
+                embed_maps=data["d"]["embed_maps"],
+                variables=data["variables"],
+            )
+
+            data["state"].update(solver_ir["state"])
+            data["variables"].update(solver_ir["variables"])
+            data["d"]["solvers"][solver_ir["id"]] = solver_ir["data"]
+
+        for post_condition in post_conditions:
+
+            monitor = g.value(predicate=Monitor.constraint, object=post_condition)
+
+            ir = MonitorTranslator().translate(g, monitor)
+
+            ir["data"]["name"] = "monitor_post"
+            ir["data"]["return"] = None
+
+            data["state"].update(ir["state"])
+            data["variables"].update(ir["variables"])
+            data["d"]["monitors"]["post"][ir["id"]] = ir["data"]
+
+    print(g.serialize(format="turtle"))
+
+    print("--" * 20)
+
+    json_obj = json.dumps(data, indent=2)
+
+    # print(json_obj)
+
+    # write to file
+    with open("ir.json", "w") as f:
+        f.write(json_obj)
 
 
 if __name__ == "__main__":
