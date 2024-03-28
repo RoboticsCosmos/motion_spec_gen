@@ -1,0 +1,24 @@
+data_type ::= [
+  "vector3": "KDL::Vector",
+  "vector6": "KDL::Twist",
+  "array": "std::array",
+  "vector": "std::vector",
+  "default": "auto"
+]
+
+variables_init(id, data) ::= <<
+<if(data.type)><({<data.type>})(id, data)><else><non_array(id, data)><endif>
+>>
+
+array(name, data) ::= <<
+  std::array\<<data.dtype>, <data.size>\> <name><if(data.value)> = { <data.value: {val | <val>}; separator=","> }<endif>;
+>>
+
+array_2d(name, data) ::= <<
+  std::array\<std::array\<<data.dtype>, <data.dim>\>, <data.size>\> <name><if(data.value)> = { <data.value: {val | { <val: {v | <v>}; separator=","> \}}; separator=", "> \}<endif>;
+>>
+
+non_array(name, data) ::= <<
+  <data.dtype> <name><if(data.value)> = <data.value><endif>;
+>>
+

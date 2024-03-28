@@ -1,0 +1,8 @@
+
+motion_spec_include() ::= <<
+
+>>
+
+controller_include() ::= <<
+#include \<controllers/pid_controller.hpp>
+>>

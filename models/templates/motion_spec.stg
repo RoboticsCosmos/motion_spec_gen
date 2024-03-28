@@ -1,20 +1,23 @@
+import "includes.stg"
+import "data_type.stg"
 import "pid_controller.stg"
 
-application(variables, state) ::= <<
+
+
+application(variables, state, d) ::= <<
+
+<motion_spec_include()>
+<controller_include()>
 
 int main()
 {
 
-  <variables: {v | <v.type> <v.name><if(v.value)> = <v.value><endif>; }>
-
-  struct State {
-    <state: {s | <s.type> <s.name><if(s.value)> = <s.value><endif>;}; separator="\n">
-  };
+<variables: {v | <variables_init(v, variables.(v))> }; separator="\n">
 
   while (true) {
 
     <! controllers !>
-    <data.output> = <type: {t | <({<t>})(data)>}; separator=" + ">;
+    <d.controllers: {v | <({<d.controllers.(v).name>})(d.controllers.(v))>}; separator="\n">
   }
 
   return 0;
