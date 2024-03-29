@@ -30,6 +30,12 @@ class MonitorTranslator:
         state.update(coord_trans_ir["state"])
         variables.update(coord_trans_ir["variables"])
 
+        coord_type = coord_trans_ir["data"]["type"]
+
+        
+        if coord_type == "VelocityTwist":
+            measure_variable = "computeForwardVelocityKinematics"
+
         variables[f"{id}_threshold_value"] = {
             "type": None,
             "dtype": "double",
@@ -46,6 +52,7 @@ class MonitorTranslator:
         return {
             "id": id,
             "data": {
+                "measure_variable": measure_variable,
                 "operator": g.compute_qname(operator)[2],
                 "threshold_value": f"{id}_threshold_value",
                 "measured": coord_trans_ir["data"]["of"],

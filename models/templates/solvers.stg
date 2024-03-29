@@ -1,0 +1,10 @@
+achd_solver(data) ::= <<
+// solver beta
+std::array\<double, 6> beta;
+// solver ext_wrench
+std::array\<std::array\<double, 6>, <data.ns>\> ext_wrench;
+
+<data.beta: {b | add(<b>, beta, beta);}; separator="\n">
+
+achd_solver(&rob, &robot_chain, <data.nc>, <data.root_acceleration>, <data.alpha>, beta, ext_wrench, <data.tau_ff>, <data.predicted_accelerations>, <data.output_torques>);
+>>

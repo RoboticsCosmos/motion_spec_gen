@@ -24,14 +24,12 @@ class EmbedMapTranslator:
         em_output_ae = g.value(node, EMBED_MAP["output-acceleration-energy"])
         em_output_ew = g.value(node, EMBED_MAP["output-external-wrench"])
 
-        output = {
-            "acceleration-energy": (
-                g.compute_qname(em_output_ae)[2] if em_output_ae else None
-            ),
-            "external-wrench": (
-                g.compute_qname(em_output_ew)[2] if em_output_ew else None
-            ),
-        }
+        if em_output_ae:
+            output = g.compute_qname(em_output_ae)[2]
+            output_type = "acceleration-energy"
+        elif em_output_ew:
+            output = g.compute_qname(em_output_ew)[2]
+            output_type = "external-wrench"
 
         embed_map_vector_collec = g.value(node, EMBED_MAP.vector)
         embed_map_vector = list(Collection(g, embed_map_vector_collec))
@@ -52,6 +50,7 @@ class EmbedMapTranslator:
                 "name": "embed_map",
                 "input": g.compute_qname(em_input)[2],
                 "output": output,
+                "output_type": output_type,
                 "vector": vector_id,
                 "return": None,
             },

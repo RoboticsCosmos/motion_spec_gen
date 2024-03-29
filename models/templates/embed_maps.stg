@@ -1,0 +1,14 @@
+
+embed_maps(data) ::= <<
+<data: {m | <embed_mapping(m)>}>
+>> 
+
+embed_mapping(data) ::= <<
+for (size_t i = 0; i \< <data.vector>.size(); i++)
+{
+  if (<data.vector>[i] == 1.0)
+  {
+    <data.output>[i] += <data.input>[i];
+  }
+}
+>>

@@ -4,7 +4,8 @@ from motion_spec_gen.namespaces import (
     THRESHOLD,
     CONSTRAINT,
     EMBED_MAP,
-    ACHD_SOLVER
+    ACHD_SOLVER,
+    SOLVER,
 )
 import rdflib
 from rdflib.collection import Collection
@@ -29,8 +30,20 @@ class SolverTranslator:
         # get embed maps for this solver
         embed_maps_for_solver = embed_maps[id]
 
+        # root acceleration
+        root_acc_vector_collec = g.value(node, SOLVER["root-acceleration"])
+        root_acc_vector = list(Collection(g, root_acc_vector_collec))
+        root_acc_vector = [float(q) for q in root_acc_vector]
+
+        variables[f"{id}_root_acceleration"] = {
+            "type": "array",
+            "size": 6,
+            "dtype": "double",
+            "value": root_acc_vector,
+        }
+
         # achd solver
-        if (g[node : rdflib.RDF.type : ACHD_SOLVER.VereshchaginSolver]):
+        if g[node : rdflib.RDF.type : ACHD_SOLVER.VereshchaginSolver]:
 
             alpha = np.array([])
             beta = []
@@ -48,7 +61,7 @@ class SolverTranslator:
 
                 # remove zero columns
                 local_alpha = local_alpha[:, ~np.all(local_alpha == 0, axis=0)]
-                
+
                 if alpha.size == 0:
                     alpha = local_alpha
                 else:
@@ -57,104 +70,84 @@ class SolverTranslator:
                 # output
                 output = embed_map["output"]
 
-                if output["acceleration-energy"]:
-                    variables[output["acceleration-energy"]] = {
+                if embed_map["output_type"] == "acceleration-energy":
+                    variables[embed_map["output"]] = {
                         "type": "array",
                         "size": 6,
                         "dtype": "double",
-                        "value": None
+                        "value": None,
                     }
-                    beta += [output["acceleration-energy"]]
-                
-                if output["external-wrench"]:
+                    beta += [embed_map["output"]]
+
+                if embed_map["output_type"] == "external-wrench":
                     pass
-                    
+
             nc = alpha.shape[1]
 
             # num of joints TODO: get from the robot model
             nj = 7
+            ns = 8
 
             # solver variables
             # number of constraints
-            variables[f'{id}_nc'] = {
-                "type": None,
-                "dtype": "int",
-                "value": nc
-            }
+            variables[f"{id}_nc"] = {"type": None, "dtype": "int", "value": nc}
             # number of joints
-            variables[f'{id}_nj'] = {
-                "type": None,
-                "dtype": "int",
-                "value": nj
-            }
+            variables[f"{id}_nj"] = {"type": None, "dtype": "int", "value": nj}
+            # number of segments
+            variables[f"{id}_ns"] = {"type": None, "dtype": "int", "value": ns}
             # alpha matrix
-            variables[f'{id}_alpha'] = {
+            variables[f"{id}_alpha"] = {
                 "type": "array_2d",
                 "size": 6,
                 "dim": 2,
                 "dtype": "double",
-                "value": alpha.tolist()
-            }
-            # joint positions
-            variables[f'{id}_joint_positions'] = {
-                "type": "array",
-                "size": nj,
-                "dim": 1,
-                "dtype": "double",
-                "value": None
-            }
-            # joint velocities
-            variables[f'{id}_joint_velocities'] = {
-                "type": "array",
-                "size": nj,
-                "dim": 1,
-                "dtype": "double",
-                "value": None
+                "value": alpha.tolist(),
             }
             # feed forward torques
-            variables[f'{id}_feed_forward_torques'] = {
+            variables[f"{id}_feed_forward_torques"] = {
                 "type": "array",
                 "size": nj,
                 "dim": 1,
                 "dtype": "double",
-                "value": None
+                "value": None,
             }
 
             # output variables
             # predicted joint accelerations
-            variables[f'{id}_joint_accelerations'] = {
+            variables[f"{id}_predicted_accelerations"] = {
                 "type": "array",
                 "size": nj,
                 "dim": 1,
                 "dtype": "double",
-                "value": None
+                "value": None,
             }
             # output constraint torques
-            variables[f'{id}_output_torques'] = {
+            variables[f"{id}_output_torques"] = {
                 "type": "array",
                 "size": nj,
                 "dim": 1,
                 "dtype": "double",
-                "value": None
+                "value": None,
+            }
+
+            data = {
+                "name": "achd_solver",
+                "root_acceleration": f"{id}_root_acceleration",
+                "alpha": f"{id}_alpha",
+                "beta": beta,
+                "ext_wrench": ext_wrench,
+                "nc": f"{id}_nc",
+                "nj": f"{id}_nj",
+                "ns": f"{id}_ns",
+                "tau_ff": f"{id}_feed_forward_torques",
+                "output_torques": f"{id}_output_torques",
+                "predicted_accelerations": f"{id}_predicted_accelerations",
+                "return": None,
             }
 
         return {
             "id": id,
-            "data": {
-                "name": "vereshchagin_solver",
-                "alpha": f'{id}_alpha',
-                "beta": beta,
-                "ext_wrench": ext_wrench,
-                "nc": f'{id}_nc',
-                "nj": f'{id}_nj',
-                "q": f'{id}_joint_positions',
-                "qdot": f'{id}_joint_velocities',
-                "tau_ff": f'{id}_feed_forward_torques',
-                "output_torques": f'{id}_output_torques',
-                "predicted_accelerations": f'{id}_predicted_accelerations',
-                "return": None,
-            },
+            "data": data,
             "state": state,
             "variables": variables,
         }
-        

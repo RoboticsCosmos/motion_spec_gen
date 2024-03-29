@@ -110,6 +110,11 @@ def main():
             data["variables"].update(embed_map_ir["variables"])
             data["state"].update(embed_map_ir["state"])
 
+        # command torques
+        command_torques = []
+        # predicted accelerations
+        predicted_accelerations = []
+
         # get solvers
         solvers = g.subjects(rdflib.RDF.type, SOLVER.Solver)
 
@@ -125,6 +130,20 @@ def main():
             data["state"].update(solver_ir["state"])
             data["variables"].update(solver_ir["variables"])
             data["d"]["solvers"][solver_ir["id"]] = solver_ir["data"]
+
+            command_torques.append(solver_ir["data"]["output_torques"])
+            predicted_accelerations.append(solver_ir["data"]["predicted_accelerations"])
+
+        data["d"]["commands"] = {
+            "torques": {
+                "name": "command_torques",
+                "data": command_torques,
+            },
+            "accelerations": {
+                "name": "command_accelerations",
+                "data": predicted_accelerations,
+            },
+        }
 
         for post_condition in post_conditions:
 
@@ -145,10 +164,9 @@ def main():
 
     json_obj = json.dumps(data, indent=2)
 
-    # print(json_obj)
-
     # write to file
-    with open("ir.json", "w") as f:
+    file_path = os.path.join(os.path.dirname(__file__), "irs", "ir.json")
+    with open(file_path, "w") as f:
         f.write(json_obj)
 
 

@@ -1,0 +1,52 @@
+import "kdl.stg"
+
+monitor_pre(data) ::= <<
+// measure the variable
+<measure_variable(data)>
+
+for (size_t i = 0; i \< <data.measured.id>.size(); i++)
+{
+  // compare
+  compare(<data.measured.id>[i], <data.setpoint>[i], <data.threshold_value>, <data.operator>, <data.flag>);
+
+  // check if the flag is set
+  if (<data.flag>)
+  {
+    // break the loop
+    break;
+  }
+}
+
+// stop the execution if the flag is set
+if (<data.flag>)
+{
+  return -1;
+}
+
+>>
+
+monitor_post(data) ::= <<
+// measure the variable
+<measure_variable(data)>
+
+for (size_t i = 0; i \< <data.measured.id>.size(); i++)
+{
+  // compare
+  compare(<data.measured.id>[i], <data.setpoint>[i], <data.threshold_value>, <data.operator>, <data.flag>);
+
+  // check if the flag is set
+  if (<data.flag>)
+  {
+    // break the loop
+    break;
+  }
+}
+
+// break the system loop if the flag is set
+if (<data.flag>)
+{
+  // break the loop
+  break;
+}
+
+>>

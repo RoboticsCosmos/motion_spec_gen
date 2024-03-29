@@ -161,6 +161,10 @@ class SOLVER(DefinedNamespace):
 
     Solver: URIRef
 
+    _extras = [
+        "root-acceleration",
+    ]
+
     _NS = Namespace("https://roboticscosmos.github.io/metamodels/solvers/solver#")
 
 
@@ -169,7 +173,6 @@ class ACHD_SOLVER(DefinedNamespace):
     VereshchaginSolver: URIRef
 
     _extras = [
-        "root-acceleration",
         "alpha-constraints",
         "acceleration-energy",
         "external-wrench",

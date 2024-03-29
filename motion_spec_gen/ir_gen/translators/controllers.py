@@ -52,6 +52,12 @@ class PIDControllerTranslator:
         state.update(coord_trans_ir["state"])
         variables.update(coord_trans_ir["variables"])
 
+        coord_type = coord_trans_ir["data"]["type"]
+
+        
+        if coord_type == "VelocityTwist":
+            measure_variable = "computeForwardVelocityKinematics"
+
         # time-step
         variables[f"{id}_time_step"] = {
             "type": None,
@@ -67,52 +73,51 @@ class PIDControllerTranslator:
         }
 
         # skip any of p, i and d gains if they are not present
-        gains = {
-            "kp": None,
-            "ki": None,
-            "kd": None,
+        variables[f"{id}_kp"] = {
+            "type": None,
+            "dtype": "double",
+            "value": 0.0,
         }
-        error_sum = None
-        prev_error = None
-        if p_gain:
-            variables[f'{id}_kp'] = {
-                "type": None,
-                "dtype": "double",
-                "value": p_gain,
-            }
-            gains["kp"] = f'{id}_kp'
-        if i_gain:
-            variables[f'{id}_ki'] = {
-                "type": None,
-                "dtype": "double",
-                "value": i_gain,
-            }
-            gains["ki"] = f'{id}_ki'
-            error_sum = f"{id}_error_sum"
-            variables[error_sum] = {
-                "type": "array",
-                "size": len(embed_map_vector),
-                "dtype": "double",
-                "value": None,
-            }
+        variables[f"{id}_ki"] = {
+            "type": None,
+            "dtype": "double",
+            "value": 0.0,
+        }
+        variables[f"{id}_kd"] = {
+            "type": None,
+            "dtype": "double",
+            "value": 0.0,
+        }
 
+        variables[f"{id}_error_sum"] = {
+            "type": "array",
+            "size": len(embed_map_vector),
+            "dtype": "double",
+            "value": None,
+        }
+
+        variables[f"{id}_prev_error"] = {
+            "type": "array",
+            "size": len(embed_map_vector),
+            "dtype": "double",
+            "value": None,
+        }
+
+        gains = {
+            "kp": f"{id}_kp",
+            "ki": f"{id}_ki",
+            "kd": f"{id}_kd",
+        }
+
+        if p_gain:
+            variables[f"{id}_kp"]["value"] = p_gain
+        if i_gain:
+            variables[f"{id}_ki"]["value"] = i_gain
         if d_gain:
-            variables[f'{id}_kd'] = {
-                "type": None,
-                "dtype": "double",
-                "value": d_gain,
-            }
-            gains["kd"] = f'{id}_kd'
-            prev_error = f"{id}_prev_error"
-            variables[prev_error] = {
-                "type": "array",
-                "size": len(embed_map_vector),
-                "dtype": "double",
-                "value": None,
-            }
+            variables[f"{id}_kd"]["value"] = d_gain
 
         # vector
-        vector_id = f'{g.compute_qname(embedded_map)[2]}_vector'
+        vector_id = f"{g.compute_qname(embedded_map)[2]}_vector"
         variables[vector_id] = {
             "type": "array",
             "size": len(embed_map_vector),
@@ -124,15 +129,16 @@ class PIDControllerTranslator:
             "id": id,
             "data": {
                 "name": "pid_controller",
-                "dt": f'{id}_time_step',
+                "measure_variable": measure_variable,
+                "dt": f"{id}_time_step",
                 "gains": gains if len(gains) > 0 else None,
                 "threshold_value": f"{id}_threshold_value",
                 "measured": coord_trans_ir["data"]["of"],
                 "setpoint": coord_trans_ir["data"]["sp"],
                 "signal": g.compute_qname(signal)[2],
                 "vector": vector_id,
-                "error_sum": error_sum,
-                "last_error": prev_error,
+                "error_sum": f"{id}_error_sum",
+                "last_error": f"{id}_prev_error",
             },
             "state": state,
             "variables": variables,

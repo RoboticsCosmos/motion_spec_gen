@@ -1,0 +1,18 @@
+robot_state_def() ::= <<
+struct Kinova {
+  std::array\<double, 7> q;
+  std::array\<double, 7> q_dot;
+  std::array\<double, 7> q_ddot;
+};
+>>
+
+robot_state_init() ::= <<
+Kinova rob;
+>>
+
+robot_state_update(cmd_data) ::= <<
+std::array\<double, 7> command_accelerations;
+
+<cmd_data.data: {d | add(<d>, command_accelerations, command_accelerations);}; separator="\n">
+updateQandQdot(command_accelerations, &rob);
+>>

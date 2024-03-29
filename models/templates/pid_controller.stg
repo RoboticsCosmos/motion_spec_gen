@@ -1,22 +1,16 @@
+import "kdl.stg"
 
 pid_controller(data) ::= <<
-
-// get measured variable link id from kdl chain
-int seg_id = utils->getLinkIDFromChain(robot_chain, <data.measured.entity>);
-
-// get the current twist of the link
-KDL::Twist current_twist = twists[seg_id];
-
-// convert from kdl
-utils->fromKDL(current_twist, <data.measured.id>);
+// measure the variable
+<measure_variable(data)>
 
 for (size_t i = 0; i \< <data.vector>.size(); i++)
 {
   if (<data.vector>[i] == 1.0)
   {
-    double error = computeError(<data.measured.id>[i], <data.setpoint>[i], data.threshold_value);
-    pidController(error, <if(data.gains.kp)><data.gains.kp>[i]<else>0.0<endif>, <if(data.gains.ki)><data.gains.ki>[i]<else>0.0<endif>, <if(data.gains.kd)><data.gains.kd>[i]<else>0.0<endif>, <data.dt>, <if(data.error_sum)><data.error_sum>[i]<else>0.0<endif>, <data.signal>[i]);
+    double error;
+    computeError(<data.measured.id>[i], <data.setpoint>[i], data.threshold_value, error);
+    pidController(error, <data.gains.kp>, <data.gains.ki>, <data.gains.kd>, <data.dt>, <data.error_sum>[i], <data.last_error>[i], <data.signal>[i]);
   }
 }
-
 >>

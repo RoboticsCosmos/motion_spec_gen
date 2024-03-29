@@ -1,8 +1,17 @@
+cpp_include() ::= <<
+#include \<std/array.hpp>
+#include \<std/string.hpp>
+#include \<filesystem>
+>>
 
 motion_spec_include() ::= <<
-
 >>
 
 controller_include() ::= <<
 #include \<controllers/pid_controller.hpp>
+>>
+
+kdl_include() ::= <<
+#include \<kdl_utils/solver_utils.hpp>
+#include \<kdl_utils/utils.hpp>
 >>

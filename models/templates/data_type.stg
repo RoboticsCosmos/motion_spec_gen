@@ -11,14 +11,14 @@ variables_init(id, data) ::= <<
 >>
 
 array(name, data) ::= <<
-  std::array\<<data.dtype>, <data.size>\> <name><if(data.value)> = { <data.value: {val | <val>}; separator=","> }<endif>;
+std::array\<<data.dtype>, <data.size>\> <name><if(data.value)> = { <data.value: {val | <val>}; separator=","> }<endif>;
 >>
 
 array_2d(name, data) ::= <<
-  std::array\<std::array\<<data.dtype>, <data.dim>\>, <data.size>\> <name><if(data.value)> = { <data.value: {val | { <val: {v | <v>}; separator=","> \}}; separator=", "> \}<endif>;
+std::array\<std::array\<<data.dtype>, <data.dim>\>, <data.size>\> <name><if(data.value)> = { <data.value: {val | { <val: {v | <v>}; separator=","> \}}; separator=", "> \}<endif>;
 >>
 
 non_array(name, data) ::= <<
-  <data.dtype> <name><if(data.value)> = <data.value><endif>;
+<data.dtype> <name><if(data.value)> = <data.value><endif>;
 >>
 

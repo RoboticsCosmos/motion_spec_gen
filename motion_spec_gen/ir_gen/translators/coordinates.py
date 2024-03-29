@@ -31,6 +31,8 @@ class CoordinatesTranslator:
                 pass
 
             elif (node, rdflib.RDF.type, GEOM_COORD.VelocityTwistCoordinate) in g:
+                data["type"] = "VelocityTwist"
+
                 of_vel = g.value(node, GEOM_COORD.of)
                 # TODO: as-seen-by is assumed to be base_link for now
                 as_seen_by = g.value(node, GEOM_COORD["as-seen-by"])
@@ -59,10 +61,12 @@ class CoordinatesTranslator:
 
                 # TODO: units are not considered for now as it is assumed to be m/s and rad/s
 
-                # state[of_vel_qname] = {
-                #     "type": "Twist",
-                #     "value": None
-                # }
+                variables[of_vel_qname] = {
+                    "type": "array",
+                    "size": 6,
+                    "dtype": "double",
+                    "value": None
+                }
 
                 if linear_vel or angular_vel:
                     data["sp"] = f'{prefix}_{of_vel_qname}_sp'

@@ -4,24 +4,40 @@ import "monitors.stg"
 import "pid_controller.stg"
 import "embed_maps.stg"
 import "solvers.stg"
+import "kdl.stg"
+import "robot_sim.stg"
 
 
 application(variables, state, d) ::= <<
-
+<cpp_include()>
 <motion_spec_include()>
 <controller_include()>
+<kdl_include()>
+
+<! define robot data structure !>
+<robot_state_def()>
 
 int main()
 {
-// initialize variables
-<! variables !>
-<variables: {v | <variables_init(v, variables.(v))> }; separator="\n">
+
+  <! init robot data structure !>
+  <robot_state_init()>
+
+  // initialize variables
+  <! variables !>
+  <variables: {v | <variables_init(v, variables.(v))> }; separator="\n">
+
+  <! kdl init !>
+  <kdl_init()>
 
   // pre monitors
   <! pre condition monitors !>
   <d.monitors.pre: {m | <({<d.monitors.pre.(m).name>})(d.monitors.pre.(m))> }; separator="\n">
 
   while (true) {
+
+    <! update robot state !>
+    <robot_state_update(d.commands.accelerations)>
 
     // controllers
     <! controllers !>
@@ -36,7 +52,7 @@ int main()
     <d.solvers: {s | <({<d.solvers.(s).name>})(d.solvers.(s))> }; separator="\n">
 
     <! command torques !>
-    <({<d.command_torques.name>})(d.command_torques.data)>
+    <({<d.commands.torques.name>})(d.commands.torques.data)>
 
     // post monitors
     <! post condition monitors !>
@@ -50,7 +66,7 @@ int main()
 
 command_torques(cmd_data) ::= <<
 // command torques
-std::array\<double, 7\> command_torques;
+std::array\<double, 7> command_torques;
 
-<cmd_data: {d | add(<d>, command_torques)>}; separator="\n">
+<cmd_data: {d | add(<d>, command_torques, command_torques);}; separator="\n">
 >>
