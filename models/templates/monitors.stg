@@ -4,10 +4,10 @@ monitor_pre(data) ::= <<
 // measure the variable
 <measure_variable(data)>
 
-for (size_t i = 0; i \< <data.measured.id>.size(); i++)
+for (size_t i = 0; i \< sizeof(<data.measured.id>)/sizeof(<data.measured.id>[0]); i++)
 {
   // compare
-  compare(<data.measured.id>[i], <data.setpoint>[i], <data.threshold_value>, <data.operator>, <data.flag>);
+  compare(<data.measured.id>[i], <data.setpoint>[i], <data.threshold>, "<data.operator>", <data.flag>);
 
   // check if the flag is set
   if (<data.flag>)
@@ -29,10 +29,10 @@ monitor_post(data) ::= <<
 // measure the variable
 <measure_variable(data)>
 
-for (size_t i = 0; i \< <data.measured.id>.size(); i++)
+for (size_t i = 0; i \< sizeof(<data.measured.id>)/sizeof(<data.measured.id>[0]); i++)
 {
   // compare
-  compare(<data.measured.id>[i], <data.setpoint>[i], <data.threshold_value>, <data.operator>, <data.flag>);
+  compare(<data.measured.id>[i], <data.setpoint>[i], <data.threshold>, "<data.operator>", <data.flag>);
 
   // check if the flag is set
   if (<data.flag>)

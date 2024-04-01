@@ -1,18 +1,19 @@
 robot_state_def() ::= <<
-struct Kinova {
-  std::array\<double, 7> q;
-  std::array\<double, 7> q_dot;
-  std::array\<double, 7> q_ddot;
-};
 >>
 
 robot_state_init() ::= <<
 Kinova rob;
+double init_q[7] = {0.0, 0.26, 0.0, 2.26, 0.0, -0.95, -1.57};
+initialize_robot_state(7, 7, init_q, &rob);
+>>
+
+robot_variables() ::= <<
+double dt = 0.001;
 >>
 
 robot_state_update(cmd_data) ::= <<
-std::array\<double, 7> command_accelerations;
+double command_accelerations[7]{};
 
-<cmd_data.data: {d | add(<d>, command_accelerations, command_accelerations);}; separator="\n">
-updateQandQdot(command_accelerations, &rob);
+<cmd_data.data: {d | add(<d>, command_accelerations, command_accelerations, 7);}; separator="\n">
+updateQandQdot(command_accelerations, dt, &rob);
 >>

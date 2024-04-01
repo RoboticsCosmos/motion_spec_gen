@@ -15,5 +15,5 @@ initialize_robot_chain(robot_urdf, base_link, tool_link, robot_chain);
 >>
 
 measure_variable(data) ::= <<
-<data.measure_variable>(<data.measured.entity>, <data.measured.id>, &rob, &robot_chain);
+<data.measure_variable>(<data.measured.entity>, &rob, &robot_chain, <data.measured.id>);
 >>

@@ -11,14 +11,29 @@ variables_init(id, data) ::= <<
 >>
 
 array(name, data) ::= <<
-std::array\<<data.dtype>, <data.size>\> <name><if(data.value)> = { <data.value: {val | <val>}; separator=","> }<endif>;
+<data.dtype> <name>[<data.size>]<if(data.value)> = { <data.value: {val | <val>}; separator=","> }<else>{}<endif>;
 >>
 
 array_2d(name, data) ::= <<
-std::array\<std::array\<<data.dtype>, <data.dim>\>, <data.size>\> <name><if(data.value)> = { <data.value: {val | { <val: {v | <v>}; separator=","> \}}; separator=", "> \}<endif>;
+<data.dtype> *<name>[<data.cols>]<if(data.value)> = { <data.value: {val | new double[<data.rows>]{ <val: {v | <v>}; separator=","> \}}; separator=", "> \}<endif>;
 >>
 
 non_array(name, data) ::= <<
-<data.dtype> <name><if(data.value)> = <data.value><endif>;
+<({<data.dtype>})(name, data)>
 >>
 
+bool(name, data) ::= <<
+bool <name><if(data.value)> = <data.value><endif>;
+>>
+
+int(name, data) ::= <<
+int <name><if(data.value)> = <data.value><endif>;
+>>
+
+double(name, data) ::= <<
+double <name><if(data.value)> = <data.value><endif>;
+>>
+
+string(name, data) ::= <<
+std::string <name><if(data.value)> = "<data.value>"<endif>;
+>>

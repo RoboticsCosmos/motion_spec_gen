@@ -50,7 +50,7 @@ int main()
 
 command_torques(cmd_data) ::= <<
 // command torques
-std::array\<double, 7\> command_torques;
+double command_torques[7];
 
 <cmd_data: {d | add(<d>, command_torques)>}; separator="\n">
 >>

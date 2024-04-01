@@ -1,10 +1,20 @@
 achd_solver(data) ::= <<
 // solver beta
-std::array\<double, 6> beta;
-// solver ext_wrench
-std::array\<std::array\<double, 6>, <data.ns>\> ext_wrench;
+double beta[6]{};
+for (size_t i = 0; i \< 6; i++)
+{
+  beta[i] = <data.root_acceleration>[i];
+}
 
-<data.beta: {b | add(<b>, beta, beta);}; separator="\n">
+// solver ext_wrench
+double *ext_wrench[7];
+
+for (size_t i = 0; i \< 7; i++)
+{
+  ext_wrench[i] = new double[6] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+}
+
+<data.beta: {b | add(<b>, beta, beta, 6);}; separator="\n">
 
 achd_solver(&rob, &robot_chain, <data.nc>, <data.root_acceleration>, <data.alpha>, beta, ext_wrench, <data.tau_ff>, <data.predicted_accelerations>, <data.output_torques>);
 >>

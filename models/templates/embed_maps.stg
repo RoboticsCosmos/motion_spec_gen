@@ -4,11 +4,11 @@ embed_maps(data) ::= <<
 >> 
 
 embed_mapping(data) ::= <<
-for (size_t i = 0; i \< <data.vector>.size(); i++)
+for (size_t i = 0; i \< sizeof(<data.vector>)/sizeof(<data.vector>[0]); i++)
 {
   if (<data.vector>[i] == 1.0)
   {
-    <data.output>[i] += <data.input>[i];
+    <data.output>[i] = <data.input>[i];
   }
 }
 >>

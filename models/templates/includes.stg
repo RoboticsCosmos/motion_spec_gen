@@ -1,7 +1,8 @@
 cpp_include() ::= <<
-#include \<std/array.hpp>
-#include \<std/string.hpp>
+#include \<array>
+#include \<string>
 #include \<filesystem>
+#include \<iostream>
 >>
 
 motion_spec_include() ::= <<
@@ -12,6 +13,7 @@ controller_include() ::= <<
 >>
 
 kdl_include() ::= <<
-#include \<kdl_utils/solver_utils.hpp>
 #include \<kdl_utils/utils.hpp>
+#include \<kdl_utils/math_utils.hpp>
+#include \<kdl_utils/solver_utils.hpp>
 >>
