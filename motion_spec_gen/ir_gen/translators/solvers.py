@@ -98,8 +98,8 @@ class SolverTranslator:
             # alpha matrix
             variables[f"{id}_alpha"] = {
                 "type": "array_2d",
-                "size": 6,
-                "dim": 2,
+                "rows": 6,
+                "cols": nc,
                 "dtype": "double",
                 "value": alpha.tolist(),
             }

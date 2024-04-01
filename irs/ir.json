@@ -140,8 +140,8 @@
     },
     "move_arm_down_vel_twist_achd_solver_alpha": {
       "type": "array_2d",
-      "size": 6,
-      "dim": 2,
+      "rows": 6,
+      "cols": 6,
       "dtype": "double",
       "value": [
         [
@@ -245,7 +245,7 @@
         "move_arm_down_vel_twist_monitor_pre": {
           "measure_variable": "computeForwardVelocityKinematics",
           "operator": "lt",
-          "threshold_value": "move_arm_down_vel_twist_monitor_pre_threshold_value",
+          "threshold": "move_arm_down_vel_twist_monitor_pre_threshold_value",
           "measured": {
             "id": "bracelet_link_vel_twist",
             "entity": "bracelet_link"
@@ -260,7 +260,7 @@
         "move_arm_down_vel_twist_monitor_post": {
           "measure_variable": "computeForwardVelocityKinematics",
           "operator": "eq",
-          "threshold_value": "move_arm_down_vel_twist_monitor_post_threshold_value",
+          "threshold": "move_arm_down_vel_twist_monitor_post_threshold_value",
           "measured": {
             "id": "bracelet_link_vel_twist",
             "entity": "bracelet_link"
@@ -282,7 +282,7 @@
           "ki": "pid_move_arm_down_vel_twist_controller_ki",
           "kd": "pid_move_arm_down_vel_twist_controller_kd"
         },
-        "threshold_value": "pid_move_arm_down_vel_twist_controller_threshold_value",
+        "threshold": "pid_move_arm_down_vel_twist_controller_threshold_value",
         "measured": {
           "id": "bracelet_link_vel_twist",
           "entity": "bracelet_link"

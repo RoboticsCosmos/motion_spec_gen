@@ -132,7 +132,7 @@ class PIDControllerTranslator:
                 "measure_variable": measure_variable,
                 "dt": f"{id}_time_step",
                 "gains": gains if len(gains) > 0 else None,
-                "threshold_value": f"{id}_threshold_value",
+                "threshold": f"{id}_threshold_value",
                 "measured": coord_trans_ir["data"]["of"],
                 "setpoint": coord_trans_ir["data"]["sp"],
                 "signal": g.compute_qname(signal)[2],

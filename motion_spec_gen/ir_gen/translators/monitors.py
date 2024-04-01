@@ -54,7 +54,7 @@ class MonitorTranslator:
             "data": {
                 "measure_variable": measure_variable,
                 "operator": g.compute_qname(operator)[2],
-                "threshold_value": f"{id}_threshold_value",
+                "threshold": f"{id}_threshold_value",
                 "measured": coord_trans_ir["data"]["of"],
                 "setpoint": coord_trans_ir["data"]["sp"],
                 "flag": f"{id}_flag",
