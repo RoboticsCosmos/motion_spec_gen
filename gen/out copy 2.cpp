@@ -9,6 +9,7 @@
 
 int main()
 {
+  // initialize the robot state
   Kinova rob;
   double init_q[7] = {0.0, 0.26, 0.0, 2.26, 0.0, -0.95, -1.57};
   initialize_robot_state(7, 7, init_q, &rob);
@@ -42,7 +43,7 @@ int main()
   double move_arm_down_vel_twist_achd_solver_root_acceleration[6] = {0.0, 0.0, 9.81,
                                                                      0.0, 0.0, 0.0};
   double pid_move_arm_down_vel_twist_controller_ki = 0.9;
-  double pid_move_arm_down_vel_twist_controller_bracelet_link_vel_twist_sp[6] = {0.0, 0.0, -0.05,
+  double pid_move_arm_down_vel_twist_controller_bracelet_link_vel_twist_sp[6] = {0.0, 0.0, 0.05,
                                                                                  0.0, 0.0, 0.0};
   double pid_move_arm_down_vel_twist_controller_kd = 0.0;
   double pid_move_arm_down_vel_twist_controller_time_step = 1;
@@ -125,7 +126,7 @@ int main()
     {
       if (pid_move_arm_down_vel_twist_embed_map_vector[i] == 1.0)
       {
-        double error;
+        double error = 0.0;
         computeError(bracelet_link_vel_twist[i],
                      pid_move_arm_down_vel_twist_controller_bracelet_link_vel_twist_sp[i],
                      pid_move_arm_down_vel_twist_controller_threshold_value, error);
@@ -153,12 +154,7 @@ int main()
 
     // solvers
     // solver beta
-    double beta[6]{};
-    for (size_t i = 0; i < 6; i++)
-    {
-      beta[i] = move_arm_down_vel_twist_achd_solver_root_acceleration[i];
-    }
-
+    double beta[6] = {0.0, 0.0, 9.81, 0.0, 0.0, 0.0};
     // solver ext_wrench
     double *ext_wrench[7];
 
@@ -175,34 +171,6 @@ int main()
                 move_arm_down_vel_twist_achd_solver_feed_forward_torques,
                 move_arm_down_vel_twist_achd_solver_predicted_accelerations,
                 move_arm_down_vel_twist_achd_solver_output_torques);
-
-    // command torques
-    double command_torques[7];
-
-    add(move_arm_down_vel_twist_achd_solver_output_torques, command_torques, command_torques, 7);
-
-    // post monitors
-    // measure the variable
-    computeForwardVelocityKinematics(bracelet_link, &rob, &robot_chain, bracelet_link_vel_twist);
-
-    for (size_t i = 0; i < sizeof(bracelet_link_vel_twist) / sizeof(bracelet_link_vel_twist[0]);
-         i++)
-    {
-      // compare
-      compare(bracelet_link_vel_twist[i],
-              move_arm_down_vel_twist_monitor_post_bracelet_link_vel_twist_sp[i],
-              move_arm_down_vel_twist_monitor_post_threshold_value, "eq",
-              move_arm_down_vel_twist_monitor_post_flag);
-
-      // check if the flag is set
-      if (move_arm_down_vel_twist_monitor_post_flag)
-      {
-        // break the loop
-        break;
-      }
-    }
-
-    
   }
 
   return 0;
