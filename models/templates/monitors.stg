@@ -4,43 +4,26 @@ monitor_pre(data) ::= <<
 // measure the variable
 <measure_variable(data)>
 
-for (size_t i = 0; i \< sizeof(<data.measured.id>)/sizeof(<data.measured.id>[0]); i++)
-{
-  // compare
-  compare(<data.measured.id>[i], <data.setpoint>[i], <data.threshold>, "<data.operator>", <data.flag>);
+// compare
+<({compare<data.operator>})(data)>;
 
-  // check if the flag is set
-  if (<data.flag>)
-  {
-    // break the loop
-    break;
-  }
-}
-
-// stop the execution if the flag is set
+// check if the flag is set
 if (<data.flag>)
 {
   return -1;
 }
+>>
 
+compareEqual(data) ::= <<
+compareEqual(<data.measured.id>, <data.reference_value>, <data.flag>);
 >>
 
 monitor_post(data) ::= <<
 // measure the variable
 <measure_variable(data)>
 
-for (size_t i = 0; i \< sizeof(<data.measured.id>)/sizeof(<data.measured.id>[0]); i++)
-{
-  // compare
-  compare(<data.measured.id>[i], <data.setpoint>[i], <data.threshold>, "<data.operator>", <data.flag>);
-
-  // check if the flag is set
-  if (<data.flag>)
-  {
-    // break the loop
-    break;
-  }
-}
+// compare
+<({compare<data.operator>})(data)>;
 
 // break the system loop if the flag is set
 if (<data.flag>)
@@ -48,5 +31,4 @@ if (<data.flag>)
   // break the loop
   break;
 }
-
 >>

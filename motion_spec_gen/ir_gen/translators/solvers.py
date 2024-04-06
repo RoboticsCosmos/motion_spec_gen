@@ -77,7 +77,9 @@ class SolverTranslator:
                         "dtype": "double",
                         "value": None,
                     }
-                    beta += [embed_map["output"]]
+                    # append to beta if not already present
+                    if output not in beta:
+                        beta.append(output)
 
                 if embed_map["output_type"] == "external-wrench":
                     pass

@@ -69,7 +69,12 @@ class CONSTRAINT(DefinedNamespace):
 
     threshold: URIRef
     operator: URIRef
-    coordinate: URIRef
+
+    quantity: URIRef
+
+    _extras = [
+        "reference-value",
+    ]
 
     _NS = Namespace(
         "https://roboticscosmos.github.io/metamodels/relations/constraints#"

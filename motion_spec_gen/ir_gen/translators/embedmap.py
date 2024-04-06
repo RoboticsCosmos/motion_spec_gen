@@ -12,7 +12,6 @@ class EmbedMapTranslator:
     def translate(self, g: rdflib.Graph, node) -> dict:
 
         variables = {}
-        state = {}
 
         # input
         em_input = g.value(node, EMBED_MAP.input)
@@ -54,6 +53,5 @@ class EmbedMapTranslator:
                 "vector": vector_id,
                 "return": None,
             },
-            "variables": variables,
-            "state": state,
+            "variables": variables
         }

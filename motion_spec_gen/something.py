@@ -46,7 +46,8 @@ class PIDControllerStep:
 
         constraint = g.value(node, Controller.constraint)
 
-        coordinate = g.value(constraint, CONSTRAINT.coordinate)
+        # *Assumption: compute using setpoint
+        coordinate = g.value(constraint, CONSTRAINT.quantity)
 
         output_data = {}
 
@@ -57,6 +58,7 @@ class PIDControllerStep:
         # get solver from embed map
         embed_map = g.value(predicate=EMBED_MAP.controller, object=node)
         solver = g.value(embed_map, EMBED_MAP.solver)
+        solver_name = g.compute_qname(solver)[2]
 
         # TOOD: check for a better way
         is_geom_coord = (
@@ -71,7 +73,7 @@ class PIDControllerStep:
             # type = AccelerationEnergy
             output_data["output"] = {
                 "type": "output-acceleration-energy",
-                "var_name": rdflib.URIRef(f"{prefix}{name}_output_acceleration_energy"),
+                "var_name": rdflib.URIRef(f"{prefix}{solver_name}_output_acceleration_energy"),
             }
 
             g.add(
@@ -86,7 +88,7 @@ class PIDControllerStep:
             # type = ExternalWrench
             output_data["output"] = {
                 "type": "output-external-wrench",
-                "var_name": rdflib.URIRef(f"{prefix}{name}_output_external_wrench"),
+                "var_name": rdflib.URIRef(f"{prefix}{solver_name}_output_external_wrench"),
             }
 
             g.add(
@@ -97,34 +99,38 @@ class PIDControllerStep:
                 )
             )
 
-        for vector_type, vector in linear_vector_type_to_num.items():
-            if (coordinate, rdflib.RDF.type, vector_type) in g:
-                output_data["vector"] = vector
-                break
+        
+        types_of_coord = list(g.objects(coordinate, rdflib.RDF.type))
+        # get the type with "vector" in it
+        vec_type = [t for t in types_of_coord if "vector" in str(t).lower()][0]
+        vec_type_qname = g.compute_qname(vec_type)[2]
 
-        for vector_type, vector in angular_vector_type_to_num.items():
-            if (coordinate, rdflib.RDF.type, vector_type) in g:
-                output_data["vector"] += vector
-                break
+        output_data["vector"] = [0, 0, 0, 0, 0, 0]
+        if "linear" in vec_type_qname.lower():
+            output_data["vector"][0:3] = linear_vector_type_to_num[vec_type]
 
-        signal = g.value(node, Controller.signal)
+        elif "angular" in vec_type_qname.lower():
+            output_data["vector"][3:] = angular_vector_type_to_num[vec_type]
+                
+        signal = rdflib.URIRef(f"{prefix}{name}_signal")
+        # add the signal to the controller
+        g.add((node, Controller.signal, rdflib.URIRef(signal)))
 
         # add the output node to the graph
-        # id_ = rdflib.URIRef(uuid.uuid4().urn)
-        id_ = embed_map
-        g.add((id_, rdflib.RDF.type, EMBED_MAP.EmbeddingMap))
         # add vector as a collection
         vector_collection = rdflib.BNode()
         l = [rdflib.Literal(i) for i in output_data["vector"]]
         Collection(g, vector_collection, l)
-        g.add((id_, EMBED_MAP.vector, vector_collection))
+        g.add((embed_map, EMBED_MAP.vector, vector_collection))
         # add input
-        g.add((id_, EMBED_MAP.input, signal))
+        g.add((embed_map, EMBED_MAP.input, signal))
         # add the output data
         g.add(
             (
-                id_,
+                embed_map,
                 EMBED_MAP[output_data["output"]["type"]],
                 output_data["output"]["var_name"],
             )
         )
+
+        print(output_data)

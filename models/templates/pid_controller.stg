@@ -4,13 +4,7 @@ pid_controller(data) ::= <<
 // measure the variable
 <measure_variable(data)>
 
-for (size_t i = 0; i \< sizeof(<data.measured.id>)/sizeof(<data.measured.id>[0]); i++)
-{
-  if (<data.vector>[i] == 1.0)
-  {
-    double error;
-    computeError(<data.measured.id>[i], <data.setpoint>[i], <data.threshold>, error);
-    pidController(error, <data.gains.kp>, <data.gains.ki>, <data.gains.kd>, <data.dt>, <data.error_sum>[i], <data.last_error>[i], <data.signal>[i]);
-  }
-}
+double error;
+computeError(<data.measured.id>, <data.setpoint_value>, error);
+pidController(error, <data.gains.kp>, <data.gains.ki>, <data.gains.kd>, <data.dt>, <data.error_sum>, <data.last_error>, <data.signal>);
 >>

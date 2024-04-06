@@ -39,7 +39,8 @@ def main():
     g.bind("uuid", rdflib.Namespace("urn:uuid:"))
     g.bind("embedding-map", EMBED_MAP)
 
-    models_path = os.path.join(os.path.dirname(__file__), "../models/")
+    motion_spec_name = "vel_6dof"
+    models_path = os.path.join(os.path.dirname(__file__), f"../models/{motion_spec_name}/")
 
     for file in os.listdir(models_path):
         if file.endswith(".jsonld"):
@@ -52,7 +53,6 @@ def main():
     steps = [PIDControllerStep]
 
     data = {
-        "state": {},
         "variables": {},
         "d": {
             "monitors": {
@@ -66,6 +66,7 @@ def main():
     }
 
     for motion_spec in g.subjects(rdflib.RDF.type, MOTION_SPEC.MotionSpec):
+
         pre_conditions = g.objects(motion_spec, MOTION_SPEC["pre-conditions"])
         per_conditions = g.objects(motion_spec, MOTION_SPEC["per-conditions"])
         post_conditions = g.objects(motion_spec, MOTION_SPEC["post-conditions"])
@@ -79,7 +80,6 @@ def main():
             ir["data"]["name"] = "monitor_pre"
             ir["data"]["return"] = None
 
-            data["state"].update(ir["state"])
             data["variables"].update(ir["variables"])
             data["d"]["monitors"]["pre"][ir["id"]] = ir["data"]
 
@@ -94,7 +94,6 @@ def main():
             # intermediate representation generator
             ir = PIDControllerTranslator().translate(g, controller)
 
-            data["state"].update(ir["state"])
             data["variables"].update(ir["variables"])
             data["d"]["controllers"][ir["id"]] = ir["data"]
 
@@ -108,7 +107,6 @@ def main():
                 + [embed_map_ir["data"]]
             )
             data["variables"].update(embed_map_ir["variables"])
-            data["state"].update(embed_map_ir["state"])
 
         # command torques
         command_torques = []
@@ -127,7 +125,6 @@ def main():
                 variables=data["variables"],
             )
 
-            data["state"].update(solver_ir["state"])
             data["variables"].update(solver_ir["variables"])
             data["d"]["solvers"][solver_ir["id"]] = solver_ir["data"]
 
@@ -154,7 +151,6 @@ def main():
             ir["data"]["name"] = "monitor_post"
             ir["data"]["return"] = None
 
-            data["state"].update(ir["state"])
             data["variables"].update(ir["variables"])
             data["d"]["monitors"]["post"][ir["id"]] = ir["data"]
 
@@ -163,6 +159,8 @@ def main():
     print("--" * 20)
 
     json_obj = json.dumps(data, indent=2)
+
+    # print(json_obj)
 
     # write to file
     file_path = os.path.join(os.path.dirname(__file__), "irs", "ir.json")

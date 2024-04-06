@@ -1,0 +1,342 @@
+{
+  "state": {},
+  "variables": {
+    "bracelet_link": {
+      "type": null,
+      "dtype": "string",
+      "value": "bracelet_link"
+    },
+    "bracelet_link_vel_twist": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": null
+    },
+    "move_arm_down_vel_twist_monitor_pre_bracelet_link_vel_twist_sp": {
+      "type": "array",
+      "dtype": "double",
+      "value": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "size": 6
+    },
+    "move_arm_down_vel_twist_monitor_pre_threshold_value": {
+      "type": null,
+      "dtype": "double",
+      "value": "0.0"
+    },
+    "move_arm_down_vel_twist_monitor_pre_flag": {
+      "type": null,
+      "dtype": "bool",
+      "value": false
+    },
+    "pid_move_arm_down_vel_twist_controller_signal": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": null
+    },
+    "pid_move_arm_down_vel_twist_controller_bracelet_link_vel_twist_sp": {
+      "type": "array",
+      "dtype": "double",
+      "value": [
+        0.0,
+        0.0,
+        -0.05,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "size": 6
+    },
+    "pid_move_arm_down_vel_twist_controller_time_step": {
+      "type": null,
+      "dtype": "double",
+      "value": "1"
+    },
+    "pid_move_arm_down_vel_twist_controller_threshold_value": {
+      "type": null,
+      "dtype": "double",
+      "value": "0.001"
+    },
+    "pid_move_arm_down_vel_twist_controller_kp": {
+      "type": null,
+      "dtype": "double",
+      "value": "20.0"
+    },
+    "pid_move_arm_down_vel_twist_controller_ki": {
+      "type": null,
+      "dtype": "double",
+      "value": "0.9"
+    },
+    "pid_move_arm_down_vel_twist_controller_kd": {
+      "type": null,
+      "dtype": "double",
+      "value": 0.0
+    },
+    "pid_move_arm_down_vel_twist_controller_error_sum": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": null
+    },
+    "pid_move_arm_down_vel_twist_controller_prev_error": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": null
+    },
+    "pid_move_arm_down_vel_twist_embed_map_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "move_arm_down_vel_twist_achd_solver_root_acceleration": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0.0,
+        0.0,
+        9.81,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "pid_move_arm_down_vel_twist_controller_output_acceleration_energy": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": null
+    },
+    "move_arm_down_vel_twist_achd_solver_nc": {
+      "type": null,
+      "dtype": "int",
+      "value": 6
+    },
+    "move_arm_down_vel_twist_achd_solver_nj": {
+      "type": null,
+      "dtype": "int",
+      "value": 7
+    },
+    "move_arm_down_vel_twist_achd_solver_ns": {
+      "type": null,
+      "dtype": "int",
+      "value": 8
+    },
+    "move_arm_down_vel_twist_achd_solver_alpha": {
+      "type": "array_2d",
+      "rows": 6,
+      "cols": 6,
+      "dtype": "double",
+      "value": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    "move_arm_down_vel_twist_achd_solver_feed_forward_torques": {
+      "type": "array",
+      "size": 7,
+      "dim": 1,
+      "dtype": "double",
+      "value": null
+    },
+    "move_arm_down_vel_twist_achd_solver_predicted_accelerations": {
+      "type": "array",
+      "size": 7,
+      "dim": 1,
+      "dtype": "double",
+      "value": null
+    },
+    "move_arm_down_vel_twist_achd_solver_output_torques": {
+      "type": "array",
+      "size": 7,
+      "dim": 1,
+      "dtype": "double",
+      "value": null
+    },
+    "move_arm_down_vel_twist_monitor_post_bracelet_link_vel_twist_sp": {
+      "type": "array",
+      "dtype": "double",
+      "value": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "size": 6
+    },
+    "move_arm_down_vel_twist_monitor_post_threshold_value": {
+      "type": null,
+      "dtype": "double",
+      "value": "0.001"
+    },
+    "move_arm_down_vel_twist_monitor_post_flag": {
+      "type": null,
+      "dtype": "bool",
+      "value": false
+    }
+  },
+  "d": {
+    "monitors": {
+      "pre": {
+        "move_arm_down_vel_twist_monitor_pre": {
+          "measure_variable": "computeForwardVelocityKinematics",
+          "operator": "lt",
+          "threshold": "move_arm_down_vel_twist_monitor_pre_threshold_value",
+          "measured": {
+            "id": "bracelet_link_vel_twist",
+            "entity": "bracelet_link"
+          },
+          "setpoint": "move_arm_down_vel_twist_monitor_pre_bracelet_link_vel_twist_sp",
+          "flag": "move_arm_down_vel_twist_monitor_pre_flag",
+          "return": null,
+          "name": "monitor_pre"
+        }
+      },
+      "post": {
+        "move_arm_down_vel_twist_monitor_post": {
+          "measure_variable": "computeForwardVelocityKinematics",
+          "operator": "eq",
+          "threshold": "move_arm_down_vel_twist_monitor_post_threshold_value",
+          "measured": {
+            "id": "bracelet_link_vel_twist",
+            "entity": "bracelet_link"
+          },
+          "setpoint": "move_arm_down_vel_twist_monitor_post_bracelet_link_vel_twist_sp",
+          "flag": "move_arm_down_vel_twist_monitor_post_flag",
+          "return": null,
+          "name": "monitor_post"
+        }
+      }
+    },
+    "controllers": {
+      "pid_move_arm_down_vel_twist_controller": {
+        "name": "pid_controller",
+        "measure_variable": "computeForwardVelocityKinematics",
+        "dt": "pid_move_arm_down_vel_twist_controller_time_step",
+        "gains": {
+          "kp": "pid_move_arm_down_vel_twist_controller_kp",
+          "ki": "pid_move_arm_down_vel_twist_controller_ki",
+          "kd": "pid_move_arm_down_vel_twist_controller_kd"
+        },
+        "threshold": "pid_move_arm_down_vel_twist_controller_threshold_value",
+        "measured": {
+          "id": "bracelet_link_vel_twist",
+          "entity": "bracelet_link"
+        },
+        "setpoint": "pid_move_arm_down_vel_twist_controller_bracelet_link_vel_twist_sp",
+        "signal": "pid_move_arm_down_vel_twist_controller_signal",
+        "vector": "pid_move_arm_down_vel_twist_embed_map_vector",
+        "error_sum": "pid_move_arm_down_vel_twist_controller_error_sum",
+        "last_error": "pid_move_arm_down_vel_twist_controller_prev_error"
+      }
+    },
+    "embed_maps": {
+      "move_arm_down_vel_twist_achd_solver": [
+        {
+          "name": "embed_map",
+          "input": "pid_move_arm_down_vel_twist_controller_signal",
+          "output": "pid_move_arm_down_vel_twist_controller_output_acceleration_energy",
+          "output_type": "acceleration-energy",
+          "vector": "pid_move_arm_down_vel_twist_embed_map_vector",
+          "return": null
+        }
+      ]
+    },
+    "solvers": {
+      "move_arm_down_vel_twist_achd_solver": {
+        "name": "achd_solver",
+        "root_acceleration": "move_arm_down_vel_twist_achd_solver_root_acceleration",
+        "alpha": "move_arm_down_vel_twist_achd_solver_alpha",
+        "beta": [
+          "pid_move_arm_down_vel_twist_controller_output_acceleration_energy"
+        ],
+        "ext_wrench": [],
+        "nc": "move_arm_down_vel_twist_achd_solver_nc",
+        "nj": "move_arm_down_vel_twist_achd_solver_nj",
+        "ns": "move_arm_down_vel_twist_achd_solver_ns",
+        "tau_ff": "move_arm_down_vel_twist_achd_solver_feed_forward_torques",
+        "output_torques": "move_arm_down_vel_twist_achd_solver_output_torques",
+        "predicted_accelerations": "move_arm_down_vel_twist_achd_solver_predicted_accelerations",
+        "return": null
+      }
+    },
+    "commands": {
+      "torques": {
+        "name": "command_torques",
+        "data": [
+          "move_arm_down_vel_twist_achd_solver_output_torques"
+        ]
+      },
+      "accelerations": {
+        "name": "command_accelerations",
+        "data": [
+          "move_arm_down_vel_twist_achd_solver_predicted_accelerations"
+        ]
+      }
+    }
+  }
+}

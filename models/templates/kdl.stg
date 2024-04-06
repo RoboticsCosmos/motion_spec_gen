@@ -6,14 +6,14 @@ std::filesystem::path path = __FILE__;
 std::string robot_urdf = (path.parent_path().parent_path() / "urdf" / "gen3_robotiq_2f_85.urdf").string();
 
 // set the base and tool links
-std::string base_link = "base_link";
-std::string tool_link = "bracelet_link";
+std::string kdl_base_link = "base_link";
+std::string kdl_tool_link = "bracelet_link";
 
 // initialize the chain
 KDL::Chain robot_chain;
-initialize_robot_chain(robot_urdf, base_link, tool_link, robot_chain);
+initialize_robot_chain(robot_urdf, kdl_base_link, kdl_tool_link, robot_chain);
 >>
 
 measure_variable(data) ::= <<
-<data.measure_variable>(<data.measured.entity>, &rob, &robot_chain, <data.measured.id>);
+<data.measure_variable>(<data.measured.entity>, <data.measured.asb>, <data.measured.wrt>, <data.measured.vector>, &rob, &robot_chain, <data.measured.id>);
 >>

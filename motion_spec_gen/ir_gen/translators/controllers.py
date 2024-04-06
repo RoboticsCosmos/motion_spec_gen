@@ -15,8 +15,8 @@ class PIDControllerTranslator:
 
     def translate(self, g: rdflib.Graph, node) -> dict:
 
-        state = {}
         variables = {}
+        data = {}
 
         id = g.compute_qname(node)[2]
 
@@ -36,25 +36,61 @@ class PIDControllerTranslator:
 
         # append signal to variables
         variables[g.compute_qname(signal)[2]] = {
-            "type": "array",
-            "size": len(embed_map_vector),
+            "type": None,
             "dtype": "double",
             "value": None,
         }
 
         constraint = g.value(node, Controller.constraint)
         threshold = g.value(constraint, CONSTRAINT["threshold"])
-        threshold_value = g.value(threshold, THRESHOLD["threshold-value"])
 
-        coord = g.value(constraint, CONSTRAINT.coordinate)
-        coord_trans_ir = CoordinatesTranslator().translate(g, coord, prefix=id)
-        # extend state and variables with the ones from coord
-        state.update(coord_trans_ir["state"])
-        variables.update(coord_trans_ir["variables"])
+        operator = g.value(constraint, CONSTRAINT.operator)
 
-        coord_type = coord_trans_ir["data"]["type"]
+        operator_type = g.value(operator, rdflib.RDF.type)
+        operator_type = g.compute_qname(operator_type)[2]
 
-        
+        data["operator"] = operator_type
+        if operator_type == "Equal":
+            reference_value = g.value(constraint, CONSTRAINT["reference-value"])
+
+            if reference_value is None:
+                # TODO: maybe check for reference (@id)
+                raise ValueError("Reference value not found")
+
+            ref_val_id = f"{id}_reference_value"
+            variables[ref_val_id] = {
+                "type": None,
+                "dtype": "double",
+                "value": reference_value,
+            }
+            data["setpoint_value"] = ref_val_id
+
+        elif operator_type == "LessThan" or operator_type == "GreaterThan":
+            threshold_value = g.value(threshold, THRESHOLD["threshold-value"])
+
+            if threshold_value is None:
+                raise ValueError("Threshold value not found")
+
+            threshold_id = f"{id}_threshold_value"
+            variables[threshold_id] = {
+                "type": None,
+                "dtype": "double",
+                "value": threshold_value,
+            }
+            data["threshold_value"] = threshold_id
+
+        else:
+            raise ValueError("Operator type not supported")
+
+        # measured coordinate
+        measured_coord = g.value(constraint, CONSTRAINT["quantity"])
+        measured_coord_ir = CoordinatesTranslator().translate(
+            g, measured_coord, prefix=""
+        )
+        variables.update(measured_coord_ir["variables"])
+
+        coord_type = measured_coord_ir["data"]["type"]
+
         if coord_type == "VelocityTwist":
             measure_variable = "computeForwardVelocityKinematics"
 
@@ -63,13 +99,6 @@ class PIDControllerTranslator:
             "type": None,
             "dtype": "double",
             "value": time_step,
-        }
-
-        # threshold value
-        variables[f"{id}_threshold_value"] = {
-            "type": None,
-            "dtype": "double",
-            "value": threshold_value,
         }
 
         # skip any of p, i and d gains if they are not present
@@ -90,15 +119,13 @@ class PIDControllerTranslator:
         }
 
         variables[f"{id}_error_sum"] = {
-            "type": "array",
-            "size": len(embed_map_vector),
+            "type": None,
             "dtype": "double",
             "value": None,
         }
 
         variables[f"{id}_prev_error"] = {
-            "type": "array",
-            "size": len(embed_map_vector),
+            "type": None,
             "dtype": "double",
             "value": None,
         }
@@ -125,21 +152,20 @@ class PIDControllerTranslator:
             "value": embed_map_vector,
         }
 
+        data["name"] = "pid_controller"
+        data["measure_variable"] = measure_variable
+        data["dt"] = f"{id}_time_step"
+        data["gains"] = gains if len(gains) > 0 else None
+        data["measured"] = measured_coord_ir["data"]["of"]
+        data["measured"]["asb"] = measured_coord_ir["data"]["asb"]
+        data["measured"]["wrt"] = measured_coord_ir["data"]["wrt"]
+        data["signal"] = g.compute_qname(signal)[2]
+        data["vector"] = vector_id
+        data["error_sum"] = f"{id}_error_sum"
+        data["last_error"] = f"{id}_prev_error"
+
         return {
             "id": id,
-            "data": {
-                "name": "pid_controller",
-                "measure_variable": measure_variable,
-                "dt": f"{id}_time_step",
-                "gains": gains if len(gains) > 0 else None,
-                "threshold": f"{id}_threshold_value",
-                "measured": coord_trans_ir["data"]["of"],
-                "setpoint": coord_trans_ir["data"]["sp"],
-                "signal": g.compute_qname(signal)[2],
-                "vector": vector_id,
-                "error_sum": f"{id}_error_sum",
-                "last_error": f"{id}_prev_error",
-            },
-            "state": state,
+            "data": data,
             "variables": variables,
         }

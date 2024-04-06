@@ -1,0 +1,20 @@
+{
+  "data": {
+    "operator": "Equal",
+    "reference_value": "move_arm_down_vel_twist_monitor_pre_lin_x_reference_value",
+    "measure_variable": "computeForwardVelocityKinematics",
+    "measured": {
+      "of": {
+        "id": "of_vel_qname_lin_x",
+        "entity": "bracelet_link",
+        "type": null,
+        "vector": "vel_bl_wrt_base_vector_lin_x"
+      },
+      "wrt": "base_link",
+      "asb": "base_link"
+    },
+    "flag": "move_arm_down_vel_twist_monitor_pre_lin_x_flag",
+    "return": null,
+    "name": "monitor_pre"
+  }
+}
