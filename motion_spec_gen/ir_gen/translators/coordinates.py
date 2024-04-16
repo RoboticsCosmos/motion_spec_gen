@@ -1,9 +1,11 @@
 from motion_spec_gen.namespaces import (
-    PIDController,
+    PID_CONTROLLER,
     THRESHOLD,
     CONSTRAINT,
     GEOM_COORD,
     GEOM_REL,
+    NEWTONIAN_RBD_REL,
+    NEWTONIAN_RBD_COORD
 )
 import rdflib
 from rdflib.collection import Collection
@@ -29,13 +31,14 @@ def get_vector_value(input_string):
 
     if vec_comp is None:
         raise ValueError("Invalid suffix")
-    
+
     if "linear" in input_string.lower():
-        return vec_comp + (0, 0, 0), f'lin_{suffix.lower()}'
+        return vec_comp + (0, 0, 0), f"lin_{suffix.lower()}"
     elif "angular" in input_string.lower():
-        return (0, 0, 0) + vec_comp, f'ang_{suffix.lower()}'
+        return (0, 0, 0) + vec_comp, f"ang_{suffix.lower()}"
     else:
         return vec_comp, suffix.lower()
+
 
 class CoordinatesTranslator:
     def translate(self, g: rdflib.Graph, node, **kwargs) -> dict:
@@ -177,7 +180,7 @@ class CoordinatesTranslator:
                     "value": vel_wrt,
                 }
 
-                of_vel_qname = f'{g.compute_qname(of_vel)[2]}{prefix}'
+                of_vel_qname = f"{g.compute_qname(of_vel)[2]}{prefix}"
                 vel_of_qname = g.compute_qname(vel_of)[2]
 
                 variables[vel_of_qname] = {
@@ -186,7 +189,7 @@ class CoordinatesTranslator:
                     "value": vel_of_qname,
                 }
 
-                variables[f'{of_vel_qname}_vector_{suffix}'] = {
+                variables[f"{of_vel_qname}_vector_{suffix}"] = {
                     "type": "array",
                     "size": 6,
                     "dtype": "double",
@@ -194,10 +197,10 @@ class CoordinatesTranslator:
                 }
 
                 data["of"] = {
-                    "id": f'of_vel_qname_{suffix}',
+                    "id": f"of_vel_qname_{suffix}",
                     "entity": vel_of_qname,
                     "type": None,
-                    "vector": f'{of_vel_qname}_vector_{suffix}',
+                    "vector": f"{of_vel_qname}_vector_{suffix}",
                 }
 
                 linear_vel = g.value(node, GEOM_COORD["linear-velocity"])
@@ -205,7 +208,7 @@ class CoordinatesTranslator:
 
                 # TODO: units are not considered for now as it is assumed to be m/s and rad/s
 
-                variables[f'of_vel_qname_{suffix}'] = {
+                variables[f"of_vel_qname_{suffix}"] = {
                     "type": None,
                     "dtype": "double",
                     "value": None,
@@ -240,7 +243,13 @@ class CoordinatesTranslator:
                 pass
 
         else:
-            pass
+            if g[node : rdflib.RDF.type : NEWTONIAN_RBD_COORD.WrenchCoordinate]:
+                data["type"] = "Wrench"
+
+                of_wrench = g.value(node, NEWTONIAN_RBD_COORD.of)
+                asb = g.value(node, NEWTONIAN_RBD_COORD["as-seen-by"])
+
+                # get the wrench
 
         return {
             "data": data,

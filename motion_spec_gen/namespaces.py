@@ -2,7 +2,15 @@ from rdflib.namespace import DefinedNamespace, Namespace
 from rdflib.term import URIRef
 
 
-class Monitor(DefinedNamespace):
+class QUDT(DefinedNamespace):
+
+    unit: URIRef
+    value: URIRef
+    hasQuantityKind: URIRef
+
+    _NS = Namespace("http://qudt.org/schema/qudt/")
+
+class MONITOR(DefinedNamespace):
 
     Monitor: URIRef
 
@@ -11,7 +19,7 @@ class Monitor(DefinedNamespace):
     _NS = Namespace("https://roboticscosmos.github.io/metamodels/monitors/monitor#")
 
 
-class Controller(DefinedNamespace):
+class CONTROLLER(DefinedNamespace):
 
     Controller: URIRef
 
@@ -23,7 +31,7 @@ class Controller(DefinedNamespace):
     )
 
 
-class PIDController(DefinedNamespace):
+class PID_CONTROLLER(DefinedNamespace):
 
     PIDController: URIRef
 
@@ -39,12 +47,32 @@ class PIDController(DefinedNamespace):
     )
 
 
+class IMPEDANCE_CONTROLLER(DefinedNamespace):
+
+    ImpedanceController: URIRef
+
+    stiffness: URIRef
+    damping: URIRef
+
+    _extras = [
+        "position-constraint",
+        "velocity-constraint",
+    ]
+
+    _NS = Namespace(
+        "https://roboticscosmos.github.io/metamodels/controllers/impedance_controller#"
+    )
+
+
 class THRESHOLD(DefinedNamespace):
 
     Threshold: URIRef
 
     _extras = [
-        "threshold-value",
+        "reference-value",
+        "threshold",
+        "upper-threshold",
+        "lower-threshold"
     ]
 
     _NS = Namespace("https://roboticscosmos.github.io/metamodels/thresholds#")
@@ -67,14 +95,9 @@ class CONSTRAINT(DefinedNamespace):
     NotEqual: URIRef
     InInterval: URIRef
 
-    threshold: URIRef
     operator: URIRef
 
     quantity: URIRef
-
-    _extras = [
-        "reference-value",
-    ]
 
     _NS = Namespace(
         "https://roboticscosmos.github.io/metamodels/relations/constraints#"
@@ -150,6 +173,51 @@ class GEOM_REL(DefinedNamespace):
     )
 
 
+class NEWTONIAN_RBD_COORD(DefinedNamespace):
+
+    ForceReference: URIRef
+    TorqueReference: URIRef
+    WrenchReference: URIRef
+
+    ForeCoordinate: URIRef
+    TorqueCoordinate: URIRef
+    WrenchCoordinate: URIRef
+
+    ForceVectorX: URIRef
+    ForceVectorY: URIRef
+    ForceVectorZ: URIRef
+
+    of: URIRef
+
+    _NS = Namespace(
+        "https://comp-rob2b.github.io/metamodels/newtonian-rigid-body-dynamics/coordinates#"
+    )
+
+
+class NEWTONIAN_RBD_REL(DefinedNamespace):
+
+    Force: URIRef
+    ContactForce: URIRef
+    Torque: URIRef
+    Wrench: URIRef
+
+    Stiffness: URIRef
+    LinearStiffness: URIRef
+    Damping: URIRef
+    LinearDamping: URIRef
+
+    _extras = [
+        "applied-to",
+        "applied-by",
+        "stiffness-diagonal-matrix",
+        "damping-diagonal-matrix",
+    ]
+
+    _NS = Namespace(
+        "https://roboticscosmos.github.io/metamodels/newtonian-rigid-body-dynamics/spatial-relations#"
+    )
+
+
 class GEOM_ENT(DefinedNamespace):
 
     Point: URIRef
@@ -175,7 +243,8 @@ class SOLVER(DefinedNamespace):
 
 class ACHD_SOLVER(DefinedNamespace):
 
-    VereshchaginSolver: URIRef
+    ACHDSolver: URIRef
+    ACHDSolverFext: URIRef
 
     _extras = [
         "alpha-constraints",
@@ -185,6 +254,17 @@ class ACHD_SOLVER(DefinedNamespace):
 
     _NS = Namespace(
         "https://roboticscosmos.github.io/metamodels/solvers/vereshchagin_solver#"
+    )
+
+
+class BASE_FD_SOLVER(DefinedNamespace):
+
+    BaseFDSolver: URIRef
+
+    wrench: URIRef
+
+    _NS = Namespace(
+        "https://roboticscosmos.github.io/metamodels/solvers/base_fd_solver#"
     )
 
 
@@ -200,6 +280,8 @@ class EMBED_MAP(DefinedNamespace):
     _extras = [
         "output-external-wrench",
         "output-acceleration-energy",
+        "stiffness-vector",
+        "damping-vector",
     ]
 
     _NS = Namespace(

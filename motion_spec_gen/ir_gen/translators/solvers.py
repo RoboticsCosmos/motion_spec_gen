@@ -1,6 +1,6 @@
 import numpy as np
 from motion_spec_gen.namespaces import (
-    Monitor,
+    MONITOR,
     THRESHOLD,
     CONSTRAINT,
     EMBED_MAP,

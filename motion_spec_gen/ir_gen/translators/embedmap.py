@@ -1,6 +1,6 @@
 from motion_spec_gen.namespaces import (
-    Controller,
-    PIDController,
+    CONTROLLER,
+    PID_CONTROLLER,
     EMBED_MAP,
 )
 import rdflib
@@ -34,7 +34,7 @@ class EmbedMapTranslator:
         embed_map_vector = list(Collection(g, embed_map_vector_collec))
         embed_map_vector = [float(q) for q in embed_map_vector]
 
-        vector_id = f'{g.compute_qname(node)[2]}_vector'
+        vector_id = f"{g.compute_qname(node)[2]}_vector"
 
         variables[vector_id] = {
             "type": "array",
@@ -45,7 +45,7 @@ class EmbedMapTranslator:
 
         return {
             "id": g.compute_qname(em_solver)[2],
-            "data":{
+            "data": {
                 "name": "embed_map",
                 "input": g.compute_qname(em_input)[2],
                 "output": output,
@@ -53,5 +53,5 @@ class EmbedMapTranslator:
                 "vector": vector_id,
                 "return": None,
             },
-            "variables": variables
+            "variables": variables,
         }

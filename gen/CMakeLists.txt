@@ -6,20 +6,23 @@ set(CMAKE_CXX_STANDARD 17)
 # find dependencies
 find_package(Eigen3 REQUIRED)
 find_package(kdl_utils REQUIRED)
-find_package(controllers REQUIRED)
 
 link_directories(${CMAKE_INSTALL_PREFIX}/lib)
 
-# export library
-add_executable(${PROJECT_NAME}
-  out.cpp
-)
+# add all cpp files in the folder
+file(GLOB SOURCES "*.cpp")
 
-# link libraries
-target_link_libraries(${PROJECT_NAME}
-  Eigen3::Eigen
-  kdl_utils::mutils
-  kdl_utils::math_utils
-  kdl_utils::solver_utils
-  controllers::pid_controller
-)
+# make executables
+foreach(source ${SOURCES})
+  get_filename_component(name ${source} NAME_WE)
+  add_executable(${name} ${source})
+  target_link_libraries(${name} Eigen3::Eigen kdl_utils::mutils kdl_utils::math_utils kdl_utils::solver_utils)
+
+  # set runtime path
+  set_target_properties(${name} PROPERTIES
+   BUILD_WITH_INSTALL_RPATH TRUE
+   INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
+   INSTALL_RPATH_USE_LINK_PATH TRUE)
+  install(TARGETS ${name} RUNTIME DESTINATION bin)
+endforeach(source ${SOURCES})
+

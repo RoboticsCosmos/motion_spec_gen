@@ -1,5 +1,5 @@
 from motion_spec_gen.namespaces import (
-    Monitor,
+    MONITOR,
     THRESHOLD,
     CONSTRAINT,
     EMBED_MAP,
@@ -19,13 +19,13 @@ class MonitorTranslator:
 
         id = g.compute_qname(node)[2]
 
-        constraint = g.value(node, Monitor.constraint)
+        constraint = g.value(node, MONITOR.constraint)
         threshold = g.value(constraint, CONSTRAINT["threshold"])
         operator = g.value(constraint, CONSTRAINT.operator)
 
         operator_type = g.value(operator, rdflib.RDF.type)
         operator_type = g.compute_qname(operator_type)[2]
-        
+
         data["operator"] = operator_type
         if operator_type == "Equal":
             reference_value = g.value(constraint, CONSTRAINT["reference-value"])
@@ -33,8 +33,8 @@ class MonitorTranslator:
             if reference_value is None:
                 # TODO: maybe check for reference (@id)
                 raise ValueError("Reference value not found")
-            
-            ref_val_id = f'{id}_reference_value'
+
+            ref_val_id = f"{id}_reference_value"
             variables[ref_val_id] = {
                 "type": None,
                 "dtype": "double",
@@ -47,8 +47,8 @@ class MonitorTranslator:
 
             if threshold_value is None:
                 raise ValueError("Threshold value not found")
-            
-            threshold_id = f'{id}_threshold_value'
+
+            threshold_id = f"{id}_threshold_value"
             variables[threshold_id] = {
                 "type": None,
                 "dtype": "double",
@@ -61,13 +61,13 @@ class MonitorTranslator:
 
         # measured coordinate
         measured_coord = g.value(constraint, CONSTRAINT["quantity"])
-        measured_coord_ir = CoordinatesTranslator().translate(g, measured_coord, prefix="")
+        measured_coord_ir = CoordinatesTranslator().translate(
+            g, measured_coord, prefix=""
+        )
         variables.update(measured_coord_ir["variables"])
-        
-        
+
         coord_type = measured_coord_ir["data"]["type"]
 
-                
         # if coord_type == "Position":
         #     data["measure_variable"] = "computeForwardPositionKinematics"
         #     data["measured"] = coord_trans_ir["data"]["of"]
@@ -84,7 +84,7 @@ class MonitorTranslator:
         #         "entities": [g.compute_qname(e)[2] for e in of["entities"]],
         #     }
         #     data["asb"] = asb
-        
+
         if coord_type == "VelocityTwist":
             data["measure_variable"] = "computeForwardVelocityKinematics"
             data["measured"] = measured_coord_ir["data"]["of"]

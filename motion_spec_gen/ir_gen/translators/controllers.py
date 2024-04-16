@@ -1,16 +1,25 @@
 from motion_spec_gen.namespaces import (
-    Controller,
-    PIDController,
+    CONTROLLER,
+    PID_CONTROLLER,
+    IMPEDANCE_CONTROLLER,
     THRESHOLD,
     CONSTRAINT,
     EMBED_MAP,
+    QUDT,
+    GEOM_REL,
+    GEOM_COORD,
+    NEWTONIAN_RBD_COORD,
+    NEWTONIAN_RBD_REL
 )
 import rdflib
 from rdflib.collection import Collection
 
 from motion_spec_gen.ir_gen.translators.coordinates import CoordinatesTranslator
 
+from motion_spec_gen.utility.helpers import for_type
 
+
+@for_type(PID_CONTROLLER.PIDController)
 class PIDControllerTranslator:
 
     def translate(self, g: rdflib.Graph, node) -> dict:
@@ -20,12 +29,12 @@ class PIDControllerTranslator:
 
         id = g.compute_qname(node)[2]
 
-        p_gain = g.value(node, PIDController["p-gain"])
-        i_gain = g.value(node, PIDController["i-gain"])
-        d_gain = g.value(node, PIDController["d-gain"])
-        time_step = g.value(node, PIDController["time-step"])
+        p_gain = g.value(node, PID_CONTROLLER["p-gain"])
+        i_gain = g.value(node, PID_CONTROLLER["i-gain"])
+        d_gain = g.value(node, PID_CONTROLLER["d-gain"])
+        time_step = g.value(node, PID_CONTROLLER["time-step"])
 
-        signal = g.value(node, Controller.signal)
+        signal = g.value(node, CONTROLLER.signal)
 
         # find a embedded_map associated with the signal
         embedded_map = g.value(predicate=EMBED_MAP.input, object=signal)
@@ -41,8 +50,8 @@ class PIDControllerTranslator:
             "value": None,
         }
 
-        constraint = g.value(node, Controller.constraint)
-        threshold = g.value(constraint, CONSTRAINT["threshold"])
+        constraint = g.value(node, CONTROLLER.constraint)
+        quantity = g.value(constraint, CONSTRAINT.quantity)
 
         operator = g.value(constraint, CONSTRAINT.operator)
 
@@ -51,41 +60,31 @@ class PIDControllerTranslator:
 
         data["operator"] = operator_type
         if operator_type == "Equal":
-            reference_value = g.value(constraint, CONSTRAINT["reference-value"])
+            reference_value = g.value(constraint, THRESHOLD["reference-value"])
 
             if reference_value is None:
-                # TODO: maybe check for reference (@id)
                 raise ValueError("Reference value not found")
+            
+            #TODO: check quantity kind of reference value is same as that of the quantity
+            rv_quant_kind = g.value(reference_value, QUDT.hasQuantityKind)
 
-            ref_val_id = f"{id}_reference_value"
+            unit = g.value(reference_value, QUDT.unit)
+            value = g.value(reference_value, QUDT["value"])
+
+            ref_val_id = g.compute_qname(reference_value)[2]
             variables[ref_val_id] = {
                 "type": None,
                 "dtype": "double",
-                "value": reference_value,
+                "value": value,
             }
-            data["setpoint_value"] = ref_val_id
-
-        elif operator_type == "LessThan" or operator_type == "GreaterThan":
-            threshold_value = g.value(threshold, THRESHOLD["threshold-value"])
-
-            if threshold_value is None:
-                raise ValueError("Threshold value not found")
-
-            threshold_id = f"{id}_threshold_value"
-            variables[threshold_id] = {
-                "type": None,
-                "dtype": "double",
-                "value": threshold_value,
-            }
-            data["threshold_value"] = threshold_id
+            data["reference_value"] = ref_val_id
 
         else:
             raise ValueError("Operator type not supported")
 
         # measured coordinate
-        measured_coord = g.value(constraint, CONSTRAINT["quantity"])
         measured_coord_ir = CoordinatesTranslator().translate(
-            g, measured_coord, prefix=""
+            g, quantity, prefix=""
         )
         variables.update(measured_coord_ir["variables"])
 
@@ -169,3 +168,49 @@ class PIDControllerTranslator:
             "data": data,
             "variables": variables,
         }
+
+
+@for_type(IMPEDANCE_CONTROLLER.ImpedanceController)
+class ImpedanceControllerTranslator:
+
+    def translate(self, g: rdflib.Graph, node) -> dict:
+
+        pass
+
+        variables = {}
+        data = {}
+
+        id = g.compute_qname(node)[2]
+
+        stiffness = g.value(node, IMPEDANCE_CONTROLLER.stiffness)
+        damping = g.value(node, IMPEDANCE_CONTROLLER.damping)
+
+        signal = g.value(node, CONTROLLER.signal)
+
+        # find a embedded_map associated with the signal
+        embedded_map = g.value(predicate=EMBED_MAP.input, object=signal)
+
+        embed_map_vector_collec = g.value(embedded_map, EMBED_MAP.vector)
+        embed_map_vector = list(Collection(g, embed_map_vector_collec))
+        embed_map_vector = [float(q) for q in embed_map_vector]
+
+        # append signal to variables
+        variables[g.compute_qname(signal)[2]] = {
+            "type": None,
+            "dtype": "double",
+            "value": None,
+        }
+
+        constraint = g.value(node, CONTROLLER.constraint)
+        threshold = g.value(constraint, CONSTRAINT["threshold"])
+
+        operator = g.value(constraint, CONSTRAINT.operator)
+
+        operator_type = g.value(operator, rdflib.RDF.type)
+        operator_type = g.compute_qname(operator_type)[2]
+
+        data["operator"] = operator_type
+        if operator_type == "Equal":
+            reference_value = g.value(constraint, CONSTRAINT["reference-value"])
+
+            pass
