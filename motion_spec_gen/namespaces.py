@@ -179,7 +179,7 @@ class NEWTONIAN_RBD_COORD(DefinedNamespace):
     TorqueReference: URIRef
     WrenchReference: URIRef
 
-    ForeCoordinate: URIRef
+    ForceCoordinate: URIRef
     TorqueCoordinate: URIRef
     WrenchCoordinate: URIRef
 
@@ -188,6 +188,10 @@ class NEWTONIAN_RBD_COORD(DefinedNamespace):
     ForceVectorZ: URIRef
 
     of: URIRef
+
+    _extras = [
+        "as-seen-by",
+    ]
 
     _NS = Namespace(
         "https://comp-rob2b.github.io/metamodels/newtonian-rigid-body-dynamics/coordinates#"

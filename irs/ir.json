@@ -1,11 +1,574 @@
 {
-  "variables": {},
+  "variables": {
+    "kinova_left_bracelet_base_lin_vel_x_pid_controller_signal": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "arm_bracelet_link_lin_xy_vel_reference_value": {
+      "type": null,
+      "dtype": "double",
+      "value": "-10.0"
+    },
+    "base_link": {
+      "type": null,
+      "dtype": "string",
+      "value": "base_link"
+    },
+    "kinova_left_bracelet_link": {
+      "type": null,
+      "dtype": "string",
+      "value": "kinova_left_bracelet_link"
+    },
+    "kinova_left_bracelet_base_vel_vector_lin_x": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [1, 0, 0, 0, 0, 0]
+    },
+    "of_vel_qname_lin_x": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kinova_left_bracelet_base_lin_vel_x_pid_controller_time_step": {
+      "type": null,
+      "dtype": "double",
+      "value": "1"
+    },
+    "kinova_left_bracelet_base_lin_vel_x_pid_controller_kp": {
+      "type": null,
+      "dtype": "double",
+      "value": "20.0"
+    },
+    "kinova_left_bracelet_base_lin_vel_x_pid_controller_ki": {
+      "type": null,
+      "dtype": "double",
+      "value": "0.9"
+    },
+    "kinova_left_bracelet_base_lin_vel_x_pid_controller_kd": {
+      "type": null,
+      "dtype": "double",
+      "value": 0.0
+    },
+    "kinova_left_bracelet_base_lin_vel_x_pid_controller_error_sum": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kinova_left_bracelet_base_lin_vel_x_pid_controller_prev_error": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kinova_left_bracelet_base_lin_vel_x_twist_embed_map_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    },
+    "kinova_left_bracelet_table_contact_force_pid_controller_signal": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "arm_table_contact_force_reference_value": {
+      "type": null,
+      "dtype": "double",
+      "value": "-10.0"
+    },
+    "table": {
+      "type": null,
+      "dtype": "string",
+      "value": "table"
+    },
+    "kinova_left_bracelet_table_contact_force_lin_z_vector_z": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [0, 0, 1]
+    },
+    "kinova_left_bracelet_table_contact_force_pid_controller_time_step": {
+      "type": null,
+      "dtype": "double",
+      "value": "1"
+    },
+    "kinova_left_bracelet_table_contact_force_pid_controller_kp": {
+      "type": null,
+      "dtype": "double",
+      "value": "20.0"
+    },
+    "kinova_left_bracelet_table_contact_force_pid_controller_ki": {
+      "type": null,
+      "dtype": "double",
+      "value": "0.9"
+    },
+    "kinova_left_bracelet_table_contact_force_pid_controller_kd": {
+      "type": null,
+      "dtype": "double",
+      "value": 0.0
+    },
+    "kinova_left_bracelet_table_contact_force_pid_controller_error_sum": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kinova_left_bracelet_table_contact_force_pid_controller_prev_error": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kinova_left_bracelet_table_contact_force_embed_map_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [0.0, 0.0, 1.0, 0.0, 0.0, 0.0]
+    },
+    "kinova_right_bracelet_table_contact_force_pid_controller_signal": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kinova_right_bracelet_link": {
+      "type": null,
+      "dtype": "string",
+      "value": "kinova_right_bracelet_link"
+    },
+    "kinova_right_bracelet_table_contact_force_lin_z_vector_z": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [0, 0, 1]
+    },
+    "kinova_right_bracelet_table_contact_force_pid_controller_time_step": {
+      "type": null,
+      "dtype": "double",
+      "value": "1"
+    },
+    "kinova_right_bracelet_table_contact_force_pid_controller_kp": {
+      "type": null,
+      "dtype": "double",
+      "value": "20.0"
+    },
+    "kinova_right_bracelet_table_contact_force_pid_controller_ki": {
+      "type": null,
+      "dtype": "double",
+      "value": "0.9"
+    },
+    "kinova_right_bracelet_table_contact_force_pid_controller_kd": {
+      "type": null,
+      "dtype": "double",
+      "value": 0.0
+    },
+    "kinova_right_bracelet_table_contact_force_pid_controller_error_sum": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kinova_right_bracelet_table_contact_force_pid_controller_prev_error": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kinova_right_bracelet_table_contact_force_embed_map_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [0.0, 0.0, 1.0, 0.0, 0.0, 0.0]
+    },
+    "kinova_left_bracelet_base_lin_vel_y_pid_controller_signal": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kinova_left_bracelet_base_vel_vector_lin_y": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [0, 1, 0, 0, 0, 0]
+    },
+    "of_vel_qname_lin_y": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kinova_left_bracelet_base_lin_vel_y_pid_controller_time_step": {
+      "type": null,
+      "dtype": "double",
+      "value": "1"
+    },
+    "kinova_left_bracelet_base_lin_vel_y_pid_controller_kp": {
+      "type": null,
+      "dtype": "double",
+      "value": "20.0"
+    },
+    "kinova_left_bracelet_base_lin_vel_y_pid_controller_ki": {
+      "type": null,
+      "dtype": "double",
+      "value": "0.9"
+    },
+    "kinova_left_bracelet_base_lin_vel_y_pid_controller_kd": {
+      "type": null,
+      "dtype": "double",
+      "value": 0.0
+    },
+    "kinova_left_bracelet_base_lin_vel_y_pid_controller_error_sum": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kinova_left_bracelet_base_lin_vel_y_pid_controller_prev_error": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kinova_left_bracelet_base_lin_vel_y_embed_map_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
+    },
+    "kinova_right_bracelet_base_lin_vel_x_pid_controller_signal": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kinova_right_bracelet_base_vel_vector_lin_x": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [1, 0, 0, 0, 0, 0]
+    },
+    "kinova_right_bracelet_base_lin_vel_x_pid_controller_time_step": {
+      "type": null,
+      "dtype": "double",
+      "value": "1"
+    },
+    "kinova_right_bracelet_base_lin_vel_x_pid_controller_kp": {
+      "type": null,
+      "dtype": "double",
+      "value": "20.0"
+    },
+    "kinova_right_bracelet_base_lin_vel_x_pid_controller_ki": {
+      "type": null,
+      "dtype": "double",
+      "value": "0.9"
+    },
+    "kinova_right_bracelet_base_lin_vel_x_pid_controller_kd": {
+      "type": null,
+      "dtype": "double",
+      "value": 0.0
+    },
+    "kinova_right_bracelet_base_lin_vel_x_pid_controller_error_sum": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kinova_right_bracelet_base_lin_vel_x_pid_controller_prev_error": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kinova_right_bracelet_base_lin_vel_x_embed_map_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    },
+    "kinova_right_bracelet_base_lin_vel_y_pid_controller_signal": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kinova_right_bracelet_base_vel_vector_lin_y": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [0, 1, 0, 0, 0, 0]
+    },
+    "kinova_right_bracelet_base_lin_vel_y_pid_controller_time_step": {
+      "type": null,
+      "dtype": "double",
+      "value": "1"
+    },
+    "kinova_right_bracelet_base_lin_vel_y_pid_controller_kp": {
+      "type": null,
+      "dtype": "double",
+      "value": "20.0"
+    },
+    "kinova_right_bracelet_base_lin_vel_y_pid_controller_ki": {
+      "type": null,
+      "dtype": "double",
+      "value": "0.9"
+    },
+    "kinova_right_bracelet_base_lin_vel_y_pid_controller_kd": {
+      "type": null,
+      "dtype": "double",
+      "value": 0.0
+    },
+    "kinova_right_bracelet_base_lin_vel_y_pid_controller_error_sum": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kinova_right_bracelet_base_lin_vel_y_pid_controller_prev_error": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kinova_right_bracelet_base_lin_vel_y_twist_embed_map_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
+    },
+    "kinova_left_bracelet_base_distance_impedance_controller_signal": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kinova_left_bracelet_base_distance_impedance_controller_stiffness_diag_mat": {
+      "type": "array",
+      "size": 1,
+      "dtype": "double",
+      "value": [1.0]
+    },
+    "arms_distance_reference_value": {
+      "type": null,
+      "dtype": "double",
+      "value": "0.5"
+    },
+    "kinova_left_bracelet_base_distance": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kinova_left_bracelet_base_distance_embed_map_vector": {
+      "type": "array",
+      "size": 0,
+      "dtype": "double",
+      "value": []
+    },
+    "kinova_right_bracelet_base_distance_impedance_controller_signal": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kinova_right_bracelet_base_distance_impedance_controller_stiffness_diag_mat": {
+      "type": "array",
+      "size": 1,
+      "dtype": "double",
+      "value": [1.0]
+    },
+    "kinova_right_bracelet_base_distance": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kinova_right_bracelet_base_distance_embed_map_vector": {
+      "type": "array",
+      "size": 0,
+      "dtype": "double",
+      "value": []
+    }
+  },
   "d": {
     "monitors": {
       "pre": {},
       "post": {}
     },
-    "controllers": {},
+    "controllers": {
+      "kinova_left_bracelet_base_lin_vel_x_pid_controller": {
+        "measured": {
+          "wrt": "base_link",
+          "of": {
+            "id": "of_vel_qname_lin_x",
+            "entity": "kinova_left_bracelet_link",
+            "type": "twist",
+            "vector": "kinova_left_bracelet_base_vel_vector_lin_x"
+          },
+          "asb": "base_link"
+        },
+        "operator": "Equal",
+        "reference_value": "arm_bracelet_link_lin_xy_vel_reference_value",
+        "name": "pid_controller",
+        "measure_variable": "computeForwardVelocityKinematics",
+        "dt": "kinova_left_bracelet_base_lin_vel_x_pid_controller_time_step",
+        "gains": {
+          "kp": "kinova_left_bracelet_base_lin_vel_x_pid_controller_kp",
+          "ki": "kinova_left_bracelet_base_lin_vel_x_pid_controller_ki",
+          "kd": "kinova_left_bracelet_base_lin_vel_x_pid_controller_kd"
+        },
+        "signal": "kinova_left_bracelet_base_lin_vel_x_pid_controller_signal",
+        "vector": "kinova_left_bracelet_base_lin_vel_x_twist_embed_map_vector",
+        "error_sum": "kinova_left_bracelet_base_lin_vel_x_pid_controller_error_sum",
+        "last_error": "kinova_left_bracelet_base_lin_vel_x_pid_controller_prev_error"
+      },
+      "kinova_left_bracelet_table_contact_force_pid_controller": {
+        "measured": {
+          "of": {
+            "id": "kinova_left_bracelet_table_contact_force_lin_z_z",
+            "applied-by-entity": "kinova_left_bracelet_link",
+            "applied-to-entity": "table",
+            "type": "force",
+            "vector": "kinova_left_bracelet_table_contact_force_lin_z_vector_z"
+          },
+          "asb": "kinova_left_bracelet_link"
+        },
+        "operator": "Equal",
+        "reference_value": "arm_table_contact_force_reference_value",
+        "name": "pid_controller",
+        "measure_variable": "computeForce",
+        "dt": "kinova_left_bracelet_table_contact_force_pid_controller_time_step",
+        "gains": {
+          "kp": "kinova_left_bracelet_table_contact_force_pid_controller_kp",
+          "ki": "kinova_left_bracelet_table_contact_force_pid_controller_ki",
+          "kd": "kinova_left_bracelet_table_contact_force_pid_controller_kd"
+        },
+        "signal": "kinova_left_bracelet_table_contact_force_pid_controller_signal",
+        "vector": "kinova_left_bracelet_table_contact_force_embed_map_vector",
+        "error_sum": "kinova_left_bracelet_table_contact_force_pid_controller_error_sum",
+        "last_error": "kinova_left_bracelet_table_contact_force_pid_controller_prev_error"
+      },
+      "kinova_right_bracelet_table_contact_force_pid_controller": {
+        "measured": {
+          "of": {
+            "id": "kinova_right_bracelet_table_contact_force_lin_z_z",
+            "applied-by-entity": "kinova_right_bracelet_link",
+            "applied-to-entity": "table",
+            "type": "force",
+            "vector": "kinova_right_bracelet_table_contact_force_lin_z_vector_z"
+          },
+          "asb": "kinova_right_bracelet_link"
+        },
+        "operator": "Equal",
+        "reference_value": "arm_table_contact_force_reference_value",
+        "name": "pid_controller",
+        "measure_variable": "computeForce",
+        "dt": "kinova_right_bracelet_table_contact_force_pid_controller_time_step",
+        "gains": {
+          "kp": "kinova_right_bracelet_table_contact_force_pid_controller_kp",
+          "ki": "kinova_right_bracelet_table_contact_force_pid_controller_ki",
+          "kd": "kinova_right_bracelet_table_contact_force_pid_controller_kd"
+        },
+        "signal": "kinova_right_bracelet_table_contact_force_pid_controller_signal",
+        "vector": "kinova_right_bracelet_table_contact_force_embed_map_vector",
+        "error_sum": "kinova_right_bracelet_table_contact_force_pid_controller_error_sum",
+        "last_error": "kinova_right_bracelet_table_contact_force_pid_controller_prev_error"
+      },
+      "kinova_left_bracelet_base_lin_vel_y_pid_controller": {
+        "measured": {
+          "wrt": "base_link",
+          "of": {
+            "id": "of_vel_qname_lin_y",
+            "entity": "kinova_left_bracelet_link",
+            "type": "twist",
+            "vector": "kinova_left_bracelet_base_vel_vector_lin_y"
+          },
+          "asb": "base_link"
+        },
+        "operator": "Equal",
+        "reference_value": "arm_bracelet_link_lin_xy_vel_reference_value",
+        "name": "pid_controller",
+        "measure_variable": "computeForwardVelocityKinematics",
+        "dt": "kinova_left_bracelet_base_lin_vel_y_pid_controller_time_step",
+        "gains": {
+          "kp": "kinova_left_bracelet_base_lin_vel_y_pid_controller_kp",
+          "ki": "kinova_left_bracelet_base_lin_vel_y_pid_controller_ki",
+          "kd": "kinova_left_bracelet_base_lin_vel_y_pid_controller_kd"
+        },
+        "signal": "kinova_left_bracelet_base_lin_vel_y_pid_controller_signal",
+        "vector": "kinova_left_bracelet_base_lin_vel_y_embed_map_vector",
+        "error_sum": "kinova_left_bracelet_base_lin_vel_y_pid_controller_error_sum",
+        "last_error": "kinova_left_bracelet_base_lin_vel_y_pid_controller_prev_error"
+      },
+      "kinova_right_bracelet_base_lin_vel_x_pid_controller": {
+        "measured": {
+          "wrt": "base_link",
+          "of": {
+            "id": "of_vel_qname_lin_x",
+            "entity": "kinova_right_bracelet_link",
+            "type": "twist",
+            "vector": "kinova_right_bracelet_base_vel_vector_lin_x"
+          },
+          "asb": "base_link"
+        },
+        "operator": "Equal",
+        "reference_value": "arm_bracelet_link_lin_xy_vel_reference_value",
+        "name": "pid_controller",
+        "measure_variable": "computeForwardVelocityKinematics",
+        "dt": "kinova_right_bracelet_base_lin_vel_x_pid_controller_time_step",
+        "gains": {
+          "kp": "kinova_right_bracelet_base_lin_vel_x_pid_controller_kp",
+          "ki": "kinova_right_bracelet_base_lin_vel_x_pid_controller_ki",
+          "kd": "kinova_right_bracelet_base_lin_vel_x_pid_controller_kd"
+        },
+        "signal": "kinova_right_bracelet_base_lin_vel_x_pid_controller_signal",
+        "vector": "kinova_right_bracelet_base_lin_vel_x_embed_map_vector",
+        "error_sum": "kinova_right_bracelet_base_lin_vel_x_pid_controller_error_sum",
+        "last_error": "kinova_right_bracelet_base_lin_vel_x_pid_controller_prev_error"
+      },
+      "kinova_right_bracelet_base_lin_vel_y_pid_controller": {
+        "measured": {
+          "wrt": "base_link",
+          "of": {
+            "id": "of_vel_qname_lin_y",
+            "entity": "kinova_right_bracelet_link",
+            "type": "twist",
+            "vector": "kinova_right_bracelet_base_vel_vector_lin_y"
+          },
+          "asb": "base_link"
+        },
+        "operator": "Equal",
+        "reference_value": "arm_bracelet_link_lin_xy_vel_reference_value",
+        "name": "pid_controller",
+        "measure_variable": "computeForwardVelocityKinematics",
+        "dt": "kinova_right_bracelet_base_lin_vel_y_pid_controller_time_step",
+        "gains": {
+          "kp": "kinova_right_bracelet_base_lin_vel_y_pid_controller_kp",
+          "ki": "kinova_right_bracelet_base_lin_vel_y_pid_controller_ki",
+          "kd": "kinova_right_bracelet_base_lin_vel_y_pid_controller_kd"
+        },
+        "signal": "kinova_right_bracelet_base_lin_vel_y_pid_controller_signal",
+        "vector": "kinova_right_bracelet_base_lin_vel_y_twist_embed_map_vector",
+        "error_sum": "kinova_right_bracelet_base_lin_vel_y_pid_controller_error_sum",
+        "last_error": "kinova_right_bracelet_base_lin_vel_y_pid_controller_prev_error"
+      },
+      "kinova_left_bracelet_base_distance_impedance_controller": {
+        "operator": "Equal",
+        "reference_value": "arms_distance_reference_value",
+        "stiffness": {
+          "measure_variable": "computeDistance",
+          "diag_mat": "kinova_left_bracelet_base_distance_impedance_controller_stiffness_diag_mat",
+          "measured": {
+            "id": "kinova_left_bracelet_base_distance",
+            "entities": ["kinova_left_bracelet_link", "kinova_left_base_link"]
+          },
+          "asb": "base_link"
+        },
+        "name": "impedance_controller",
+        "damping": null,
+        "signal": "kinova_left_bracelet_base_distance_impedance_controller_signal",
+        "vector": "kinova_left_bracelet_base_distance_embed_map_vector"
+      },
+      "kinova_right_bracelet_base_distance_impedance_controller": {
+        "operator": "Equal",
+        "reference_value": "arms_distance_reference_value",
+        "stiffness": {
+          "measure_variable": "computeDistance",
+          "diag_mat": "kinova_right_bracelet_base_distance_impedance_controller_stiffness_diag_mat",
+          "measured": {
+            "id": "kinova_right_bracelet_base_distance",
+            "entities": ["kinova_right_bracelet_link", "kinova_right_base_link"]
+          },
+          "asb": "base_link"
+        },
+        "name": "impedance_controller",
+        "damping": null,
+        "signal": "kinova_right_bracelet_base_distance_impedance_controller_signal",
+        "vector": "kinova_right_bracelet_base_distance_embed_map_vector"
+      }
+    },
     "embed_maps": {},
     "solvers": {}
   }

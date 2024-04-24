@@ -117,7 +117,10 @@ def main():
 
             for translator in controller_translators:
                 if translator.is_applicable(g, controller):
-                    translator().translate(g, controller)
+                    ir = translator().translate(g, controller)
+
+                    data["variables"].update(ir["variables"])
+                    data["d"]["controllers"][ir["id"]] = ir["data"]
 
             # intermediate representation generator
         #     ir = PIDControllerTranslator().translate(g, controller)

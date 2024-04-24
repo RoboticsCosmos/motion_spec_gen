@@ -9,7 +9,7 @@ from motion_spec_gen.namespaces import (
     GEOM_REL,
     GEOM_COORD,
     NEWTONIAN_RBD_COORD,
-    NEWTONIAN_RBD_REL
+    NEWTONIAN_RBD_REL,
 )
 import rdflib
 from rdflib.collection import Collection
@@ -25,7 +25,9 @@ class PIDControllerTranslator:
     def translate(self, g: rdflib.Graph, node) -> dict:
 
         variables = {}
-        data = {}
+        data = {
+            "measured": {},
+        }
 
         id = g.compute_qname(node)[2]
 
@@ -64,8 +66,8 @@ class PIDControllerTranslator:
 
             if reference_value is None:
                 raise ValueError("Reference value not found")
-            
-            #TODO: check quantity kind of reference value is same as that of the quantity
+
+            # TODO: check quantity kind of reference value is same as that of the quantity
             rv_quant_kind = g.value(reference_value, QUDT.hasQuantityKind)
 
             unit = g.value(reference_value, QUDT.unit)
@@ -83,15 +85,17 @@ class PIDControllerTranslator:
             raise ValueError("Operator type not supported")
 
         # measured coordinate
-        measured_coord_ir = CoordinatesTranslator().translate(
-            g, quantity, prefix=""
-        )
+        measured_coord_ir = CoordinatesTranslator().translate(g, quantity, prefix="")
         variables.update(measured_coord_ir["variables"])
 
         coord_type = measured_coord_ir["data"]["type"]
 
         if coord_type == "VelocityTwist":
             measure_variable = "computeForwardVelocityKinematics"
+
+            data["measured"]["wrt"] = measured_coord_ir["data"]["wrt"]
+        elif coord_type == "Force":
+            measure_variable = "computeForce"
 
         # time-step
         variables[f"{id}_time_step"] = {
@@ -155,9 +159,8 @@ class PIDControllerTranslator:
         data["measure_variable"] = measure_variable
         data["dt"] = f"{id}_time_step"
         data["gains"] = gains if len(gains) > 0 else None
-        data["measured"] = measured_coord_ir["data"]["of"]
+        data["measured"]["of"] = measured_coord_ir["data"]["of"]
         data["measured"]["asb"] = measured_coord_ir["data"]["asb"]
-        data["measured"]["wrt"] = measured_coord_ir["data"]["wrt"]
         data["signal"] = g.compute_qname(signal)[2]
         data["vector"] = vector_id
         data["error_sum"] = f"{id}_error_sum"
@@ -175,8 +178,6 @@ class ImpedanceControllerTranslator:
 
     def translate(self, g: rdflib.Graph, node) -> dict:
 
-        pass
-
         variables = {}
         data = {}
 
@@ -186,6 +187,7 @@ class ImpedanceControllerTranslator:
         damping = g.value(node, IMPEDANCE_CONTROLLER.damping)
 
         signal = g.value(node, CONTROLLER.signal)
+        signal_qname = g.compute_qname(signal)[2]
 
         # find a embedded_map associated with the signal
         embedded_map = g.value(predicate=EMBED_MAP.input, object=signal)
@@ -195,22 +197,93 @@ class ImpedanceControllerTranslator:
         embed_map_vector = [float(q) for q in embed_map_vector]
 
         # append signal to variables
-        variables[g.compute_qname(signal)[2]] = {
+        variables[signal_qname] = {
             "type": None,
             "dtype": "double",
             "value": None,
         }
 
-        constraint = g.value(node, CONTROLLER.constraint)
-        threshold = g.value(constraint, CONSTRAINT["threshold"])
+        if stiffness:
+            stiffness_constraint = g.value(stiffness, CONTROLLER.constraint)
+            stiffness_diag_mat = g.value(
+                stiffness, NEWTONIAN_RBD_REL["stiffness-diagonal-matrix"]
+            )
+            stiffness_diag_mat = list(Collection(g, stiffness_diag_mat))
+            stiffness_diag_mat = [float(q) for q in stiffness_diag_mat]
 
-        operator = g.value(constraint, CONSTRAINT.operator)
+            variables[f"{id}_stiffness_diag_mat"] = {
+                "type": "array",
+                "size": len(stiffness_diag_mat),
+                "dtype": "double",
+                "value": stiffness_diag_mat,
+            }
 
-        operator_type = g.value(operator, rdflib.RDF.type)
-        operator_type = g.compute_qname(operator_type)[2]
+            quantity = g.value(stiffness_constraint, CONSTRAINT.quantity)
 
-        data["operator"] = operator_type
-        if operator_type == "Equal":
-            reference_value = g.value(constraint, CONSTRAINT["reference-value"])
+            operator = g.value(stiffness_constraint, CONSTRAINT.operator)
 
-            pass
+            operator_type = g.value(operator, rdflib.RDF.type)
+            operator_type = g.compute_qname(operator_type)[2]
+
+            data["operator"] = operator_type
+            if operator_type == "Equal":
+                reference_value = g.value(
+                    stiffness_constraint, THRESHOLD["reference-value"]
+                )
+
+                if reference_value is None:
+                    raise ValueError("Reference value not found")
+
+                # TODO: check quantity kind of reference value is same as that of the quantity
+                rv_quant_kind = g.value(reference_value, QUDT.hasQuantityKind)
+
+                unit = g.value(reference_value, QUDT.unit)
+                value = g.value(reference_value, QUDT["value"])
+
+                ref_val_id = g.compute_qname(reference_value)[2]
+                variables[ref_val_id] = {
+                    "type": None,
+                    "dtype": "double",
+                    "value": value,
+                }
+                data["reference_value"] = ref_val_id
+
+            else:
+                raise ValueError("Operator type not supported")
+            
+            # measured coordinate
+            measured_coord_ir = CoordinatesTranslator().translate(g, quantity, prefix="")
+            variables.update(measured_coord_ir["variables"])
+
+            coord_type = measured_coord_ir["data"]["type"]
+
+            if coord_type == "Distance":
+                measure_variable = "computeDistance"
+
+            # vector
+            vector_id = f"{g.compute_qname(embedded_map)[2]}_vector"
+            variables[vector_id] = {
+                "type": "array",
+                "size": len(embed_map_vector),
+                "dtype": "double",
+                "value": embed_map_vector,
+            }
+
+            data["stiffness"] = {
+                "measure_variable": measure_variable,
+                "diag_mat": f"{id}_stiffness_diag_mat",
+                "measured": measured_coord_ir["data"]["of"],
+                "asb": measured_coord_ir["data"]["asb"],
+            }
+
+        data["name"] = "impedance_controller"
+        data["damping"] = None
+        data["signal"] = signal_qname
+        data["vector"] = vector_id
+
+        return {
+            "id": id,
+            "data": data,
+            "variables": variables,
+        }
+

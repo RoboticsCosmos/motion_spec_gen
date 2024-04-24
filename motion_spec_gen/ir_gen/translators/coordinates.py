@@ -5,7 +5,7 @@ from motion_spec_gen.namespaces import (
     GEOM_COORD,
     GEOM_REL,
     NEWTONIAN_RBD_REL,
-    NEWTONIAN_RBD_COORD
+    NEWTONIAN_RBD_COORD,
 )
 import rdflib
 from rdflib.collection import Collection
@@ -130,6 +130,7 @@ class CoordinatesTranslator:
 
                 # distance entities
                 dist_bw = g.objects(of_dist, GEOM_REL["between-entities"])
+                dist_bw = [g.compute_qname(e)[2] for e in dist_bw]
 
                 of_dist_qname = g.compute_qname(of_dist)[2]
                 asb_qname = g.compute_qname(asb)[2]
@@ -170,7 +171,6 @@ class CoordinatesTranslator:
 
                 # get the veloicty
                 vel_of = g.value(of_vel, GEOM_REL["of-entity"])
-                # TODO: do something with the with-respect-to
                 vel_wrt = g.value(of_vel, GEOM_REL["with-respect-to"])
                 vel_wrt = g.compute_qname(vel_wrt)[2]
 
@@ -199,12 +199,9 @@ class CoordinatesTranslator:
                 data["of"] = {
                     "id": f"of_vel_qname_{suffix}",
                     "entity": vel_of_qname,
-                    "type": None,
+                    "type": "twist",
                     "vector": f"{of_vel_qname}_vector_{suffix}",
                 }
-
-                linear_vel = g.value(node, GEOM_COORD["linear-velocity"])
-                angular_vel = g.value(node, GEOM_COORD["angular-velocity"])
 
                 # TODO: units are not considered for now as it is assumed to be m/s and rad/s
 
@@ -214,28 +211,6 @@ class CoordinatesTranslator:
                     "value": None,
                 }
 
-                if linear_vel or angular_vel:
-                    data["of"]["entity"] = None
-                    if linear_vel:
-                        linear = list(Collection(g, linear_vel))
-                        linear_value = [float(q) for q in linear]
-                        variables[of_vel_qname]["value"] = linear_value
-                        data["of"]["type"] = "linear"
-                    if angular_vel:
-                        angular = list(Collection(g, angular_vel))
-                        angular_value = [float(q) for q in angular]
-                        variables[of_vel_qname]["value"] = (
-                            angular_value
-                            if not variables[of_vel_qname]["value"]
-                            else variables[of_vel_qname]["value"] + angular_value
-                        )
-                        data["of"]["type"] = "angular"
-
-                    if linear_vel and angular_vel:
-                        data["of"]["type"] = "twist"
-
-                    # variables[of_vel_qname]["size"] = len(variables[of_vel_qname]["value"])
-
                 data["wrt"] = vel_wrt
                 data["asb"] = as_seen_by
 
@@ -243,13 +218,63 @@ class CoordinatesTranslator:
                 pass
 
         else:
-            if g[node : rdflib.RDF.type : NEWTONIAN_RBD_COORD.WrenchCoordinate]:
-                data["type"] = "Wrench"
+            if g[node : rdflib.RDF.type : NEWTONIAN_RBD_COORD.ForceCoordinate]:
+                data["type"] = "Force"
 
-                of_wrench = g.value(node, NEWTONIAN_RBD_COORD.of)
+                of_force = g.value(node, NEWTONIAN_RBD_COORD.of)
                 asb = g.value(node, NEWTONIAN_RBD_COORD["as-seen-by"])
 
-                # get the wrench
+                # get the force
+                if not g[of_force : rdflib.RDF.type : NEWTONIAN_RBD_REL.ContactForce]:
+                    raise ValueError("Invalid force type")
+
+                assert g.value(of_force, NEWTONIAN_RBD_REL["applied-by"]) != g.value(
+                    of_force, NEWTONIAN_RBD_REL["applied-to"]
+                ), "Applied by and applied to cannot be the same"
+
+                applied_by = g.value(of_force, NEWTONIAN_RBD_REL["applied-by"])
+                applied_to = g.value(of_force, NEWTONIAN_RBD_REL["applied-to"])
+
+                asb_qname = g.compute_qname(asb)[2]
+                ab_qname = g.compute_qname(applied_by)[2]
+                at_qname = g.compute_qname(applied_to)[2]
+
+                variables[asb_qname] = {
+                    "type": None,
+                    "dtype": "string",
+                    "value": asb_qname,
+                }
+
+                variables[ab_qname] = {
+                    "type": None,
+                    "dtype": "string",
+                    "value": ab_qname,
+                }
+
+                variables[at_qname] = {
+                    "type": None,
+                    "dtype": "string",
+                    "value": at_qname,
+                }
+
+                of_force_qname = g.compute_qname(of_force)[2]
+
+                variables[f'{of_force_qname}_vector_{suffix}'] = {
+                    "type": "array",
+                    "size": 6,
+                    "dtype": "double",
+                    "value": vec_comp,
+                }
+
+                data["of"] = {
+                    "id": f"{of_force_qname}_{suffix}",
+                    "applied-by-entity": ab_qname,
+                    "applied-to-entity": at_qname,
+                    "type": "force",
+                    "vector": f"{of_force_qname}_vector_{suffix}",
+                }
+
+                data["asb"] = asb_qname
 
         return {
             "data": data,
