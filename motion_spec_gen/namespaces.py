@@ -309,6 +309,8 @@ class ROBOTS(DefinedNamespace):
 
     Robot: URIRef
     Manipulator: URIRef
+    MobileBase: URIRef
     
+    solvers: URIRef
 
     _NS = Namespace("https://roboticscosmos.github.io/metamodels/robots#")

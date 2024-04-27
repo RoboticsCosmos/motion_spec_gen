@@ -1,0 +1,8 @@
+init_robot_structs(robots_data) ::= <<
+  // Initialize the robot structs
+  <robots_data: {robot | <robot.type> <robot>;} separator="\n">
+>>
+
+update_robot_state(robots_data) ::= <<
+  // Update the robot structs with the data from robots
+>>

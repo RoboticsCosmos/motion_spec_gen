@@ -12,7 +12,7 @@
 int main()
 {
   // initialize the robot state
-  Arm rob;
+  Manipulator rob;
   // double init_q[7] = {0.0, 0.26, 0.0, 2.26, 0.0, -0.95, -1.57};
   double init_q[7] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   initialize_robot_state(7, 7, init_q, &rob);
@@ -26,8 +26,8 @@ int main()
   int move_arm_down_vel_twist_achd_solver_ns = 8;
   std::string bracelet_link = "bracelet_link";
 
-  double move_arm_down_vel_twist_achd_solver_feed_forward_torques[7] = {0.0, 0.0, 0.0,
-                                                                         0.0, 0.0, 0.0, 0.0};
+  double move_arm_down_vel_twist_achd_solver_feed_forward_torques[7] = {0.0, 0.0, 0.0, 0.0,
+                                                                        0.0, 0.0, 0.0};
   double *move_arm_down_vel_twist_achd_solver_alpha[6] = {
       new double[6]{1.0, 0.0, 0.0, 0.0, 0.0, 0.0}, new double[6]{0.0, 1.0, 0.0, 0.0, 0.0, 0.0},
       new double[6]{0.0, 0.0, 1.0, 0.0, 0.0, 0.0}, new double[6]{0.0, 0.0, 0.0, 1.0, 0.0, 0.0},
@@ -36,9 +36,7 @@ int main()
   double move_arm_down_vel_twist_achd_solver_output_torques[7]{};
   double move_arm_down_vel_twist_monitor_post_bracelet_link_vel_twist_sp[6] = {0.0, 0.0, 0.0,
                                                                                0.0, 0.0, 0.0};
-  double move_arm_down_vel_twist_achd_solver_root_acceleration[6] = {0.0, 0.0, 0.0,
-                                                                     0.0, 0.0, 0.0};
-
+  double move_arm_down_vel_twist_achd_solver_root_acceleration[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
   // get current file path
   std::filesystem::path path = __FILE__;
@@ -54,8 +52,7 @@ int main()
   // initialize the chain
   KDL::Chain robot_chain;
   initialize_robot_chain(robot_urdf, base_link, tool_link, robot_chain);
-  
-  
+
   int count = 0;
 
   while (true && count < 3)
@@ -91,11 +88,10 @@ int main()
                 move_arm_down_vel_twist_achd_solver_output_torques);
 
     achd_solver_fext(&rob, &robot_chain, ext_wrench,
-                move_arm_down_vel_twist_achd_solver_output_torques);
+                     move_arm_down_vel_twist_achd_solver_output_torques);
 
     rne_solver(&rob, &robot_chain, move_arm_down_vel_twist_achd_solver_root_acceleration,
                ext_wrench, move_arm_down_vel_twist_achd_solver_output_torques);
-    
   }
 
   return 0;

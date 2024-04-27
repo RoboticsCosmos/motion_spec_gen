@@ -8,20 +8,25 @@ class RobotsTranslator:
 
         solvers_data = kwargs.get("solvers_data")
 
-        data = {}
+        robot_data = {}
         variables = {}
 
-        if g[node : rdflib.RDF.type : ROBOTS.Robot]:
-            solvers = g.objects(node, ROBOTS.solvers)
-            solvers = [g.compute_qname(solver)[2] for solver in solvers]
+        if g[node : rdflib.RDF.type : ROBOTS.Manipulator]:
+            robot_data["type"] = "Manipulator"
+        elif g[node : rdflib.RDF.type : ROBOTS.MobileBase]:
+            robot_data["type"] = "MobileBase"
+        else:
+            raise ValueError("Unknown robot type")
 
-            robot_data = {
-                "input_command_torques": [],
-            }
-            for solver in solvers:
-                robot_data["input_command_torques"].append(
-                    solvers_data[solver]["output_torques"]
-                )
+        solvers = g.objects(node, ROBOTS.solvers)
+        solvers = [g.compute_qname(solver)[2] for solver in solvers]
+
+        robot_data["input_command_torques"] = [],
+
+        for solver in solvers:
+            robot_data["input_command_torques"].append(
+                solvers_data[solver]["output_torques"]
+            )
 
         return {
             "id": g.compute_qname(node)[2],
