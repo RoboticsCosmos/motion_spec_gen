@@ -2,9 +2,9 @@
 #include <controllers/pid_controller.hpp>
 #include <filesystem>
 #include <iostream>
-#include <kdl_utils/math_utils.hpp>
-#include <kdl_utils/solver_utils.hpp>
-#include <kdl_utils/utils.hpp>
+#include <motion_spec_utils/math_utils.hpp>
+#include <motion_spec_utils/solver_utils.hpp>
+#include <motion_spec_utils/utils.hpp>
 #include <string>
 
 #include "kdl/chainidsolver_recursive_newton_euler.hpp"

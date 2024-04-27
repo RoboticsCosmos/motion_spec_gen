@@ -2,9 +2,9 @@
 #include <filesystem>
 #include <iostream>
 #include <controllers/pid_controller.hpp>
-#include <kdl_utils/math_utils.hpp>
-#include <kdl_utils/solver_utils.hpp>
-#include <kdl_utils/utils.hpp>
+#include <motion_spec_utils/math_utils.hpp>
+#include <motion_spec_utils/solver_utils.hpp>
+#include <motion_spec_utils/utils.hpp>
 #include <kdl/chainfksolverpos_recursive.hpp>
 #include <kdl/kinfam_io.hpp>
 #include <string>
