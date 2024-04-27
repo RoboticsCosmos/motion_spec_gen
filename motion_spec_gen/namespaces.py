@@ -275,6 +275,7 @@ class BASE_FD_SOLVER(DefinedNamespace):
 class EMBED_MAP(DefinedNamespace):
 
     EmbeddingMap: URIRef
+    DirectionVector: URIRef
 
     controller: URIRef
     solver: URIRef
@@ -286,6 +287,8 @@ class EMBED_MAP(DefinedNamespace):
         "output-acceleration-energy",
         "stiffness-vector",
         "damping-vector",
+        "vector-direction-from",
+        "vector-direction-to",
     ]
 
     _NS = Namespace(
@@ -300,3 +303,12 @@ class MOTION_SPEC(DefinedNamespace):
     _extras = ["pre-conditions", "per-conditions", "post-conditions"]
 
     _NS = Namespace("https://roboticscosmos.github.io/metamodels/motion_specification#")
+
+
+class ROBOTS(DefinedNamespace):
+
+    Robot: URIRef
+    Manipulator: URIRef
+    
+
+    _NS = Namespace("https://roboticscosmos.github.io/metamodels/robots#")

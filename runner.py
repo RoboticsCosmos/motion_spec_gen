@@ -12,6 +12,7 @@ from motion_spec_gen.namespaces import (
     CONTROLLER,
     IMPEDANCE_CONTROLLER,
     MONITOR,
+    ROBOTS,
     SOLVER,
     GEOM_COORD,
     NEWTONIAN_RBD_REL,
@@ -23,7 +24,10 @@ from motion_spec_gen.ir_gen.translators import (
     PIDControllerTranslator,
     ImpedanceControllerTranslator,
     EmbedMapTranslator,
-    SolverTranslator,
+    ACHDSolverTranslator,
+    BaseFDSolverTranslator,
+    ACHDSolverFextTranslator,
+    RobotsTranslator,
 )
 
 
@@ -60,6 +64,12 @@ def main():
 
     controller_steps = [PIDControllerStep, ImpedanceControllerStep]
     controller_translators = [PIDControllerTranslator, ImpedanceControllerTranslator]
+    solver_translators = [
+        ACHDSolverTranslator,
+        ACHDSolverFextTranslator,
+        BaseFDSolverTranslator,
+    ]
+
 
     data = {
         "variables": {},
@@ -71,6 +81,7 @@ def main():
             "controllers": {},
             "embed_maps": {},
             "solvers": {},
+            "robots": {},
         },
     }
 
@@ -97,7 +108,7 @@ def main():
             val = g.value(predicate=CONTROLLER.constraint, object=per_condition)
 
             print()
-            print(f'val: {val}')
+            print(f"val: {val}")
 
             if g[val : rdflib.RDF.type : CONTROLLER.Controller]:
                 controller = val
@@ -122,56 +133,41 @@ def main():
                     data["variables"].update(ir["variables"])
                     data["d"]["controllers"][ir["id"]] = ir["data"]
 
-            # intermediate representation generator
-        #     ir = PIDControllerTranslator().translate(g, controller)
+            embed_map = g.value(predicate=EMBED_MAP.controller, object=controller)
+            embed_map_ir = EmbedMapTranslator().translate(g, embed_map)
 
-        #     data["variables"].update(ir["variables"])
-        #     data["d"]["controllers"][ir["id"]] = ir["data"]
+            data["d"]["embed_maps"][embed_map_ir["id"]] = (
+                [embed_map_ir["data"]]
+                if embed_map_ir["id"] not in data["d"]["embed_maps"]
+                else data["d"]["embed_maps"][embed_map_ir["id"]]
+                + [embed_map_ir["data"]]
+            )
+            data["variables"].update(embed_map_ir["variables"])
 
-        #     embed_map = g.value(predicate=EMBED_MAP.controller, object=controller)
-        #     embed_map_ir = EmbedMapTranslator().translate(g, embed_map)
+        # get solvers
+        solvers = g.subjects(rdflib.RDF.type, SOLVER.Solver)
 
-        #     data["d"]["embed_maps"][embed_map_ir["id"]] = (
-        #         [embed_map_ir["data"]]
-        #         if embed_map_ir["id"] not in data["d"]["embed_maps"]
-        #         else data["d"]["embed_maps"][embed_map_ir["id"]]
-        #         + [embed_map_ir["data"]]
-        #     )
-        #     data["variables"].update(embed_map_ir["variables"])
+        for solver in solvers:
+            for translator in solver_translators:
+                if translator.is_applicable(g, solver):
+                    ir = translator().translate(
+                        g,
+                        solver,
+                        embed_maps=data["d"]["embed_maps"],
+                        variables=data["variables"],
+                    )
 
-        # # command torques
-        # command_torques = []
-        # # predicted accelerations
-        # predicted_accelerations = []
+                    data["variables"].update(ir["variables"])
+                    data["d"]["solvers"][ir["id"]] = ir["data"]
 
-        # # get solvers
-        # solvers = g.subjects(rdflib.RDF.type, SOLVER.Solver)
+        for robot in g.subjects(rdflib.RDF.type, ROBOTS.Robot):
+            robot_ir = RobotsTranslator().translate(
+                g, robot, solvers_data=data["d"]["solvers"]
+            )
 
-        # for solver in solvers:
-        #     # solver translator
-        #     solver_ir = SolverTranslator().translate(
-        #         g,
-        #         solver,
-        #         embed_maps=data["d"]["embed_maps"],
-        #         variables=data["variables"],
-        #     )
+            data["variables"].update(robot_ir["variables"])
+            data["d"]["robots"][robot_ir["id"]] = robot_ir["data"]
 
-        #     data["variables"].update(solver_ir["variables"])
-        #     data["d"]["solvers"][solver_ir["id"]] = solver_ir["data"]
-
-        #     command_torques.append(solver_ir["data"]["output_torques"])
-        #     predicted_accelerations.append(solver_ir["data"]["predicted_accelerations"])
-
-        # data["d"]["commands"] = {
-        #     "torques": {
-        #         "name": "command_torques",
-        #         "data": command_torques,
-        #     },
-        #     "accelerations": {
-        #         "name": "command_accelerations",
-        #         "data": predicted_accelerations,
-        #     },
-        # }
 
         # for post_condition in post_conditions:
 

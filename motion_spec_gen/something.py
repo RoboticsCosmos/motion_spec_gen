@@ -4,6 +4,7 @@ from rdflib.collection import Collection
 from motion_spec_gen.utility.helpers import for_type
 from motion_spec_gen.namespaces import (
     CONTROLLER,
+    GEOM_REL,
     PID_CONTROLLER,
     IMPEDANCE_CONTROLLER,
     THRESHOLD,
@@ -192,9 +193,7 @@ class ImpedanceControllerStep:
             raise ValueError("Stiffness and Damping not defined")
 
         if stiffness:
-            position_constraint = g.value(
-                node, IMPEDANCE_CONTROLLER["position-constraint"]
-            )
+            position_constraint = g.value(stiffness, CONTROLLER.constraint)
 
             coordinate = g.value(position_constraint, CONSTRAINT.quantity)
 
@@ -207,25 +206,60 @@ class ImpedanceControllerStep:
                 output_data["stiffness"]["vector"] = vec_comp
 
             if g[coordinate : rdflib.RDF.type : GEOM_COORD.DistanceCoordinate]:
+                of_dist = g.value(coordinate, GEOM_COORD.of)
+                asb = g.value(coordinate, GEOM_COORD["as-seen-by"])
+                asb_qn = g.compute_qname(asb)[2]
+                bw_ents = g.objects(of_dist, GEOM_REL["between-entities"])
+                bw_ents = [g.compute_qname(e)[2] for e in bw_ents]
+
+                # if asb_qn in bw_ents: consider it as from for direction
+                if asb_qn in bw_ents:
+                    dir_from = asb_qn
+                    dir_to = [e for e in bw_ents if e != asb_qn][0]
+                else:
+                    raise ValueError("Dist. coord direction not supported")
+
+                output_data["stiffness"]["vector_direction"] = {
+                    "from": rdflib.URIRef(f"{prefix}{dir_from}"),
+                    "to": rdflib.URIRef(f"{prefix}{dir_to}"),
+                }
                 output_data["stiffness"]["vector"] = (1, 1, 1)
 
             output_data["stiffness"]["var_name"] = rdflib.URIRef(
                 f"{prefix}{solver_name}_output_stiffness"
             )
 
-        # add the output node to the graph
-        # add vector as a collection
-        vector_collection = rdflib.BNode()
-        l = [rdflib.Literal(i) for i in output_data["stiffness"]["vector"]]
-        Collection(g, vector_collection, l)
-        g.add((embed_map, EMBED_MAP["stiffness-vector"], vector_collection))
-        # add input
-        g.add((embed_map, EMBED_MAP.input, signal))
-        # add the output data
-        g.add(
-            (
-                embed_map,
-                EMBED_MAP[output_data["output"]["type"]],
-                output_data["output"]["var_name"],
+            # add the output node to the graph
+            # add vector as a collection
+            vector_collection = rdflib.BNode()
+            l = [rdflib.Literal(i) for i in output_data["stiffness"]["vector"]]
+            Collection(g, vector_collection, l)
+            g.add((embed_map, EMBED_MAP["vector"], vector_collection))
+            # vector direction
+            if "vector_direction" in output_data["stiffness"]:
+                # add type 
+                g.add((embed_map, rdflib.RDF.type, EMBED_MAP.DirectionVector))
+                g.add(
+                    (
+                        embed_map,
+                        EMBED_MAP["vector-direction-from"],
+                        output_data["stiffness"]["vector_direction"]["from"],
+                    )
+                )
+                g.add(
+                    (
+                        embed_map,
+                        EMBED_MAP["vector-direction-to"],
+                        output_data["stiffness"]["vector_direction"]["to"],
+                    )
+                )
+            # add input
+            g.add((embed_map, EMBED_MAP.input, signal))
+            # add the output data
+            g.add(
+                (
+                    embed_map,
+                    EMBED_MAP[output_data["output"]["type"]],
+                    output_data["output"]["var_name"],
+                )
             )
-        )
