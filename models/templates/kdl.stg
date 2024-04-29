@@ -15,5 +15,5 @@ initialize_robot_chain(robot_urdf, kdl_base_link, kdl_tool_link, robot_chain);
 >>
 
 measure_variable(data) ::= <<
-<data.measure_variable>(<data.measured.entity>, <data.measured.asb>, <data.measured.wrt>, <data.measured.vector>, &rob, &robot_chain, <data.measured.id>);
+<data.measure_variable>(<data.measured.of.entity>, <data.measured.asb>, <data.measured.wrt>, <data.measured.of.vector>, &rob, &robot_chain, <data.measured.of.id>);
 >>

@@ -1,6 +1,8 @@
 import "kdl.stg"
 import "robots.stg"
 import "../common/includes.stg"
+import "../common/controllers.stg"
+import "../common/data_types.stg"
 
 application(variables, d) ::= <<
 <cpp_include()>
@@ -21,6 +23,7 @@ int main()
 
   // initialize variables
   <! variables !>
+  <variables: {v | <variables_init(v, variables.(v))> }; separator="\n">
 
   while (true) {
     <! update robot state !>
@@ -28,6 +31,7 @@ int main()
 
     // controllers
     <! controllers !>
+    <d.controllers: {v | <({<d.controllers.(v).name>})(d.controllers.(v))>}; separator="\n">
 
     // embed maps
     <! embed maps !>

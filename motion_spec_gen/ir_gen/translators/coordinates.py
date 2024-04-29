@@ -266,8 +266,14 @@ class CoordinatesTranslator:
                     "value": vec_comp,
                 }
 
+                variables[of_force_qname] = {
+                    "type": None,
+                    "dtype": "double",
+                    "value": None,
+                }
+
                 data["of"] = {
-                    "id": f"{of_force_qname}_{suffix}",
+                    "id": of_force_qname,
                     "applied-by-entity": ab_qname,
                     "applied-to-entity": at_qname,
                     "type": "force",

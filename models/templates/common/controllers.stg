@@ -1,0 +1,12 @@
+pid_controller(data) ::= <<
+// pid controller
+<({<data.measure_variable>})(data)>
+double error;
+<({compute<data.operator>Error})(data)>
+pidController(error, <data.gains.kp>, <data.gains.ki>, <data.gains.kd>, <data.dt>, <data.error_sum>, <data.last_error>, <data.signal>);
+
+>>
+
+computeEqualError(data) ::= <<
+computeEqualityError(<data.measured.of.id>, <data.reference_value>, error);
+>>

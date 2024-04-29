@@ -24,7 +24,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [1, 0, 0, 0, 0, 0]
+      "value": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
     },
     "of_vel_qname_lin_x": {
       "type": null,
@@ -65,7 +72,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      "value": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
     },
     "kinova_left_bracelet_table_contact_force_pid_controller_signal": {
       "type": null,
@@ -86,7 +100,16 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0, 0, 1]
+      "value": [
+        0,
+        0,
+        1
+      ]
+    },
+    "kinova_left_bracelet_table_contact_force_lin_z": {
+      "type": null,
+      "dtype": "double",
+      "value": null
     },
     "kinova_left_bracelet_table_contact_force_pid_controller_time_step": {
       "type": null,
@@ -122,7 +145,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0.0, 0.0, 1.0, 0.0, 0.0, 0.0]
+      "value": [
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
     },
     "kinova_right_bracelet_table_contact_force_pid_controller_signal": {
       "type": null,
@@ -138,7 +168,16 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0, 0, 1]
+      "value": [
+        0,
+        0,
+        1
+      ]
+    },
+    "kinova_right_bracelet_table_contact_force_lin_z": {
+      "type": null,
+      "dtype": "double",
+      "value": null
     },
     "kinova_right_bracelet_table_contact_force_pid_controller_time_step": {
       "type": null,
@@ -174,7 +213,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0.0, 0.0, 1.0, 0.0, 0.0, 0.0]
+      "value": [
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
     },
     "kinova_left_bracelet_base_lin_vel_y_pid_controller_signal": {
       "type": null,
@@ -185,7 +231,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0, 1, 0, 0, 0, 0]
+      "value": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
     },
     "of_vel_qname_lin_y": {
       "type": null,
@@ -226,7 +279,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
+      "value": [
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
     },
     "kinova_right_bracelet_base_lin_vel_x_pid_controller_signal": {
       "type": null,
@@ -237,7 +297,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [1, 0, 0, 0, 0, 0]
+      "value": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
     },
     "kinova_right_bracelet_base_lin_vel_x_pid_controller_time_step": {
       "type": null,
@@ -273,7 +340,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      "value": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
     },
     "kinova_right_bracelet_base_lin_vel_y_pid_controller_signal": {
       "type": null,
@@ -284,7 +358,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0, 1, 0, 0, 0, 0]
+      "value": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
     },
     "kinova_right_bracelet_base_lin_vel_y_pid_controller_time_step": {
       "type": null,
@@ -320,7 +401,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
+      "value": [
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
     },
     "kinova_left_bracelet_base_distance_impedance_controller_signal": {
       "type": null,
@@ -331,7 +419,9 @@
       "type": "array",
       "size": 1,
       "dtype": "double",
-      "value": [1.0]
+      "value": [
+        1.0
+      ]
     },
     "arms_distance_reference_value": {
       "type": null,
@@ -347,7 +437,11 @@
       "type": "array",
       "size": 3,
       "dtype": "double",
-      "value": [1.0, 1.0, 1.0]
+      "value": [
+        1.0,
+        1.0,
+        1.0
+      ]
     },
     "kinova_right_bracelet_base_distance_impedance_controller_signal": {
       "type": null,
@@ -358,7 +452,9 @@
       "type": "array",
       "size": 1,
       "dtype": "double",
-      "value": [1.0]
+      "value": [
+        1.0
+      ]
     },
     "kinova_right_bracelet_base_distance": {
       "type": null,
@@ -369,13 +465,24 @@
       "type": "array",
       "size": 3,
       "dtype": "double",
-      "value": [1.0, 1.0, 1.0]
+      "value": [
+        1.0,
+        1.0,
+        1.0
+      ]
     },
     "achd_solver_fext_kinova_left_root_acceleration": {
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0.0, 0.0, 9.81, 0.0, 0.0, 0.0]
+      "value": [
+        0.0,
+        0.0,
+        9.81,
+        0.0,
+        0.0,
+        0.0
+      ]
     },
     "achd_solver_fext_kinova_left_output_external_wrench": {
       "type": "array",
@@ -404,7 +511,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0.0, 0.0, 9.81, 0.0, 0.0, 0.0]
+      "value": [
+        0.0,
+        0.0,
+        9.81,
+        0.0,
+        0.0,
+        0.0
+      ]
     },
     "achd_solver_fext_kinova_right_output_external_wrench": {
       "type": "array",
@@ -433,7 +547,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0.0, 0.0, 9.81, 0.0, 0.0, 0.0]
+      "value": [
+        0.0,
+        0.0,
+        9.81,
+        0.0,
+        0.0,
+        0.0
+      ]
     },
     "achd_solver_kinova_left_output_acceleration_energy": {
       "type": "array",
@@ -462,12 +583,30 @@
       "cols": 2,
       "dtype": "double",
       "value": [
-        [1.0, 0.0],
-        [0.0, 1.0],
-        [0.0, 0.0],
-        [0.0, 0.0],
-        [0.0, 0.0],
-        [0.0, 0.0]
+        [
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0
+        ],
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0
+        ]
       ]
     },
     "achd_solver_kinova_left_feed_forward_torques": {
@@ -495,7 +634,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0.0, 0.0, 9.81, 0.0, 0.0, 0.0]
+      "value": [
+        0.0,
+        0.0,
+        9.81,
+        0.0,
+        0.0,
+        0.0
+      ]
     },
     "achd_solver_kinova_right_output_acceleration_energy": {
       "type": "array",
@@ -524,12 +670,30 @@
       "cols": 2,
       "dtype": "double",
       "value": [
-        [1.0, 0.0],
-        [0.0, 1.0],
-        [0.0, 0.0],
-        [0.0, 0.0],
-        [0.0, 0.0],
-        [0.0, 0.0]
+        [
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0
+        ],
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0
+        ]
       ]
     },
     "achd_solver_kinova_right_feed_forward_torques": {
@@ -557,7 +721,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0.0, 0.0, 9.81, 0.0, 0.0, 0.0]
+      "value": [
+        0.0,
+        0.0,
+        9.81,
+        0.0,
+        0.0,
+        0.0
+      ]
     },
     "fd_solver_robile_output_torques": {
       "type": "array",
@@ -597,12 +768,13 @@
         "signal": "kinova_left_bracelet_base_lin_vel_x_pid_controller_signal",
         "vector": "kinova_left_bracelet_base_lin_vel_x_twist_embed_map_vector",
         "error_sum": "kinova_left_bracelet_base_lin_vel_x_pid_controller_error_sum",
-        "last_error": "kinova_left_bracelet_base_lin_vel_x_pid_controller_prev_error"
+        "last_error": "kinova_left_bracelet_base_lin_vel_x_pid_controller_prev_error",
+        "robot": "kinova_left"
       },
       "kinova_left_bracelet_table_contact_force_pid_controller": {
         "measured": {
           "of": {
-            "id": "kinova_left_bracelet_table_contact_force_lin_z_z",
+            "id": "kinova_left_bracelet_table_contact_force_lin_z",
             "applied-by-entity": "kinova_left_bracelet_link",
             "applied-to-entity": "table",
             "type": "force",
@@ -623,12 +795,13 @@
         "signal": "kinova_left_bracelet_table_contact_force_pid_controller_signal",
         "vector": "kinova_left_bracelet_table_contact_force_embed_map_vector",
         "error_sum": "kinova_left_bracelet_table_contact_force_pid_controller_error_sum",
-        "last_error": "kinova_left_bracelet_table_contact_force_pid_controller_prev_error"
+        "last_error": "kinova_left_bracelet_table_contact_force_pid_controller_prev_error",
+        "robot": "kinova_left"
       },
       "kinova_right_bracelet_table_contact_force_pid_controller": {
         "measured": {
           "of": {
-            "id": "kinova_right_bracelet_table_contact_force_lin_z_z",
+            "id": "kinova_right_bracelet_table_contact_force_lin_z",
             "applied-by-entity": "kinova_right_bracelet_link",
             "applied-to-entity": "table",
             "type": "force",
@@ -649,7 +822,8 @@
         "signal": "kinova_right_bracelet_table_contact_force_pid_controller_signal",
         "vector": "kinova_right_bracelet_table_contact_force_embed_map_vector",
         "error_sum": "kinova_right_bracelet_table_contact_force_pid_controller_error_sum",
-        "last_error": "kinova_right_bracelet_table_contact_force_pid_controller_prev_error"
+        "last_error": "kinova_right_bracelet_table_contact_force_pid_controller_prev_error",
+        "robot": "kinova_right"
       },
       "kinova_left_bracelet_base_lin_vel_y_pid_controller": {
         "measured": {
@@ -675,7 +849,8 @@
         "signal": "kinova_left_bracelet_base_lin_vel_y_pid_controller_signal",
         "vector": "kinova_left_bracelet_base_lin_vel_y_embed_map_vector",
         "error_sum": "kinova_left_bracelet_base_lin_vel_y_pid_controller_error_sum",
-        "last_error": "kinova_left_bracelet_base_lin_vel_y_pid_controller_prev_error"
+        "last_error": "kinova_left_bracelet_base_lin_vel_y_pid_controller_prev_error",
+        "robot": "kinova_left"
       },
       "kinova_right_bracelet_base_lin_vel_x_pid_controller": {
         "measured": {
@@ -701,7 +876,8 @@
         "signal": "kinova_right_bracelet_base_lin_vel_x_pid_controller_signal",
         "vector": "kinova_right_bracelet_base_lin_vel_x_embed_map_vector",
         "error_sum": "kinova_right_bracelet_base_lin_vel_x_pid_controller_error_sum",
-        "last_error": "kinova_right_bracelet_base_lin_vel_x_pid_controller_prev_error"
+        "last_error": "kinova_right_bracelet_base_lin_vel_x_pid_controller_prev_error",
+        "robot": "kinova_right"
       },
       "kinova_right_bracelet_base_lin_vel_y_pid_controller": {
         "measured": {
@@ -727,7 +903,8 @@
         "signal": "kinova_right_bracelet_base_lin_vel_y_pid_controller_signal",
         "vector": "kinova_right_bracelet_base_lin_vel_y_twist_embed_map_vector",
         "error_sum": "kinova_right_bracelet_base_lin_vel_y_pid_controller_error_sum",
-        "last_error": "kinova_right_bracelet_base_lin_vel_y_pid_controller_prev_error"
+        "last_error": "kinova_right_bracelet_base_lin_vel_y_pid_controller_prev_error",
+        "robot": "kinova_right"
       },
       "kinova_left_bracelet_base_distance_impedance_controller": {
         "operator": "Equal",
@@ -737,14 +914,18 @@
           "diag_mat": "kinova_left_bracelet_base_distance_impedance_controller_stiffness_diag_mat",
           "measured": {
             "id": "kinova_left_bracelet_base_distance",
-            "entities": ["kinova_left_bracelet_link", "kinova_left_base_link"]
+            "entities": [
+              "kinova_left_bracelet_link",
+              "kinova_left_base_link"
+            ]
           },
           "asb": "kinova_left_bracelet_link"
         },
         "name": "impedance_controller",
         "damping": null,
         "signal": "kinova_left_bracelet_base_distance_impedance_controller_signal",
-        "vector": "kinova_left_bracelet_base_distance_embed_map_vector"
+        "vector": "kinova_left_bracelet_base_distance_embed_map_vector",
+        "robot": "kinova_left"
       },
       "kinova_right_bracelet_base_distance_impedance_controller": {
         "operator": "Equal",
@@ -754,14 +935,18 @@
           "diag_mat": "kinova_right_bracelet_base_distance_impedance_controller_stiffness_diag_mat",
           "measured": {
             "id": "kinova_right_bracelet_base_distance",
-            "entities": ["kinova_right_bracelet_link", "kinova_right_base_link"]
+            "entities": [
+              "kinova_right_bracelet_link",
+              "kinova_right_base_link"
+            ]
           },
           "asb": "kinova_right_bracelet_link"
         },
         "name": "impedance_controller",
         "damping": null,
         "signal": "kinova_right_bracelet_base_distance_impedance_controller_signal",
-        "vector": "kinova_right_bracelet_base_distance_embed_map_vector"
+        "vector": "kinova_right_bracelet_base_distance_embed_map_vector",
+        "robot": "kinova_right"
       }
     },
     "embed_maps": {
@@ -858,7 +1043,9 @@
       "achd_solver_fext_kinova_left": {
         "name": "achd_solver_fext",
         "root_acceleration": "achd_solver_fext_kinova_left_root_acceleration",
-        "ext_wrench": ["achd_solver_fext_kinova_left_output_external_wrench"],
+        "ext_wrench": [
+          "achd_solver_fext_kinova_left_output_external_wrench"
+        ],
         "nj": "achd_solver_fext_kinova_left_nj",
         "ns": "achd_solver_fext_kinova_left_ns",
         "output_torques": "achd_solver_fext_kinova_left_output_torques",
@@ -868,7 +1055,9 @@
       "achd_solver_fext_kinova_right": {
         "name": "achd_solver_fext",
         "root_acceleration": "achd_solver_fext_kinova_right_root_acceleration",
-        "ext_wrench": ["achd_solver_fext_kinova_right_output_external_wrench"],
+        "ext_wrench": [
+          "achd_solver_fext_kinova_right_output_external_wrench"
+        ],
         "nj": "achd_solver_fext_kinova_right_nj",
         "ns": "achd_solver_fext_kinova_right_ns",
         "output_torques": "achd_solver_fext_kinova_right_output_torques",
@@ -879,7 +1068,9 @@
         "name": "achd_solver",
         "root_acceleration": "achd_solver_kinova_left_root_acceleration",
         "alpha": "achd_solver_kinova_left_alpha",
-        "beta": ["achd_solver_kinova_left_output_acceleration_energy"],
+        "beta": [
+          "achd_solver_kinova_left_output_acceleration_energy"
+        ],
         "ext_wrench": [],
         "nc": "achd_solver_kinova_left_nc",
         "nj": "achd_solver_kinova_left_nj",
@@ -893,7 +1084,9 @@
         "name": "achd_solver",
         "root_acceleration": "achd_solver_kinova_right_root_acceleration",
         "alpha": "achd_solver_kinova_right_alpha",
-        "beta": ["achd_solver_kinova_right_output_acceleration_energy"],
+        "beta": [
+          "achd_solver_kinova_right_output_acceleration_energy"
+        ],
         "ext_wrench": [],
         "nc": "achd_solver_kinova_right_nc",
         "nj": "achd_solver_kinova_right_nj",
@@ -946,7 +1139,9 @@
       },
       "freddy_base": {
         "type": "MobileBase",
-        "input_command_torques": ["fd_solver_robile_output_torques"]
+        "input_command_torques": [
+          "fd_solver_robile_output_torques"
+        ]
       }
     }
   }
