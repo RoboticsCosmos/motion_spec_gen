@@ -166,6 +166,12 @@ class PIDControllerTranslator:
         data["error_sum"] = f"{id}_error_sum"
         data["last_error"] = f"{id}_prev_error"
 
+        # TODO: this is just a temp hack
+        if "kinova_left" in id:
+            data["robot"] = "kinova_left"
+        elif "kinova_right" in id:
+            data["robot"] = "kinova_right"
+
         return {
             "id": id,
             "data": data,
@@ -280,6 +286,12 @@ class ImpedanceControllerTranslator:
         data["damping"] = None
         data["signal"] = signal_qname
         data["vector"] = vector_id
+
+        # TODO: this is just a temp hack
+        if "kinova_left" in id:
+            data["robot"] = "kinova_left"
+        elif "kinova_right" in id:
+            data["robot"] = "kinova_right"
 
         return {
             "id": id,
