@@ -1,0 +1,48 @@
+init_robot_structs(robots_data) ::= <<
+// Initialize the robot structs
+<robots_data: {robot | <robots_data.(robot).type> <robot>_state;}; separator="\n">
+
+<robots_data: {robot | <({init_<robots_data.(robot).type>_struct})(robot)>}; separator="\n">
+>>
+
+init_MobileBase_struct(robot) ::= <<
+initialize_mobile_base_state(&<robot>_state);
+>>
+
+init_robot_connections(robots_data) ::= <<
+// Initialize the robot connections
+<robots_data: {robot | <({init_<robots_data.(robot).type>_connections})(robot)>}; separator="\n">
+>>
+
+init_Manipulator_connections(robot) ::= <<
+// Initialize the Manipulator connections
+kinova_mediator *<robot>_mediator = new kinova_mediator();
+<robot>_mediator->initialize(0, 0, 0.0);
+<robot>_mediator->set_control_mode(2);
+>>
+
+init_MobileBase_connections(robot) ::= <<
+// Initialize the MobileBase connections
+KeloBaseConfig <robot>_config;
+EthercatConfig <robot>_ethercat_config;
+initialize_kelo_base(&<robot>_config, &<robot>_ethercat_config);
+int result = 0;
+establish_kelo_base_connection(&<robot>_ethercat_config, "eno1", &result);
+if (result != 0) {
+  printf("Failed to establish connection to KeloBase\n");
+  exit(1);
+}
+>>
+
+get_robots_data(robots_data) ::= <<
+// Get the robot structs with the data from robots
+<robots_data: {robot | <({get_<robots_data.(robot).type>_data})(robot)>}; separator="\n">
+>>
+
+get_Manipulator_data(robot) ::= <<
+get_manipulator_data(&<robot>_state, <robot>_mediator);
+>>
+
+get_MobileBase_data(robot) ::= <<
+get_kelo_base_state(&<robot>_config, &<robot>_ethercat_config, <robot>_state.pivot_angles);
+>>

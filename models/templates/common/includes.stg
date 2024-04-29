@@ -1,0 +1,21 @@
+cpp_include() ::= <<
+#include \<array>
+#include \<string>
+#include \<filesystem>
+#include \<iostream>
+>>
+
+controller_include() ::= <<
+#include \<controllers/pid_controller.hpp>
+>>
+
+motion_spec_utils_include() ::= <<
+#include \<motion_spec_utils/utils.hpp>
+#include \<motion_spec_utils/math_utils.hpp>
+#include \<motion_spec_utils/solver_utils.hpp>
+>>
+
+robot_mediators_include() ::= <<
+#include \<kinova_mediator/mediator.hpp>
+#include "kelo_motion_control/mediator.h"
+>>

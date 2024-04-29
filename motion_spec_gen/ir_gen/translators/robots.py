@@ -21,7 +21,7 @@ class RobotsTranslator:
         solvers = g.objects(node, ROBOTS.solvers)
         solvers = [g.compute_qname(solver)[2] for solver in solvers]
 
-        robot_data["input_command_torques"] = [],
+        robot_data["input_command_torques"] = []
 
         for solver in solvers:
             robot_data["input_command_torques"].append(

@@ -7,6 +7,11 @@ set(CMAKE_CXX_STANDARD 17)
 find_package(Eigen3 REQUIRED)
 find_package(motion_spec_utils REQUIRED)
 
+# include directories
+include_directories(
+  ${motion_spec_utils_INCLUDE_DIRS}
+)
+
 link_directories(${CMAKE_INSTALL_PREFIX}/lib)
 
 # add all cpp files in the folder

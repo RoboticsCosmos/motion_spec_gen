@@ -1,0 +1,44 @@
+import "kdl.stg"
+import "robots.stg"
+import "../common/includes.stg"
+
+application(variables, d) ::= <<
+<cpp_include()>
+<controller_include()>
+<motion_spec_utils_include()>
+<robot_mediators_include()>
+
+int main()
+{
+  <! kdl init !>
+  <kdl_init()>
+
+  <! init robot data structure !>
+  <init_robot_structs(d.robots)>
+
+  <! init robot connections !>
+  <init_robot_connections(d.robots)>
+
+  // initialize variables
+  <! variables !>
+
+  while (true) {
+    <! update robot state !>
+    <get_robots_data(d.robots)>
+
+    // controllers
+    <! controllers !>
+
+    // embed maps
+    <! embed maps !>
+
+    // solvers
+    <! solvers !>
+
+    <! command torques !>
+
+  }
+
+  return 0;
+}
+>>
