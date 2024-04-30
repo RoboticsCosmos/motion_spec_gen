@@ -135,7 +135,13 @@ class ACHDSolverTranslator:
             "value": None,
         }
 
+        if "kinova_left" in id:
+            robot = "kinova_left"
+        elif "kinova_right" in id:
+            robot = "kinova_right"
+
         data = {
+            "robot": robot,
             "name": "achd_solver",
             "root_acceleration": f"{id}_root_acceleration",
             "alpha": f"{id}_alpha",
@@ -228,7 +234,13 @@ class ACHDSolverFextTranslator:
             "value": None,
         }
 
+        if "kinova_left" in id:
+            robot = "kinova_left"
+        elif "kinova_right" in id:
+            robot = "kinova_right"
+
         data = {
+            "robot": robot,
             "name": "achd_solver_fext",
             "root_acceleration": f"{id}_root_acceleration",
             "ext_wrench": ext_wrench,
@@ -292,11 +304,7 @@ class BaseFDSolverTranslator:
                 "value": None,
             }
 
-            platform_force.append({
-                "force": embed_map["output"],
-                "vector": embed_map["vector"],
-                "vector_info": embed_map["vector_info"],
-            })
+            platform_force.append(embed_map["output"])
 
         # TODO: get the number of joints from the robot model
         variables[f"{id}_output_torques"] = {
@@ -308,6 +316,7 @@ class BaseFDSolverTranslator:
         }
 
         data = {
+            "robot": "freddy_base",
             "name": "base_fd_solver",
             "root_acceleration": f"{id}_root_acceleration",
             "platform_force": platform_force,

@@ -46,3 +46,20 @@ get_manipulator_data(&<robot>_state, <robot>_mediator);
 get_MobileBase_data(robot) ::= <<
 get_kelo_base_state(&<robot>_config, &<robot>_ethercat_config, <robot>_state.pivot_angles);
 >>
+
+set_robot_command_torques(robots_data) ::= <<
+// Command the torques to the robots
+<robots_data: {robot | <({command_<robots_data.(robot).type>_torques})(robot, robots_data.(robot))>}; separator="\n">
+>>
+
+command_Manipulator_torques(robot, robot_data) ::= <<
+double cmd_tau[7]{};
+<robot_data.input_command_torques: {ct | add(<ct>, cmd_tau, cmd_tau, 7);}; separator="\n">
+set_manipulator_torques(&<robot>_state, <robot>_mediator, cmd_tau);
+>>
+
+command_MobileBase_torques(robot, robot_data) ::= <<
+double cmd_tau[8]{};
+<robot_data.input_command_torques: {ct | add(<ct>, cmd_tau, cmd_tau, 8);}; separator="\n">
+set_kelo_base_torques(&<robot>_config, &<robot>_ethercat_config, cmd_tau);
+>>

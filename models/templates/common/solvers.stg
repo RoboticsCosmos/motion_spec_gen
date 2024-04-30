@@ -1,20 +1,38 @@
 achd_solver(data) ::= <<
-// solver beta
+// achd_solver
 double beta[6]{};
 for (size_t i = 0; i \< 6; i++)
 {
   beta[i] = <data.root_acceleration>[i];
 }
-
-// solver ext_wrench
-double *ext_wrench[7];
-
+double *ext_wrench[<data.robot>_state.ns];
 for (size_t i = 0; i \< 7; i++)
 {
   ext_wrench[i] = new double[6] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 }
-
 <data.beta: {b | add(<b>, beta, beta, 6);}; separator="\n">
+achd_solver(&<data.robot>_state, &<data.robot>_chain, <data.nc>, <data.root_acceleration>, <data.alpha>, beta, ext_wrench, <data.tau_ff>, <data.predicted_accelerations>, <data.output_torques>);
 
-achd_solver(&rob, &robot_chain, <data.nc>, <data.root_acceleration>, <data.alpha>, beta, ext_wrench, <data.tau_ff>, <data.predicted_accelerations>, <data.output_torques>);
+>>
+
+achd_solver_fext(data) ::= <<
+// achd_solver_fext
+double *ext_wrench[<data.robot>_state.ns];
+for (size_t i = 0; i \< <data.robot>_state.ns - 1; i++)
+{
+  ext_wrench[i] = new double[6] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+}
+double ext_wrench_tool[6]{};
+<data.ext_wrench: {w | add(<w>, ext_wrench_tool, ext_wrench_tool, 6);}; separator="\n">
+ext_wrench[<data.robot>_state.ns - 1] = ext_wrench_tool;
+achd_solver_fext(&<data.robot>_state, &<data.robot>_chain, ext_wrench, <data.output_torques>);
+
+>>
+
+base_fd_solver(data) ::= <<
+// base_fd_solver
+double platform_force[3]{};
+<data.platform_force: {f | add(<f>, platform_force, platform_force, 3);}; separator="\n">
+base_fd_solver(&<data.robot>_state, platform_force, <data.output_torques>);
+
 >>

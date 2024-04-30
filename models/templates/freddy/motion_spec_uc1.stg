@@ -4,6 +4,7 @@ import "../common/includes.stg"
 import "../common/controllers.stg"
 import "../common/data_types.stg"
 import "../common/embed_maps.stg"
+import "../common/solvers.stg"
 
 application(variables, d) ::= <<
 <cpp_include()>
@@ -40,9 +41,10 @@ int main()
 
     // solvers
     <! solvers !>
+    <d.solvers: {s | <({<d.solvers.(s).name>})(d.solvers.(s))> }; separator="\n">
 
     <! command torques !>
-
+    <set_robot_command_torques(d.robots)>
   }
 
   return 0;

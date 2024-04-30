@@ -7,9 +7,19 @@ set(CMAKE_CXX_STANDARD 17)
 find_package(Eigen3 REQUIRED)
 find_package(motion_spec_utils REQUIRED)
 
+list(APPEND local_INCLUDE_DIRS ${CMAKE_INSTALL_PREFIX}/include/)
+
 # include directories
 include_directories(
   ${motion_spec_utils_INCLUDE_DIRS}
+  ${local_INCLUDE_DIRS}
+
+  ${CMAKE_INSTALL_PREFIX}/include/kinova_api/
+  ${CMAKE_INSTALL_PREFIX}/include/kinova_api/client
+  ${CMAKE_INSTALL_PREFIX}/include/kinova_api/common
+  ${CMAKE_INSTALL_PREFIX}/include/kinova_api/messages
+  ${CMAKE_INSTALL_PREFIX}/include/kinova_api/client_stubs
+  ${CMAKE_INSTALL_PREFIX}/include/kinova_api/google
 )
 
 link_directories(${CMAKE_INSTALL_PREFIX}/lib)

@@ -429,6 +429,87 @@ int main()
     }
 
     // solvers
+    // achd_solver
+    double beta[6]{};
+    for (size_t i = 0; i < 6; i++)
+    {
+      beta[i] = achd_solver_kinova_right_root_acceleration[i];
+    }
+    double *ext_wrench[kinova_right_state.ns];
+    for (size_t i = 0; i < 7; i++)
+    {
+      ext_wrench[i] = new double[6]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    }
+    add(achd_solver_kinova_right_output_acceleration_energy, beta, beta, 6);
+    achd_solver(&kinova_right_state, &kinova_right_chain, achd_solver_kinova_right_nc,
+                achd_solver_kinova_right_root_acceleration,
+                achd_solver_kinova_right_alpha, beta, ext_wrench,
+                achd_solver_kinova_right_feed_forward_torques,
+                achd_solver_kinova_right_predicted_accelerations,
+                achd_solver_kinova_right_output_torques);
+
+    // achd_solver_fext
+    double *ext_wrench[kinova_left_state.ns];
+    for (size_t i = 0; i < kinova_left_state.ns - 1; i++)
+    {
+      ext_wrench[i] = new double[6]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    }
+    double ext_wrench_tool[6]{};
+    add(achd_solver_fext_kinova_left_output_external_wrench, ext_wrench_tool,
+        ext_wrench_tool, 6);
+    ext_wrench[kinova_left_state.ns - 1] = ext_wrench_tool;
+    achd_solver_fext(&kinova_left_state, &kinova_left_chain, ext_wrench,
+                     achd_solver_fext_kinova_left_output_torques);
+
+    // base_fd_solver
+    double platform_force[3]{};
+    add(fd_solver_robile_output_external_wrench, platform_force, platform_force, 3);
+    add(fd_solver_robile_output_external_wrench, platform_force, platform_force, 3);
+    base_fd_solver(&freddy_base_state, platform_force, fd_solver_robile_output_torques);
+
+    // achd_solver
+    double beta[6]{};
+    for (size_t i = 0; i < 6; i++)
+    {
+      beta[i] = achd_solver_kinova_left_root_acceleration[i];
+    }
+    double *ext_wrench[kinova_left_state.ns];
+    for (size_t i = 0; i < 7; i++)
+    {
+      ext_wrench[i] = new double[6]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    }
+    add(achd_solver_kinova_left_output_acceleration_energy, beta, beta, 6);
+    achd_solver(&kinova_left_state, &kinova_left_chain, achd_solver_kinova_left_nc,
+                achd_solver_kinova_left_root_acceleration, achd_solver_kinova_left_alpha,
+                beta, ext_wrench, achd_solver_kinova_left_feed_forward_torques,
+                achd_solver_kinova_left_predicted_accelerations,
+                achd_solver_kinova_left_output_torques);
+
+    // achd_solver_fext
+    double *ext_wrench[kinova_right_state.ns];
+    for (size_t i = 0; i < kinova_right_state.ns - 1; i++)
+    {
+      ext_wrench[i] = new double[6]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    }
+    double ext_wrench_tool[6]{};
+    add(achd_solver_fext_kinova_right_output_external_wrench, ext_wrench_tool,
+        ext_wrench_tool, 6);
+    ext_wrench[kinova_right_state.ns - 1] = ext_wrench_tool;
+    achd_solver_fext(&kinova_right_state, &kinova_right_chain, ext_wrench,
+                     achd_solver_fext_kinova_right_output_torques);
+
+    // Command the torques to the robots
+    double cmd_tau[7]{};
+    add(achd_solver_kinova_right_output_torques, cmd_tau, cmd_tau, 7);
+    add(achd_solver_fext_kinova_right_output_torques, cmd_tau, cmd_tau, 7);
+    set_manipulator_torques(&kinova_right_state, kinova_right_mediator, cmd_tau);
+    double cmd_tau[8]{};
+    add(fd_solver_robile_output_torques, cmd_tau, cmd_tau, 8);
+    set_kelo_base_torques(&freddy_base_config, &freddy_base_ethercat_config, cmd_tau);
+    double cmd_tau[7]{};
+    add(achd_solver_kinova_left_output_torques, cmd_tau, cmd_tau, 7);
+    add(achd_solver_fext_kinova_left_output_torques, cmd_tau, cmd_tau, 7);
+    set_manipulator_torques(&kinova_left_state, kinova_left_mediator, cmd_tau);
   }
 
   return 0;
