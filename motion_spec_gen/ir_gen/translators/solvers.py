@@ -56,18 +56,19 @@ class ACHDSolverTranslator:
             local_alpha = None
             # if vec has values of 0 or 1, then form a diagonal matrix
             if all(v == 0 or v == 1 for v in vec):
-                local_alpha = np.zeros((6, len(vec)))
-                np.fill_diagonal(local_alpha, vec)
+                local_alpha = np.diag(vec)
             else:
                 local_alpha = np.array(vec).reshape(6, -1)
 
             # remove zero columns
             local_alpha = local_alpha[:, ~np.all(local_alpha == 0, axis=0)]
+            # convert each column as one array
+            local_alpha = local_alpha.T
 
             if alpha.size == 0:
                 alpha = local_alpha
             else:
-                alpha = np.hstack((alpha, local_alpha))
+                alpha = np.vstack((alpha, local_alpha))
 
             # output
             output = embed_map["output"]
@@ -102,8 +103,8 @@ class ACHDSolverTranslator:
         # alpha matrix
         variables[f"{id}_alpha"] = {
             "type": "array_2d",
-            "rows": 6,
-            "cols": nc,
+            "rows": alpha.shape[1],
+            "cols": alpha.shape[0],
             "dtype": "double",
             "value": alpha.tolist(),
         }

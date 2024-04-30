@@ -70,8 +70,8 @@ int main()
   double kinova_left_bracelet_base_lin_vel_y_pid_controller_time_step = 1;
   double kinova_right_bracelet_base_lin_vel_y_pid_controller_signal;
   double *achd_solver_kinova_left_alpha[2] = {
-      new double[6]{1.0, 0.0}, new double[6]{0.0, 1.0}, new double[6]{0.0, 0.0},
-      new double[6]{0.0, 0.0}, new double[6]{0.0, 0.0}, new double[6]{0.0, 0.0}};
+      new double[6]{1.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+      new double[6]{0.0, 1.0, 0.0, 0.0, 0.0, 0.0}};
   double kinova_right_bracelet_table_contact_force_pid_controller_error_sum;
   int achd_solver_fext_kinova_right_nj = 7;
   double kinova_right_bracelet_base_distance_impedance_controller_signal;
@@ -139,12 +139,12 @@ int main()
   int achd_solver_kinova_right_nj = 7;
   double kinova_right_bracelet_table_contact_force_pid_controller_ki = 0.9;
   double kinova_right_bracelet_table_contact_force_pid_controller_kd = 0.0;
-  int achd_solver_kinova_right_nc = 2;
+  int achd_solver_kinova_right_nc = 6;
   double arms_distance_reference_value = 0.5;
   double kinova_right_bracelet_table_contact_force_embed_map_vector[6] = {0.0, 0.0, 1.0,
                                                                           0.0, 0.0, 0.0};
   double achd_solver_kinova_right_output_torques[7]{};
-  int achd_solver_kinova_left_nc = 2;
+  int achd_solver_kinova_left_nc = 6;
   double achd_solver_kinova_right_output_acceleration_energy[6]{};
   int achd_solver_kinova_left_nj = 7;
   std::string kinova_right_bracelet_link = "kinova_right_bracelet_link";
@@ -158,8 +158,8 @@ int main()
                                                                            0.0, 0.0, 0.0};
   double arm_table_contact_force_reference_value = -10.0;
   double *achd_solver_kinova_right_alpha[2] = {
-      new double[6]{1.0, 0.0}, new double[6]{0.0, 1.0}, new double[6]{0.0, 0.0},
-      new double[6]{0.0, 0.0}, new double[6]{0.0, 0.0}, new double[6]{0.0, 0.0}};
+      new double[6]{1.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+      new double[6]{0.0, 1.0, 0.0, 0.0, 0.0, 0.0}};
   double kinova_left_bracelet_base_lin_vel_x_pid_controller_kp = 20.0;
   double achd_solver_kinova_left_root_acceleration[6] = {0.0, 0.0, 9.81, 0.0, 0.0, 0.0};
   double kinova_left_bracelet_base_lin_vel_x_pid_controller_signal;
