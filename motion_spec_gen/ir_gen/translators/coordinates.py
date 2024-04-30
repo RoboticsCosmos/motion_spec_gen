@@ -281,8 +281,8 @@ class CoordinatesTranslator:
 
                 data["of"] = {
                     "id": of_force_qname,
-                    "applied-by-entity": ab_qname,
-                    "applied-to-entity": at_qname,
+                    "applied_by_entity": ab_qname,
+                    "applied_to_entity": at_qname,
                     "type": "force",
                     "vector": f"{of_force_qname}_vector_{suffix}",
                 }

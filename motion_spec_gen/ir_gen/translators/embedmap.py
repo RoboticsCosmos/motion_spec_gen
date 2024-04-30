@@ -54,7 +54,12 @@ class EmbedMapTranslator:
             vector_direction_to = g.value(node, EMBED_MAP["vector-direction-to"])
 
             vector_id = None
+            if "kinova_left" in g.compute_qname(vector_direction_from)[2]:
+                robot = "kinova_left"
+            elif "kinova_right" in g.compute_qname(vector_direction_from)[2]:
+                robot = "kinova_right"
             vector_info = {
+                "robot": robot,
                 "from": g.compute_qname(vector_direction_from)[2],
                 "to": g.compute_qname(vector_direction_to)[2],
             }

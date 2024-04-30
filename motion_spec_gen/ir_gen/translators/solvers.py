@@ -285,6 +285,13 @@ class BaseFDSolverTranslator:
                 )
                 continue
 
+            variables[embed_map["output"]] = {
+                "type": "array",
+                "size": 3,
+                "dtype": "double",
+                "value": None,
+            }
+
             platform_force.append({
                 "force": embed_map["output"],
                 "vector": embed_map["vector"],

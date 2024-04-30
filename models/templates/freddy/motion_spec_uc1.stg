@@ -3,6 +3,7 @@ import "robots.stg"
 import "../common/includes.stg"
 import "../common/controllers.stg"
 import "../common/data_types.stg"
+import "../common/embed_maps.stg"
 
 application(variables, d) ::= <<
 <cpp_include()>
@@ -35,6 +36,7 @@ int main()
 
     // embed maps
     <! embed maps !>
+    <d.embed_maps: {m | <embed_maps(d.embed_maps.(m))> }; separator="\n">
 
     // solvers
     <! solvers !>

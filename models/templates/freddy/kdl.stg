@@ -28,8 +28,7 @@ computeForwardVelocityKinematics(<measured.of.entity>, <measured.asb>, <measured
 >>
 
 computeForce(measured, data) ::= <<
-// TODO: computeForce
-// computeForce(<data.measured.of.id>);
+computeForce(<measured.of.applied_by_entity>, <measured.of.applied_to_entity>, <measured.asb>, <measured.of.vector>, &<data.robot>_state, &<data.robot>_chain, <measured.of.id>);
 >>
 
 computeDistance(measured, data) ::= <<

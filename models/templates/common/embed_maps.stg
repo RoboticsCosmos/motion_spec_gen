@@ -1,0 +1,33 @@
+
+embed_maps(data) ::= <<
+<data: {m | <if(m.vector)><embed_mapping_vector(m)><else><embed_mapping_vector_info(m)><endif>}; separator="\n">
+>> 
+
+embed_mapping_vector(data) ::= <<
+for (size_t i = 0; i \< sizeof(<data.vector>)/sizeof(<data.vector>[0]); i++)
+{
+  if (<data.vector>[i] != 0.0)
+  {
+    <data.output>[i] += <data.input>;
+  }
+}
+>>
+
+embed_mapping_vector_info(data) ::= <<
+double vector[3]{};
+findVector(<data.vector_info.from>, <data.vector_info.to>, &<data.vector_info.robot>_state, &<data.vector_info.robot>_chain, vector);
+double norm = sqrt(vector[0]*vector[0] + vector[1]*vector[1] + vector[2]*vector[2]);
+if (norm != 0.0)
+{
+  vector[0] /= norm;
+  vector[1] /= norm;
+  vector[2] /= norm;
+}
+for (size_t i = 0; i \< sizeof(vector)/sizeof(vector[0]); i++)
+{
+  if (vector[i] != 0.0)
+  {
+    <data.output>[i] += <data.input> * vector[i];
+  }
+}
+>>

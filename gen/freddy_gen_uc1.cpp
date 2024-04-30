@@ -162,6 +162,7 @@ int main()
   double *achd_solver_kinova_right_alpha[2] = {
       new double[6]{1.0, 0.0, 0.0, 0.0, 0.0, 0.0},
       new double[6]{0.0, 1.0, 0.0, 0.0, 0.0, 0.0}};
+  double fd_solver_robile_output_external_wrench[3]{};
   double kinova_left_bracelet_base_lin_vel_x_pid_controller_kp = 20.0;
   double achd_solver_kinova_left_root_acceleration[6] = {0.0, 0.0, 9.81, 0.0, 0.0, 0.0};
   double kinova_left_bracelet_base_lin_vel_x_pid_controller_signal;
@@ -194,9 +195,11 @@ int main()
 
     // controllers
     // pid controller
-    // TODO: computeForce
-    // computeForce(kinova_left_bracelet_table_contact_force_lin_z);
-    double error;
+    computeForce(kinova_left_bracelet_link, table, kinova_left_bracelet_link,
+                 kinova_left_bracelet_table_contact_force_lin_z_vector_z,
+                 &kinova_left_state, &kinova_left_chain,
+                 kinova_left_bracelet_table_contact_force_lin_z);
+    double error = 0;
     computeEqualityError(kinova_left_bracelet_table_contact_force_lin_z,
                          arm_table_contact_force_reference_value, error);
     pidController(error, kinova_left_bracelet_table_contact_force_pid_controller_kp,
@@ -212,7 +215,7 @@ int main()
                                      kinova_left_bracelet_base_vel_vector_lin_y,
                                      &kinova_left_state, &kinova_left_chain,
                                      of_vel_qname_lin_y);
-    double error;
+    double error = 0;
     computeEqualityError(of_vel_qname_lin_y, arm_bracelet_link_lin_xy_vel_reference_value,
                          error);
     pidController(error, kinova_left_bracelet_base_lin_vel_y_pid_controller_kp,
@@ -224,9 +227,11 @@ int main()
                   kinova_left_bracelet_base_lin_vel_y_pid_controller_signal);
 
     // pid controller
-    // TODO: computeForce
-    // computeForce(kinova_right_bracelet_table_contact_force_lin_z);
-    double error;
+    computeForce(kinova_right_bracelet_link, table, kinova_right_bracelet_link,
+                 kinova_right_bracelet_table_contact_force_lin_z_vector_z,
+                 &kinova_right_state, &kinova_right_chain,
+                 kinova_right_bracelet_table_contact_force_lin_z);
+    double error = 0;
     computeEqualityError(kinova_right_bracelet_table_contact_force_lin_z,
                          arm_table_contact_force_reference_value, error);
     pidController(error, kinova_right_bracelet_table_contact_force_pid_controller_kp,
@@ -242,7 +247,7 @@ int main()
                                      kinova_right_bracelet_base_vel_vector_lin_x,
                                      &kinova_right_state, &kinova_right_chain,
                                      of_vel_qname_lin_x);
-    double error;
+    double error = 0;
     computeEqualityError(of_vel_qname_lin_x, arm_bracelet_link_lin_xy_vel_reference_value,
                          error);
     pidController(error, kinova_right_bracelet_base_lin_vel_x_pid_controller_kp,
@@ -258,7 +263,7 @@ int main()
                                      kinova_right_bracelet_base_vel_vector_lin_y,
                                      &kinova_right_state, &kinova_right_chain,
                                      of_vel_qname_lin_y);
-    double error;
+    double error = 0;
     computeEqualityError(of_vel_qname_lin_y, arm_bracelet_link_lin_xy_vel_reference_value,
                          error);
     pidController(error, kinova_right_bracelet_base_lin_vel_y_pid_controller_kp,
@@ -281,7 +286,8 @@ int main()
                          arms_distance_reference_value, stiffnessError);
     impedanceController(
         stiffnessError, dampingError,
-        kinova_right_bracelet_base_distance_impedance_controller_stiffness_diag_mat, {},
+        kinova_right_bracelet_base_distance_impedance_controller_stiffness_diag_mat,
+        new double[1]{0.0},
         kinova_right_bracelet_base_distance_impedance_controller_signal);
 
     // impedance controller
@@ -296,7 +302,8 @@ int main()
                          arms_distance_reference_value, stiffnessError);
     impedanceController(
         stiffnessError, dampingError,
-        kinova_left_bracelet_base_distance_impedance_controller_stiffness_diag_mat, {},
+        kinova_left_bracelet_base_distance_impedance_controller_stiffness_diag_mat,
+        new double[1]{0.0},
         kinova_left_bracelet_base_distance_impedance_controller_signal);
 
     // pid controller
@@ -304,7 +311,7 @@ int main()
                                      kinova_left_bracelet_base_vel_vector_lin_x,
                                      &kinova_left_state, &kinova_left_chain,
                                      of_vel_qname_lin_x);
-    double error;
+    double error = 0;
     computeEqualityError(of_vel_qname_lin_x, arm_bracelet_link_lin_xy_vel_reference_value,
                          error);
     pidController(error, kinova_left_bracelet_base_lin_vel_x_pid_controller_kp,
@@ -316,6 +323,110 @@ int main()
                   kinova_left_bracelet_base_lin_vel_x_pid_controller_signal);
 
     // embed maps
+    for (size_t i = 0;
+         i < sizeof(kinova_right_bracelet_base_lin_vel_x_embed_map_vector) /
+                 sizeof(kinova_right_bracelet_base_lin_vel_x_embed_map_vector[0]);
+         i++)
+    {
+      if (kinova_right_bracelet_base_lin_vel_x_embed_map_vector[i] != 0.0)
+      {
+        achd_solver_kinova_right_output_acceleration_energy[i] +=
+            kinova_right_bracelet_base_lin_vel_x_pid_controller_signal;
+      }
+    }
+    for (size_t i = 0;
+         i < sizeof(kinova_right_bracelet_base_lin_vel_y_twist_embed_map_vector) /
+                 sizeof(kinova_right_bracelet_base_lin_vel_y_twist_embed_map_vector[0]);
+         i++)
+    {
+      if (kinova_right_bracelet_base_lin_vel_y_twist_embed_map_vector[i] != 0.0)
+      {
+        achd_solver_kinova_right_output_acceleration_energy[i] +=
+            kinova_right_bracelet_base_lin_vel_y_pid_controller_signal;
+      }
+    }
+    for (size_t i = 0;
+         i < sizeof(kinova_left_bracelet_table_contact_force_embed_map_vector) /
+                 sizeof(kinova_left_bracelet_table_contact_force_embed_map_vector[0]);
+         i++)
+    {
+      if (kinova_left_bracelet_table_contact_force_embed_map_vector[i] != 0.0)
+      {
+        achd_solver_fext_kinova_left_output_external_wrench[i] +=
+            kinova_left_bracelet_table_contact_force_pid_controller_signal;
+      }
+    }
+    double vector[3]{};
+    findVector(kinova_left_bracelet_link, kinova_left_base_link, &kinova_left_state,
+               &kinova_left_chain, vector);
+    double norm =
+        sqrt(vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2]);
+    if (norm != 0.0)
+    {
+      vector[0] /= norm;
+      vector[1] /= norm;
+      vector[2] /= norm;
+    }
+    for (size_t i = 0; i < sizeof(vector) / sizeof(vector[0]); i++)
+    {
+      if (vector[i] != 0.0)
+      {
+        fd_solver_robile_output_external_wrench[i] +=
+            kinova_left_bracelet_base_distance_impedance_controller_signal * vector[i];
+      }
+    }
+    double vector[3]{};
+    findVector(kinova_right_bracelet_link, kinova_right_base_link, &kinova_right_state,
+               &kinova_right_chain, vector);
+    double norm =
+        sqrt(vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2]);
+    if (norm != 0.0)
+    {
+      vector[0] /= norm;
+      vector[1] /= norm;
+      vector[2] /= norm;
+    }
+    for (size_t i = 0; i < sizeof(vector) / sizeof(vector[0]); i++)
+    {
+      if (vector[i] != 0.0)
+      {
+        fd_solver_robile_output_external_wrench[i] +=
+            kinova_right_bracelet_base_distance_impedance_controller_signal * vector[i];
+      }
+    }
+    for (size_t i = 0;
+         i < sizeof(kinova_left_bracelet_base_lin_vel_x_twist_embed_map_vector) /
+                 sizeof(kinova_left_bracelet_base_lin_vel_x_twist_embed_map_vector[0]);
+         i++)
+    {
+      if (kinova_left_bracelet_base_lin_vel_x_twist_embed_map_vector[i] != 0.0)
+      {
+        achd_solver_kinova_left_output_acceleration_energy[i] +=
+            kinova_left_bracelet_base_lin_vel_x_pid_controller_signal;
+      }
+    }
+    for (size_t i = 0;
+         i < sizeof(kinova_left_bracelet_base_lin_vel_y_embed_map_vector) /
+                 sizeof(kinova_left_bracelet_base_lin_vel_y_embed_map_vector[0]);
+         i++)
+    {
+      if (kinova_left_bracelet_base_lin_vel_y_embed_map_vector[i] != 0.0)
+      {
+        achd_solver_kinova_left_output_acceleration_energy[i] +=
+            kinova_left_bracelet_base_lin_vel_y_pid_controller_signal;
+      }
+    }
+    for (size_t i = 0;
+         i < sizeof(kinova_right_bracelet_table_contact_force_embed_map_vector) /
+                 sizeof(kinova_right_bracelet_table_contact_force_embed_map_vector[0]);
+         i++)
+    {
+      if (kinova_right_bracelet_table_contact_force_embed_map_vector[i] != 0.0)
+      {
+        achd_solver_fext_kinova_right_output_external_wrench[i] +=
+            kinova_right_bracelet_table_contact_force_pid_controller_signal;
+      }
+    }
 
     // solvers
   }

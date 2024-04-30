@@ -17,7 +17,7 @@ double stiffnessError = 0.0;
 double dampingError = 0.0;
 <if(data.stiffness)><stiffness(data, "stiffnessError")><endif>
 <if(data.damping)><damping(data, "dampingError")><endif>
-impedanceController(stiffnessError, dampingError, <if(data.stiffness)><data.stiffness.diag_mat><else>{}<endif>, <if(data.damping)><data.damping.diag_mat><else>{}<endif>, <data.signal>);
+impedanceController(stiffnessError, dampingError, <if(data.stiffness)><data.stiffness.diag_mat><else>new double[1]{0.0}<endif>, <if(data.damping)><data.damping.diag_mat><else>new double[1]{0.0}<endif>, <data.signal>);
 
 >>
 
