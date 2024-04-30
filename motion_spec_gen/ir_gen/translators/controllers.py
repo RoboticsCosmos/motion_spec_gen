@@ -252,7 +252,6 @@ class ImpedanceControllerTranslator:
                     "dtype": "double",
                     "value": value,
                 }
-                data["reference_value"] = ref_val_id
 
             else:
                 raise ValueError("Operator type not supported")
@@ -276,10 +275,13 @@ class ImpedanceControllerTranslator:
             }
 
             data["stiffness"] = {
+                "reference_value": ref_val_id,
                 "measure_variable": measure_variable,
                 "diag_mat": f"{id}_stiffness_diag_mat",
-                "measured": measured_coord_ir["data"]["of"],
-                "asb": measured_coord_ir["data"]["asb"],
+                "measured": {
+                    "of": measured_coord_ir["data"]["of"],
+                    "asb": measured_coord_ir["data"]["asb"],
+                },
             }
 
         data["name"] = "impedance_controller"

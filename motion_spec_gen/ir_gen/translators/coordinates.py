@@ -147,6 +147,13 @@ class CoordinatesTranslator:
                     "value": asb_qname,
                 }
 
+                for entity in dist_bw:
+                    variables[entity] = {
+                        "type": None,
+                        "dtype": "string",
+                        "value": entity,
+                    }
+
                 data["of"] = {
                     "id": of_dist_qname,
                     "entities": dist_bw,

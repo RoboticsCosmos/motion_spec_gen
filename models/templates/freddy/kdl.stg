@@ -23,11 +23,17 @@ init_Manipulator_struct(robot) ::= <<
 initialize_manipulator_state(<robot>_chain.getNrOfJoints(), <robot>_chain.getNrOfSegments(), &<robot>_state);
 >>
 
-computeForwardVelocityKinematics(data) ::= <<
-computeForwardVelocityKinematics(<data.measured.of.entity>, <data.measured.asb>, <data.measured.wrt>, <data.measured.of.vector>, &<data.robot>_state, &<data.robot>_chain, <data.measured.of.id>);
+computeForwardVelocityKinematics(measured, data) ::= <<
+computeForwardVelocityKinematics(<measured.of.entity>, <measured.asb>, <measured.wrt>, <measured.of.vector>, &<data.robot>_state, &<data.robot>_chain, <measured.of.id>);
 >>
 
-computeForce(data) ::= <<
+computeForce(measured, data) ::= <<
 // TODO: computeForce
 // computeForce(<data.measured.of.id>);
+>>
+
+computeDistance(measured, data) ::= <<
+// compute distance
+std::string between_ents[2] = { <measured.of.entities: {ent | <ent>}; separator=", "> };
+computeDistance(between_ents, <measured.asb>, &<data.robot>_state, &<data.robot>_chain, <measured.of.id>);
 >>

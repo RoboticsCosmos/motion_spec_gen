@@ -353,6 +353,11 @@
       "dtype": "double",
       "value": null
     },
+    "kinova_left_base_link": {
+      "type": null,
+      "dtype": "string",
+      "value": "kinova_left_base_link"
+    },
     "kinova_left_bracelet_base_distance_embed_map_vector": {
       "type": "array",
       "size": 3,
@@ -374,6 +379,11 @@
       "type": null,
       "dtype": "double",
       "value": null
+    },
+    "kinova_right_base_link": {
+      "type": null,
+      "dtype": "string",
+      "value": "kinova_right_base_link"
     },
     "kinova_right_bracelet_base_distance_embed_map_vector": {
       "type": "array",
@@ -739,15 +749,17 @@
       },
       "kinova_left_bracelet_base_distance_impedance_controller": {
         "operator": "Equal",
-        "reference_value": "arms_distance_reference_value",
         "stiffness": {
+          "reference_value": "arms_distance_reference_value",
           "measure_variable": "computeDistance",
           "diag_mat": "kinova_left_bracelet_base_distance_impedance_controller_stiffness_diag_mat",
           "measured": {
-            "id": "kinova_left_bracelet_base_distance",
-            "entities": ["kinova_left_bracelet_link", "kinova_left_base_link"]
-          },
-          "asb": "kinova_left_bracelet_link"
+            "of": {
+              "id": "kinova_left_bracelet_base_distance",
+              "entities": ["kinova_left_bracelet_link", "kinova_left_base_link"]
+            },
+            "asb": "kinova_left_bracelet_link"
+          }
         },
         "name": "impedance_controller",
         "damping": null,
@@ -757,15 +769,20 @@
       },
       "kinova_right_bracelet_base_distance_impedance_controller": {
         "operator": "Equal",
-        "reference_value": "arms_distance_reference_value",
         "stiffness": {
+          "reference_value": "arms_distance_reference_value",
           "measure_variable": "computeDistance",
           "diag_mat": "kinova_right_bracelet_base_distance_impedance_controller_stiffness_diag_mat",
           "measured": {
-            "id": "kinova_right_bracelet_base_distance",
-            "entities": ["kinova_right_bracelet_link", "kinova_right_base_link"]
-          },
-          "asb": "kinova_right_bracelet_link"
+            "of": {
+              "id": "kinova_right_bracelet_base_distance",
+              "entities": [
+                "kinova_right_bracelet_link",
+                "kinova_right_base_link"
+              ]
+            },
+            "asb": "kinova_right_bracelet_link"
+          }
         },
         "name": "impedance_controller",
         "damping": null,

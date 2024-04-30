@@ -121,6 +121,7 @@ int main()
   std::string table = "table";
   double kinova_left_bracelet_base_lin_vel_y_pid_controller_prev_error;
   double kinova_right_bracelet_base_lin_vel_y_pid_controller_kd = 0.0;
+  std::string kinova_right_base_link = "kinova_right_base_link";
   double kinova_left_bracelet_base_distance_embed_map_vector[3] = {1.0, 1.0, 1.0};
   double achd_solver_kinova_right_root_acceleration[6] = {0.0, 0.0, 9.81, 0.0, 0.0, 0.0};
   double kinova_left_bracelet_base_distance_impedance_controller_stiffness_diag_mat[1] = {
@@ -145,6 +146,7 @@ int main()
                                                                           0.0, 0.0, 0.0};
   double achd_solver_kinova_right_output_torques[7]{};
   int achd_solver_kinova_left_nc = 6;
+  std::string kinova_left_base_link = "kinova_left_base_link";
   double achd_solver_kinova_right_output_acceleration_energy[6]{};
   int achd_solver_kinova_left_nj = 7;
   std::string kinova_right_bracelet_link = "kinova_right_bracelet_link";
@@ -266,6 +268,36 @@ int main()
                   kinova_right_bracelet_base_lin_vel_y_pid_controller_error_sum,
                   kinova_right_bracelet_base_lin_vel_y_pid_controller_prev_error,
                   kinova_right_bracelet_base_lin_vel_y_pid_controller_signal);
+
+    // impedance controller
+    double stiffnessError = 0.0;
+    double dampingError = 0.0;
+    // stiffness
+    // compute distance
+    std::string between_ents[2] = {kinova_right_bracelet_link, kinova_right_base_link};
+    computeDistance(between_ents, kinova_right_bracelet_link, &kinova_right_state,
+                    &kinova_right_chain, kinova_right_bracelet_base_distance);
+    computeEqualityError(kinova_right_bracelet_base_distance,
+                         arms_distance_reference_value, stiffnessError);
+    impedanceController(
+        stiffnessError, dampingError,
+        kinova_right_bracelet_base_distance_impedance_controller_stiffness_diag_mat, {},
+        kinova_right_bracelet_base_distance_impedance_controller_signal);
+
+    // impedance controller
+    double stiffnessError = 0.0;
+    double dampingError = 0.0;
+    // stiffness
+    // compute distance
+    std::string between_ents[2] = {kinova_left_bracelet_link, kinova_left_base_link};
+    computeDistance(between_ents, kinova_left_bracelet_link, &kinova_left_state,
+                    &kinova_left_chain, kinova_left_bracelet_base_distance);
+    computeEqualityError(kinova_left_bracelet_base_distance,
+                         arms_distance_reference_value, stiffnessError);
+    impedanceController(
+        stiffnessError, dampingError,
+        kinova_left_bracelet_base_distance_impedance_controller_stiffness_diag_mat, {},
+        kinova_left_bracelet_base_distance_impedance_controller_signal);
 
     // pid controller
     computeForwardVelocityKinematics(kinova_left_bracelet_link, base_link, base_link,
