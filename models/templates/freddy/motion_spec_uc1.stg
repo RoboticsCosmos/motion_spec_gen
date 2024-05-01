@@ -33,15 +33,15 @@ int main()
 
     // controllers
     <! controllers !>
-    <d.controllers: {v | <({<d.controllers.(v).name>})(d.controllers.(v))>}; separator="\n">
+    <d.controllers: {v | <({<d.controllers.(v).name>})(v, d.controllers.(v))>}; separator="\n">
 
     // embed maps
     <! embed maps !>
-    <d.embed_maps: {m | <embed_maps(d.embed_maps.(m))> }; separator="\n">
+    <d.embed_maps: {m | <embed_maps(m, d.embed_maps.(m))> }; separator="\n">
 
     // solvers
     <! solvers !>
-    <d.solvers: {s | <({<d.solvers.(s).name>})(d.solvers.(s))> }; separator="\n">
+    <d.solvers: {s | <({<d.solvers.(s).name>})(s, d.solvers.(s))> }; separator="\n">
 
     <! command torques !>
     <set_robot_command_torques(d.robots)>

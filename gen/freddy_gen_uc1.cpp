@@ -20,16 +20,16 @@ int main()
       (path.parent_path().parent_path() / "urdf" / "freddy.urdf").string();
 
   // set the base and tool links
-  std::string base_link = "base_link";
+  std::string base_link1 = "base_link";
   std::string tool_link_1 = "kinova_left_bracelet_link";
   std::string tool_link_2 = "kinova_right_bracelet_link";
 
   // initialize the chain
   KDL::Chain kinova_left_chain;
-  initialize_robot_chain(robot_urdf, base_link, tool_link_1, kinova_left_chain);
+  initialize_robot_chain(robot_urdf, base_link1, tool_link_1, kinova_left_chain);
 
   KDL::Chain kinova_right_chain;
-  initialize_robot_chain(robot_urdf, base_link, tool_link_2, kinova_right_chain);
+  initialize_robot_chain(robot_urdf, base_link1, tool_link_2, kinova_right_chain);
 
   // Initialize the robot structs
   Manipulator kinova_right_state;
