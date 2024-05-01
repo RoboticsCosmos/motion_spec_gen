@@ -53,13 +53,13 @@ set_robot_command_torques(robots_data) ::= <<
 >>
 
 command_Manipulator_torques(robot, robot_data) ::= <<
-double cmd_tau[7]{};
-<robot_data.input_command_torques: {ct | add(<ct>, cmd_tau, cmd_tau, 7);}; separator="\n">
-set_manipulator_torques(&<robot>_state, <robot>_mediator, cmd_tau);
+double <robot>_cmd_tau[7]{};
+<robot_data.input_command_torques: {ct | add(<ct>, <robot>_cmd_tau, <robot>_cmd_tau, 7);}; separator="\n">
+set_manipulator_torques(&<robot>_state, <robot>_mediator, <robot>_cmd_tau);
 >>
 
 command_MobileBase_torques(robot, robot_data) ::= <<
-double cmd_tau[8]{};
-<robot_data.input_command_torques: {ct | add(<ct>, cmd_tau, cmd_tau, 8);}; separator="\n">
-set_kelo_base_torques(&<robot>_config, &<robot>_ethercat_config, cmd_tau);
+double <robot>_cmd_tau[8]{};
+<robot_data.input_command_torques: {ct | add(<ct>, <robot>_cmd_tau, <robot>_cmd_tau, 8);}; separator="\n">
+set_kelo_base_torques(&<robot>_config, &<robot>_ethercat_config, <robot>_cmd_tau);
 >>

@@ -32,7 +32,5 @@ computeForce(<measured.of.applied_by_entity>, <measured.of.applied_to_entity>, <
 >>
 
 computeDistance(measured, data) ::= <<
-// compute distance
-std::string between_ents[2] = { <measured.of.entities: {ent | <ent>}; separator=", "> };
-computeDistance(between_ents, <measured.asb>, &<data.robot>_state, &<data.robot>_chain, <measured.of.id>);
+computeDistance(new std::string[2]{ <measured.of.entities: {ent | <ent>}; separator=", "> }, <measured.asb>, &<data.robot>_state, &<data.robot>_chain, <measured.of.id>);
 >>

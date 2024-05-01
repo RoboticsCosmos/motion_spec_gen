@@ -1,9 +1,9 @@
 pid_controller(id, data) ::= <<
 // pid controller
 <({<data.measure_variable>})(data.measured, data)>
-double <id>_error = 0;
-<({compute<data.operator>Error})(data.measured, data.reference_value, "error")>
-pidController(<id>_error, <data.gains.kp>, <data.gains.ki>, <data.gains.kd>, <data.dt>, <data.error_sum>, <data.last_error>, <data.signal>);
+double <data.error> = 0;
+<({compute<data.operator>Error})(data.measured, data.reference_value, data.error)>
+pidController(<data.error>, <data.gains.kp>, <data.gains.ki>, <data.gains.kd>, <data.dt>, <data.error_sum>, <data.last_error>, <data.signal>);
 
 >>
 
@@ -13,18 +13,16 @@ computeEqualityError(<measured.of.id>, <reference_value>, <error>);
 
 impedance_controller(id, data) ::= <<
 // impedance controller
-double <id>_stiffnessError = 0.0;
-double <id>_dampingError = 0.0;
-<if(data.stiffness)><stiffness(data, "stiffnessError")><endif>
-<if(data.damping)><damping(data, "dampingError")><endif>
-impedanceController(<id>_stiffnessError, <id>_dampingError, <if(data.stiffness)><data.stiffness.diag_mat><else>new double[1]{0.0}<endif>, <if(data.damping)><data.damping.diag_mat><else>new double[1]{0.0}<endif>, <data.signal>);
+<if(data.stiffness)><stiffness(data)><endif>
+<if(data.damping)><damping(data)><endif>
+impedanceController(<if(data.stiffness)><data.stiffness.error><else>0.0<endif>, <if(data.damping)><data.damping.error><else>0.0<endif>, <if(data.stiffness)><data.stiffness.diag_mat><else>new double[1]{0.0}<endif>, <if(data.damping)><data.damping.diag_mat><else>new double[1]{0.0}<endif>, <data.signal>);
 
 >>
 
-stiffness(data, error) ::= <<
-// stiffness
+stiffness(data) ::= <<
+double <data.stiffness.error> = 0;
 <({<data.stiffness.measure_variable>})(data.stiffness.measured, data)>
-<({compute<data.operator>Error})(data.stiffness.measured, data.stiffness.reference_value, error)>
+<({compute<data.operator>Error})(data.stiffness.measured, data.stiffness.reference_value, data.stiffness.error)>
 >>
 
 damping(data, error) ::= <<

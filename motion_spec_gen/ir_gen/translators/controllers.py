@@ -156,6 +156,7 @@ class PIDControllerTranslator:
         }
 
         data["name"] = "pid_controller"
+        data["error"] = f"{id}_error"
         data["measure_variable"] = measure_variable
         data["dt"] = f"{id}_time_step"
         data["gains"] = gains if len(gains) > 0 else None
@@ -275,6 +276,7 @@ class ImpedanceControllerTranslator:
             }
 
             data["stiffness"] = {
+                "error": f"{id}_stiffness_error",
                 "reference_value": ref_val_id,
                 "measure_variable": measure_variable,
                 "diag_mat": f"{id}_stiffness_diag_mat",

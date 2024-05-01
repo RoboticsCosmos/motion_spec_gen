@@ -24,7 +24,7 @@ for (size_t i = 0; i \< <data.robot>_state.ns - 1; i++)
 }
 double <id>_ext_wrench_tool[6]{};
 <data.ext_wrench: {w | add(<w>, <id>_ext_wrench_tool, <id>_ext_wrench_tool, 6);}; separator="\n">
-ext_wrench[<data.robot>_state.ns - 1] = <id>_ext_wrench_tool;
+<id>_ext_wrench[<data.robot>_state.ns - 1] = <id>_ext_wrench_tool;
 achd_solver_fext(&<data.robot>_state, &<data.robot>_chain, <id>_ext_wrench, <data.output_torques>);
 
 >>

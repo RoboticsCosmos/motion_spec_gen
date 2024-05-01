@@ -605,6 +605,7 @@
         "operator": "Equal",
         "reference_value": "arm_bracelet_link_lin_xy_vel_reference_value",
         "name": "pid_controller",
+        "error": "kinova_left_bracelet_base_lin_vel_x_pid_controller_error",
         "measure_variable": "computeForwardVelocityKinematics",
         "dt": "kinova_left_bracelet_base_lin_vel_x_pid_controller_time_step",
         "gains": {
@@ -632,6 +633,7 @@
         "operator": "Equal",
         "reference_value": "arm_table_contact_force_reference_value",
         "name": "pid_controller",
+        "error": "kinova_left_bracelet_table_contact_force_pid_controller_error",
         "measure_variable": "computeForce",
         "dt": "kinova_left_bracelet_table_contact_force_pid_controller_time_step",
         "gains": {
@@ -659,6 +661,7 @@
         "operator": "Equal",
         "reference_value": "arm_table_contact_force_reference_value",
         "name": "pid_controller",
+        "error": "kinova_right_bracelet_table_contact_force_pid_controller_error",
         "measure_variable": "computeForce",
         "dt": "kinova_right_bracelet_table_contact_force_pid_controller_time_step",
         "gains": {
@@ -686,6 +689,7 @@
         "operator": "Equal",
         "reference_value": "arm_bracelet_link_lin_xy_vel_reference_value",
         "name": "pid_controller",
+        "error": "kinova_left_bracelet_base_lin_vel_y_pid_controller_error",
         "measure_variable": "computeForwardVelocityKinematics",
         "dt": "kinova_left_bracelet_base_lin_vel_y_pid_controller_time_step",
         "gains": {
@@ -713,6 +717,7 @@
         "operator": "Equal",
         "reference_value": "arm_bracelet_link_lin_xy_vel_reference_value",
         "name": "pid_controller",
+        "error": "kinova_right_bracelet_base_lin_vel_x_pid_controller_error",
         "measure_variable": "computeForwardVelocityKinematics",
         "dt": "kinova_right_bracelet_base_lin_vel_x_pid_controller_time_step",
         "gains": {
@@ -740,6 +745,7 @@
         "operator": "Equal",
         "reference_value": "arm_bracelet_link_lin_xy_vel_reference_value",
         "name": "pid_controller",
+        "error": "kinova_right_bracelet_base_lin_vel_y_pid_controller_error",
         "measure_variable": "computeForwardVelocityKinematics",
         "dt": "kinova_right_bracelet_base_lin_vel_y_pid_controller_time_step",
         "gains": {
@@ -756,6 +762,7 @@
       "kinova_left_bracelet_base_distance_impedance_controller": {
         "operator": "Equal",
         "stiffness": {
+          "error": "kinova_left_bracelet_base_distance_impedance_controller_stiffness_error",
           "reference_value": "arms_distance_reference_value",
           "measure_variable": "computeDistance",
           "diag_mat": "kinova_left_bracelet_base_distance_impedance_controller_stiffness_diag_mat",
@@ -776,6 +783,7 @@
       "kinova_right_bracelet_base_distance_impedance_controller": {
         "operator": "Equal",
         "stiffness": {
+          "error": "kinova_right_bracelet_base_distance_impedance_controller_stiffness_error",
           "reference_value": "arms_distance_reference_value",
           "measure_variable": "computeDistance",
           "diag_mat": "kinova_right_bracelet_base_distance_impedance_controller_stiffness_diag_mat",

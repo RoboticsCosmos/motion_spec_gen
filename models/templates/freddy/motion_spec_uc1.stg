@@ -37,7 +37,7 @@ int main()
 
     // embed maps
     <! embed maps !>
-    <d.embed_maps: {m | <embed_maps(m, d.embed_maps.(m))> }; separator="\n">
+    <d.embed_maps: {m | <embed_maps(d.embed_maps.(m))> }; separator="\n">
 
     // solvers
     <! solvers !>
