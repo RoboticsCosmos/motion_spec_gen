@@ -185,6 +185,7 @@ class ImpedanceControllerStep:
                     output_data["output"]["var_name"],
                 )
             )
+            
 
         stiffness = g.value(node, IMPEDANCE_CONTROLLER.stiffness)
         damping = g.value(node, IMPEDANCE_CONTROLLER.damping)
@@ -222,6 +223,7 @@ class ImpedanceControllerStep:
                 output_data["stiffness"]["vector_direction"] = {
                     "from": rdflib.URIRef(f"{prefix}{dir_from}"),
                     "to": rdflib.URIRef(f"{prefix}{dir_to}"),
+                    "asb": asb,
                 }
                 output_data["stiffness"]["vector"] = (1, 1, 1)
 
@@ -251,6 +253,13 @@ class ImpedanceControllerStep:
                         embed_map,
                         EMBED_MAP["vector-direction-to"],
                         output_data["stiffness"]["vector_direction"]["to"],
+                    )
+                )
+                g.add(
+                    (
+                        embed_map,
+                        EMBED_MAP["vector-direction-asb"],
+                        output_data["stiffness"]["vector_direction"]["asb"],
                     )
                 )
             # add input

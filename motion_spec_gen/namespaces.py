@@ -289,6 +289,7 @@ class EMBED_MAP(DefinedNamespace):
         "damping-vector",
         "vector-direction-from",
         "vector-direction-to",
+        "vector-direction-asb"
     ]
 
     _NS = Namespace(

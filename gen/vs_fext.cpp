@@ -13,8 +13,8 @@ int main()
 {
   // initialize the robot state
   Manipulator rob;
-  // double init_q[7] = {0.0, 0.26, 0.0, 2.26, 0.0, -0.95, -1.57};
-  double init_q[7] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+  double init_q[7] = {0.0, 0.26, 0.0, 2.26, 0.0, -0.95, -1.57};
+  // double init_q[7] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   initialize_robot_state(7, 7, init_q, &rob);
 
   double dt = 0.001;
@@ -36,7 +36,7 @@ int main()
   double move_arm_down_vel_twist_achd_solver_output_torques[7]{};
   double move_arm_down_vel_twist_monitor_post_bracelet_link_vel_twist_sp[6] = {0.0, 0.0, 0.0,
                                                                                0.0, 0.0, 0.0};
-  double move_arm_down_vel_twist_achd_solver_root_acceleration[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+  double move_arm_down_vel_twist_achd_solver_root_acceleration[6] = {0.0, 0.0, 9.81, 0.0, 0.0, 0.0};
 
   // get current file path
   std::filesystem::path path = __FILE__;
@@ -55,7 +55,7 @@ int main()
 
   int count = 0;
 
-  while (true && count < 3)
+  while (true && count < 50)
   {
     std::cout << std::endl;
     std ::cout << "---------------------->count: " << count << std::endl;
@@ -69,7 +69,7 @@ int main()
 
     // solvers
     // solver beta
-    double beta[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    double beta[6] = {0.0, 0.0, 9.81, 0.0, 0.0, 0.0};
     // solver ext_wrench
     double *ext_wrench[7];
 
@@ -78,7 +78,7 @@ int main()
       ext_wrench[i] = new double[6]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     }
 
-    ext_wrench[6] = new double[6]{1.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    ext_wrench[6] = new double[6]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
     achd_solver(&rob, &robot_chain, move_arm_down_vel_twist_achd_solver_nc,
                 move_arm_down_vel_twist_achd_solver_root_acceleration,
@@ -87,11 +87,25 @@ int main()
                 move_arm_down_vel_twist_achd_solver_predicted_accelerations,
                 move_arm_down_vel_twist_achd_solver_output_torques);
 
-    achd_solver_fext(&rob, &robot_chain, ext_wrench,
-                     move_arm_down_vel_twist_achd_solver_output_torques);
+    std::cout << "achd: ";
+    for (size_t i = 0; i < 7; i++)
+    {
+      std::cout << move_arm_down_vel_twist_achd_solver_output_torques[i] << " ";
+    }
+    std::cout << std::endl;
+
+    // achd_solver_fext(&rob, &robot_chain, ext_wrench,
+    //                  move_arm_down_vel_twist_achd_solver_output_torques);
 
     rne_solver(&rob, &robot_chain, move_arm_down_vel_twist_achd_solver_root_acceleration,
                ext_wrench, move_arm_down_vel_twist_achd_solver_output_torques);
+    
+    std::cout << "rne: ";
+    for (size_t i = 0; i < 7; i++)
+    {
+      std::cout << move_arm_down_vel_twist_achd_solver_output_torques[i] << " ";
+    }
+    std::cout << std::endl;
   }
 
   return 0;

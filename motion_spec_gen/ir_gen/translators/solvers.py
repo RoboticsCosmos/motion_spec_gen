@@ -299,7 +299,7 @@ class BaseFDSolverTranslator:
 
             variables[embed_map["output"]] = {
                 "type": "array",
-                "size": 3,
+                "size": 6,
                 "dtype": "double",
                 "value": None,
             }

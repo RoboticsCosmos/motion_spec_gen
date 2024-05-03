@@ -364,8 +364,9 @@ int main()
     findVector(kinova_left_bracelet_link, kinova_left_base_link, &kinova_left_state,
                &kinova_left_chain, fd_solver_robile_output_external_wrench_vector);
     double fd_solver_robile_output_external_wrench_norm_vector[3]{};
-    findVectorNorm(fd_solver_robile_output_external_wrench_vector,
+    findNormalizedVector(fd_solver_robile_output_external_wrench_vector,
                    fd_solver_robile_output_external_wrench_norm_vector);
+    
     for (size_t i = 0;
          i < sizeof(fd_solver_robile_output_external_wrench_norm_vector) /
                  sizeof(fd_solver_robile_output_external_wrench_norm_vector[0]);
@@ -382,7 +383,7 @@ int main()
     findVector(kinova_right_bracelet_link, kinova_right_base_link, &kinova_right_state,
                &kinova_right_chain, fd_solver_robile_output_external_wrench_vector);
     double fd_solver_robile_output_external_wrench_norm_vector[3]{};
-    findVectorNorm(fd_solver_robile_output_external_wrench_vector,
+    findNormalizedVector(fd_solver_robile_output_external_wrench_vector,
                    fd_solver_robile_output_external_wrench_norm_vector);
     for (size_t i = 0;
          i < sizeof(fd_solver_robile_output_external_wrench_norm_vector) /

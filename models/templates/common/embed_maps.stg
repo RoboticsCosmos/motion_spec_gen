@@ -17,7 +17,7 @@ embed_mapping_vector_info(data) ::= <<
 double <data.output>_vector[3]{};
 findVector(<data.vector_info.from>, <data.vector_info.to>, &<data.vector_info.robot>_state, &<data.vector_info.robot>_chain, <data.output>_vector);
 double <data.output>_norm_vector[3]{};
-findVectorNorm(<data.output>_vector, <data.output>_norm_vector);
+findNormalizedVector(<data.output>_vector, <data.output>_norm_vector);
 for (size_t i = 0; i \< sizeof(<data.output>_norm_vector)/sizeof(<data.output>_norm_vector[0]); i++)
 {
   if (<data.output>_norm_vector[i] != 0.0)

@@ -1,7 +1,6 @@
 from motion_spec_gen.namespaces import (
-    CONTROLLER,
-    PID_CONTROLLER,
     EMBED_MAP,
+    BASE_FD_SOLVER
 )
 import rdflib
 from rdflib.collection import Collection
@@ -48,20 +47,30 @@ class EmbedMapTranslator:
             "value": embed_map_vector,
         }
 
+        transform = False
+
         # check if vector direction is defined
         if g[node : rdflib.RDF.type : EMBED_MAP.DirectionVector]:
             vector_direction_from = g.value(node, EMBED_MAP["vector-direction-from"])
             vector_direction_to = g.value(node, EMBED_MAP["vector-direction-to"])
+            vector_direction_asb = g.value(node, EMBED_MAP["vector-direction-asb"])
 
             vector_id = None
             if "kinova_left" in g.compute_qname(vector_direction_from)[2]:
                 robot = "kinova_left"
             elif "kinova_right" in g.compute_qname(vector_direction_from)[2]:
                 robot = "kinova_right"
+
+            
+            if g[em_solver : rdflib.RDF.type : BASE_FD_SOLVER.BaseFDSolver]:
+                if g.compute_qname(vector_direction_asb)[2] != "base_link":
+                    transform = True
+            
             vector_info = {
                 "robot": robot,
                 "from": g.compute_qname(vector_direction_from)[2],
                 "to": g.compute_qname(vector_direction_to)[2],
+                "asb": g.compute_qname(vector_direction_asb)[2],
             }
 
         data["name"] = "embed_map"
@@ -70,6 +79,7 @@ class EmbedMapTranslator:
         data["output_type"] = output_type
         data["vector"] = vector_id
         data["vector_info"] = vector_info
+        data["transform"] = transform
         
         data["return"] = None
 
