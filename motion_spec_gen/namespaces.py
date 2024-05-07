@@ -254,6 +254,9 @@ class ACHD_SOLVER(DefinedNamespace):
         "alpha-constraints",
         "acceleration-energy",
         "external-wrench",
+
+        "root-link",
+        "tip-link"
     ]
 
     _NS = Namespace(

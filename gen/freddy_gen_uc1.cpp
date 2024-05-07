@@ -12,7 +12,6 @@
 
 int main()
 {
-
   Manipulator<kinova_mediator> kinova_right;
   kinova_right.base_frame = "kinova_right_base_link";
   kinova_right.tool_frame = "kinova_right_bracelet_link";
@@ -170,8 +169,8 @@ int main()
     // controllers
     // pid controller
     getLinkForce(kinova_left_bracelet_link, table, kinova_left_bracelet_link,
-                 kinova_left_bracelet_table_contact_force_lin_z_vector_z,
-                 &freddy, kinova_left_bracelet_table_contact_force_lin_z);
+                 kinova_left_bracelet_table_contact_force_lin_z_vector_z, &freddy,
+                 kinova_left_bracelet_table_contact_force_lin_z);
     double kinova_left_bracelet_table_contact_force_pid_controller_error = 0;
     computeEqualityError(kinova_left_bracelet_table_contact_force_lin_z,
                          arm_table_contact_force_reference_value,
@@ -186,10 +185,9 @@ int main()
                   kinova_left_bracelet_table_contact_force_pid_controller_signal);
 
     // pid controller
-    computeForwardVelocityKinematics(kinova_left_bracelet_link, base_link, base_link,
-                                     kinova_left_bracelet_base_vel_vector_lin_y,
-                                     &kinova_left_state, &kinova_left_chain,
-                                     of_vel_qname_lin_y);
+    getLinkVelocity(kinova_left_bracelet_link, base_link, base_link,
+                    kinova_left_bracelet_base_vel_vector_lin_y, &freddy,
+                    of_vel_qname_lin_y);
     double kinova_left_bracelet_base_lin_vel_y_pid_controller_error = 0;
     computeEqualityError(of_vel_qname_lin_y, arm_bracelet_link_lin_xy_vel_reference_value,
                          kinova_left_bracelet_base_lin_vel_y_pid_controller_error);
@@ -203,9 +201,8 @@ int main()
                   kinova_left_bracelet_base_lin_vel_y_pid_controller_signal);
 
     // pid controller
-    computeForce(kinova_right_bracelet_link, table, kinova_right_bracelet_link,
-                 kinova_right_bracelet_table_contact_force_lin_z_vector_z,
-                 &kinova_right_state, &kinova_right_chain,
+    getLinkForce(kinova_right_bracelet_link, table, kinova_right_bracelet_link,
+                 kinova_right_bracelet_table_contact_force_lin_z_vector_z, &freddy,
                  kinova_right_bracelet_table_contact_force_lin_z);
     double kinova_right_bracelet_table_contact_force_pid_controller_error = 0;
     computeEqualityError(kinova_right_bracelet_table_contact_force_lin_z,
@@ -221,10 +218,9 @@ int main()
                   kinova_right_bracelet_table_contact_force_pid_controller_signal);
 
     // pid controller
-    computeForwardVelocityKinematics(kinova_right_bracelet_link, base_link, base_link,
-                                     kinova_right_bracelet_base_vel_vector_lin_x,
-                                     &kinova_right_state, &kinova_right_chain,
-                                     of_vel_qname_lin_x);
+    getLinkVelocity(kinova_right_bracelet_link, base_link, base_link,
+                    kinova_right_bracelet_base_vel_vector_lin_x, &freddy,
+                    of_vel_qname_lin_x);
     double kinova_right_bracelet_base_lin_vel_x_pid_controller_error = 0;
     computeEqualityError(of_vel_qname_lin_x, arm_bracelet_link_lin_xy_vel_reference_value,
                          kinova_right_bracelet_base_lin_vel_x_pid_controller_error);
@@ -238,10 +234,9 @@ int main()
                   kinova_right_bracelet_base_lin_vel_x_pid_controller_signal);
 
     // pid controller
-    computeForwardVelocityKinematics(kinova_right_bracelet_link, base_link, base_link,
-                                     kinova_right_bracelet_base_vel_vector_lin_y,
-                                     &kinova_right_state, &kinova_right_chain,
-                                     of_vel_qname_lin_y);
+    getLinkVelocity(kinova_right_bracelet_link, base_link, base_link,
+                    kinova_right_bracelet_base_vel_vector_lin_y, &freddy,
+                    of_vel_qname_lin_y);
     double kinova_right_bracelet_base_lin_vel_y_pid_controller_error = 0;
     computeEqualityError(of_vel_qname_lin_y, arm_bracelet_link_lin_xy_vel_reference_value,
                          kinova_right_bracelet_base_lin_vel_y_pid_controller_error);
@@ -256,9 +251,9 @@ int main()
 
     // impedance controller
     double kinova_right_bracelet_base_distance_impedance_controller_stiffness_error = 0;
-    computeDistance(new std::string[2]{kinova_right_bracelet_link, kinova_right_base_link},
-                    kinova_right_bracelet_link, &kinova_right_state, &kinova_right_chain,
-                    kinova_right_bracelet_base_distance);
+    computeDistance(
+        new std::string[2]{kinova_right_bracelet_link, kinova_right_base_link},
+        kinova_right_bracelet_link, &freddy, kinova_right_bracelet_base_distance);
     computeEqualityError(
         kinova_right_bracelet_base_distance, arms_distance_reference_value,
         kinova_right_bracelet_base_distance_impedance_controller_stiffness_error);
@@ -271,7 +266,7 @@ int main()
     // impedance controller
     double kinova_left_bracelet_base_distance_impedance_controller_stiffness_error = 0;
     computeDistance(new std::string[2]{kinova_left_bracelet_link, kinova_left_base_link},
-                    kinova_left_bracelet_link, &kinova_left_state, &kinova_left_chain,
+                    kinova_left_bracelet_link, &freddy,
                     kinova_left_bracelet_base_distance);
     computeEqualityError(
         kinova_left_bracelet_base_distance, arms_distance_reference_value,
@@ -283,10 +278,9 @@ int main()
         kinova_left_bracelet_base_distance_impedance_controller_signal);
 
     // pid controller
-    computeForwardVelocityKinematics(kinova_left_bracelet_link, base_link, base_link,
-                                     kinova_left_bracelet_base_vel_vector_lin_x,
-                                     &kinova_left_state, &kinova_left_chain,
-                                     of_vel_qname_lin_x);
+    getLinkVelocity(kinova_left_bracelet_link, base_link, base_link,
+                    kinova_left_bracelet_base_vel_vector_lin_x, &freddy,
+                    of_vel_qname_lin_x);
     double kinova_left_bracelet_base_lin_vel_x_pid_controller_error = 0;
     computeEqualityError(of_vel_qname_lin_x, arm_bracelet_link_lin_xy_vel_reference_value,
                          kinova_left_bracelet_base_lin_vel_x_pid_controller_error);
@@ -334,12 +328,12 @@ int main()
       }
     }
     double fd_solver_robile_output_external_wrench_vector[3]{};
-    findVector(kinova_left_bracelet_link, kinova_left_base_link, &kinova_left_state,
-               &kinova_left_chain, fd_solver_robile_output_external_wrench_vector);
+    findVector(kinova_left_bracelet_link, kinova_left_base_link, &freddy,
+               fd_solver_robile_output_external_wrench_vector);
     double fd_solver_robile_output_external_wrench_norm_vector[3]{};
     findNormalizedVector(fd_solver_robile_output_external_wrench_vector,
-                   fd_solver_robile_output_external_wrench_norm_vector);
-    
+                         fd_solver_robile_output_external_wrench_norm_vector);
+
     for (size_t i = 0;
          i < sizeof(fd_solver_robile_output_external_wrench_norm_vector) /
                  sizeof(fd_solver_robile_output_external_wrench_norm_vector[0]);
@@ -353,11 +347,11 @@ int main()
       }
     }
     double fd_solver_robile_output_external_wrench_vector[3]{};
-    findVector(kinova_right_bracelet_link, kinova_right_base_link, &kinova_right_state,
-               &kinova_right_chain, fd_solver_robile_output_external_wrench_vector);
+    findVector(kinova_right_bracelet_link, kinova_right_base_link, &freddy,
+               fd_solver_robile_output_external_wrench_vector);
     double fd_solver_robile_output_external_wrench_norm_vector[3]{};
     findNormalizedVector(fd_solver_robile_output_external_wrench_vector,
-                   fd_solver_robile_output_external_wrench_norm_vector);
+                         fd_solver_robile_output_external_wrench_norm_vector);
     for (size_t i = 0;
          i < sizeof(fd_solver_robile_output_external_wrench_norm_vector) /
                  sizeof(fd_solver_robile_output_external_wrench_norm_vector[0]);
@@ -411,18 +405,11 @@ int main()
     {
       achd_solver_kinova_right_beta[i] = achd_solver_kinova_right_root_acceleration[i];
     }
-    double *achd_solver_kinova_right_ext_wrench[kinova_right_state.ns];
-    for (size_t i = 0; i < 7; i++)
-    {
-      achd_solver_kinova_right_ext_wrench[i] =
-          new double[6]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    }
     add(achd_solver_kinova_right_output_acceleration_energy,
         achd_solver_kinova_right_beta, achd_solver_kinova_right_beta, 6);
-    achd_solver(&kinova_right_state, &kinova_right_chain, achd_solver_kinova_right_nc,
+    achd_solver(&freddy, "kinova_right_base_link", "kinova_right_bracelet_link", achd_solver_kinova_right_nc,
                 achd_solver_kinova_right_root_acceleration,
                 achd_solver_kinova_right_alpha, achd_solver_kinova_right_beta,
-                achd_solver_kinova_right_ext_wrench,
                 achd_solver_kinova_right_feed_forward_torques,
                 achd_solver_kinova_right_predicted_accelerations,
                 achd_solver_kinova_right_output_torques);
