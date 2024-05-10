@@ -4,7 +4,15 @@ project(motion_spec VERSION 0.1.0 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 17)
 add_compile_definitions(_OS_UNIX)
 
-LINK_DIRECTORIES(${CMAKE_INSTALL_PREFIX}/lib/)
+# add path to CMAKE_PREFIX_PATH
+list(APPEND CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR}/../build/)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR}/../build/)
+
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+# link directories
+link_directories(${CMAKE_INSTALL_PREFIX}/lib/)
 
 # find dependencies
 find_package(Eigen3 REQUIRED)
@@ -23,10 +31,8 @@ include_directories(
   ${CMAKE_INSTALL_PREFIX}/include/kinova_api/common
   ${CMAKE_INSTALL_PREFIX}/include/kinova_api/messages
   ${CMAKE_INSTALL_PREFIX}/include/kinova_api/client_stubs
-  ${CMAKE_INSTALL_PREFIX}/include/kinova_api/google
+  ${CMAKE_INSTALL_PREFIX}/include/kinova_api/google   
 )
-
-link_directories(${CMAKE_INSTALL_PREFIX}/lib)
 
 # add all cpp files in the folder
 file(GLOB SOURCES "*.cpp")
@@ -35,7 +41,7 @@ file(GLOB SOURCES "*.cpp")
 foreach(source ${SOURCES})
   get_filename_component(name ${source} NAME_WE)
   add_executable(${name} ${source})
-  target_link_libraries(${name} 
+  target_link_libraries(${name}
     Eigen3::Eigen 
     motion_spec_utils::mutils 
     motion_spec_utils::math_utils 
@@ -46,8 +52,7 @@ foreach(source ${SOURCES})
   # set runtime path
   set_target_properties(${name} PROPERTIES
    BUILD_WITH_INSTALL_RPATH TRUE
-   INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
-   INSTALL_RPATH_USE_LINK_PATH TRUE)
+   INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
   install(TARGETS ${name} RUNTIME DESTINATION bin)
 endforeach(source ${SOURCES})
 

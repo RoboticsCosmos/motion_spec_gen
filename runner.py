@@ -107,9 +107,6 @@ def main():
 
             val = g.value(predicate=CONTROLLER.constraint, object=per_condition)
 
-            print()
-            print(f"val: {val}")
-
             if g[val : rdflib.RDF.type : CONTROLLER.Controller]:
                 controller = val
             elif g[val : rdflib.RDF.type : NEWTONIAN_RBD_REL.Stiffness]:
