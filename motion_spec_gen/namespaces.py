@@ -317,4 +317,9 @@ class ROBOTS(DefinedNamespace):
     
     solvers: URIRef
 
+    _extras = [
+        "kinematic-chain-start",
+        "kinematic-chain-end",
+    ]
+
     _NS = Namespace("https://roboticscosmos.github.io/metamodels/robots#")

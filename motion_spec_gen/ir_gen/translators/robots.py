@@ -13,6 +13,13 @@ class RobotsTranslator:
 
         if g[node : rdflib.RDF.type : ROBOTS.Manipulator]:
             robot_data["type"] = "Manipulator"
+
+            robot_data["kinematic_chain_start"] = g.compute_qname(
+                g.value(node, ROBOTS["kinematic-chain-start"])
+            )[2]
+            robot_data["kinematic_chain_end"] = g.compute_qname(
+                g.value(node, ROBOTS["kinematic-chain-end"])
+            )[2]
         elif g[node : rdflib.RDF.type : ROBOTS.MobileBase]:
             robot_data["type"] = "MobileBase"
         else:

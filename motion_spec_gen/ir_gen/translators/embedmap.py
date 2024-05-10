@@ -13,6 +13,8 @@ class EmbedMapTranslator:
         variables = {}
         data = {}
 
+        id = g.compute_qname(node)[2]
+
         # input
         em_input = g.value(node, EMBED_MAP.input)
 
@@ -47,8 +49,6 @@ class EmbedMapTranslator:
             "value": embed_map_vector,
         }
 
-        transform = False
-
         # check if vector direction is defined
         if g[node : rdflib.RDF.type : EMBED_MAP.DirectionVector]:
             vector_direction_from = g.value(node, EMBED_MAP["vector-direction-from"])
@@ -56,18 +56,8 @@ class EmbedMapTranslator:
             vector_direction_asb = g.value(node, EMBED_MAP["vector-direction-asb"])
 
             vector_id = None
-            if "kinova_left" in g.compute_qname(vector_direction_from)[2]:
-                robot = "kinova_left"
-            elif "kinova_right" in g.compute_qname(vector_direction_from)[2]:
-                robot = "kinova_right"
-
-            
-            if g[em_solver : rdflib.RDF.type : BASE_FD_SOLVER.BaseFDSolver]:
-                if g.compute_qname(vector_direction_asb)[2] != "base_link":
-                    transform = True
             
             vector_info = {
-                "robot": robot,
                 "from": g.compute_qname(vector_direction_from)[2],
                 "to": g.compute_qname(vector_direction_to)[2],
                 "asb": g.compute_qname(vector_direction_asb)[2],
@@ -75,11 +65,10 @@ class EmbedMapTranslator:
 
         data["name"] = "embed_map"
         data["input"] = g.compute_qname(em_input)[2]
-        data["output"] = output
+        data["output"] = f'{id}_{output}'
         data["output_type"] = output_type
         data["vector"] = vector_id
         data["vector_info"] = vector_info
-        data["transform"] = transform
         
         data["return"] = None
 

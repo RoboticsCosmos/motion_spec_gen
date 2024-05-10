@@ -1,17 +1,25 @@
-init_robot_structs(robots_data) ::= <<
+init_robots(robots_data) ::= <<
 // Initialize the robot structs
-<robots_data: {robot | <robots_data.(robot).type> <robot>_state;}; separator="\n">
-
-<robots_data: {robot | <({init_<robots_data.(robot).type>_struct})(robot)>}; separator="\n">
+<robots_data: {robot | <({init_<robots_data.(robot).type>})(robot, robots_data.(robot))>}; separator="\n">
 >>
 
-init_MobileBase_struct(robot) ::= <<
-initialize_mobile_base_state(&<robot>_state);
+init_Manipulator(robot, robot_data) ::= <<
+<robot_data.type>\<kinova_mediator> <robot>;
+<robot>.base_frame = <robot_data.kinematic_chain_start>;
+<robot>.tool_frame = <robot_data.kinematic_chain_end>;
+<robot>.mediator = new kinova_mediator();
+<robot>.state = new <robot_data.type>State();
+>>
+
+init_MobileBase(robot, robot_data) ::= <<
+<robot_data.type>\<Robile> <robot>;
+<robot>.mediator = new Robile();
+<robot>.state = new <robot_data.type>State();
 >>
 
 init_robot_connections(robots_data) ::= <<
 // Initialize the robot connections
-<robots_data: {robot | <({init_<robots_data.(robot).type>_connections})(robot)>}; separator="\n">
+Freddy robot = { <robots_data: {robot | &<robot>}; separator=","> };
 >>
 
 init_Manipulator_connections(robot) ::= <<
