@@ -15,11 +15,29 @@ init_MobileBase(robot, robot_data) ::= <<
 <robot_data.type>\<Robile> <robot>;
 <robot>.mediator = new Robile();
 <robot>.state = new <robot_data.type>State();
+
+KeloBaseConfig kelo_base_config;
+kelo_base_config.nWheels = 4;
+kelo_base_config.index_to_EtherCAT = new int[4]{3, 5, 7, 9};
+kelo_base_config.radius = 0.052;
+kelo_base_config.castor_offset = 0.01;
+kelo_base_config.half_wheel_distance = 0.0275;
+kelo_base_config.wheel_coordinates =
+    new double[8]{0.175, 0.1605, -0.175, 0.1605, -0.175, -0.1605, 0.175, -0.1605};
+kelo_base_config.pivot_angles_deviation = new double[4]{-2.5, -1.25, -2.14, 1.49};
+
+<robot_data.type>\<Robile> <robot>;
+Robile robile;
+robile.ethercat_config = new EthercatConfig();
+robile.kelo_base_config = &kelo_base_config;
+
+<robot>.mediator = &robile;
+<robot>.state = new <robot_data.type>State();
 >>
 
 init_robot_connections(robots_data) ::= <<
 // Initialize the robot connections
-Freddy robot = { <robots_data: {robot | &<robot>}; separator=","> };
+Freddy robot = { <robots_data: {rob | &<rob>}; separator=","> };
 >>
 
 init_Manipulator_connections(robot) ::= <<

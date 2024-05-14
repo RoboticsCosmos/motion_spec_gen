@@ -9,6 +9,17 @@ std::string robot_urdf =
 initialize_robot(robot_urdf, &robot);
 >>
 
+kdl_init_sim() ::= <<
+// get current file path
+std::filesystem::path path = __FILE__;
+
+// get the robot urdf path
+std::string robot_urdf =
+    (path.parent_path().parent_path() / "urdf" / "freddy.urdf").string();
+
+initialize_robot_sim(robot_urdf, &robot);
+>>
+
 init_Manipulator_struct(robot) ::= <<
 initialize_manipulator_state(<robot>_chain.getNrOfJoints(), <robot>_chain.getNrOfSegments(), &<robot>_state);
 >>
