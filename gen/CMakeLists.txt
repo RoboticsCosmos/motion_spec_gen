@@ -47,6 +47,8 @@ foreach(source ${SOURCES})
     motion_spec_utils::math_utils 
     motion_spec_utils::solver_utils
     controllers::pid_controller
+    gsl
+	  gslcblas
   )
 
   # set runtime path

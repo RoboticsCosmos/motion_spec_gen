@@ -47,6 +47,25 @@ class ACHDSolverTranslator:
             "value": root_acc_vector,
         }
 
+        # root and tip links
+        root_link = g.value(node, ACHD_SOLVER["root-link"])
+        tip_link = g.value(node, ACHD_SOLVER["tip-link"])
+
+        root_link_name = g.compute_qname(root_link)[2]
+        tip_link_name = g.compute_qname(tip_link)[2]
+
+        variables[root_link_name] = {
+            "type": None,
+            "dtype": "string",
+            "value": root_link_name,
+        }
+
+        variables[tip_link_name] = {
+            "type": None,
+            "dtype": "string",
+            "value": tip_link_name,
+        }
+
         alpha = np.array([])
         beta = []
         ext_wrench = []
@@ -91,15 +110,12 @@ class ACHDSolverTranslator:
 
         # num of joints TODO: get from the robot model
         nj = 7
-        ns = 8
 
         # solver variables
         # number of constraints
         variables[f"{id}_nc"] = {"type": None, "dtype": "int", "value": nc}
         # number of joints
         variables[f"{id}_nj"] = {"type": None, "dtype": "int", "value": nj}
-        # number of segments
-        variables[f"{id}_ns"] = {"type": None, "dtype": "int", "value": ns}
         # alpha matrix
         variables[f"{id}_alpha"] = {
             "type": "array_2d",
@@ -147,6 +163,8 @@ class ACHDSolverTranslator:
             "tau_ff": f"{id}_feed_forward_torques",
             "output_torques": f"{id}_output_torques",
             "predicted_accelerations": f"{id}_predicted_accelerations",
+            "root_link": root_link_name,
+            "tip_link": tip_link_name,
             "return": None,
         }
 
@@ -202,13 +220,10 @@ class ACHDSolverFextTranslator:
 
         # TODO: get num of joints from the robot model
         nj = 7
-        ns = 8
 
         # solver variables
         # number of joints
         variables[f"{id}_nj"] = {"type": None, "dtype": "int", "value": nj}
-        # number of segments
-        variables[f"{id}_ns"] = {"type": None, "dtype": "int", "value": ns}
 
         # output variables
         # # predicted joint accelerations

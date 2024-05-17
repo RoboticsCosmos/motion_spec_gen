@@ -1,6 +1,6 @@
 import os
 import json
-import pprint
+import argparse
 import rdflib
 
 from motion_spec_gen.utility import resolver, loader
@@ -31,7 +31,10 @@ from motion_spec_gen.ir_gen.translators import (
 )
 
 
-def main():
+def main(motion_spec_name: str = None, ir_out_file_name: str = "ir.json"):
+
+    if motion_spec_name is None:
+        raise ValueError("Motion specification name is required")
 
     ROB = rdflib.Namespace("https://roboticscosmos.github.io/rob")
 
@@ -49,7 +52,7 @@ def main():
     # g.bind("embedding-map", EMBED_MAP)
     g.bind("controller", CONTROLLER)
 
-    motion_spec_name = "freddy_uc1"
+    motion_spec_name = motion_spec_name
     models_path = os.path.join(
         os.path.dirname(__file__), f"../models/{motion_spec_name}/"
     )
@@ -58,9 +61,9 @@ def main():
         if file.endswith(".jsonld"):
             g.parse(models_path + file, format="json-ld")
 
-    print(g.serialize(format="turtle"))
+    # print(g.serialize(format="turtle"))
 
-    print("**" * 20)
+    # print("**" * 20)
 
     controller_steps = [PIDControllerStep, ImpedanceControllerStep]
     controller_translators = [PIDControllerTranslator, ImpedanceControllerTranslator]
@@ -69,7 +72,6 @@ def main():
         ACHDSolverFextTranslator,
         BaseFDSolverTranslator,
     ]
-
 
     data = {
         "variables": {},
@@ -145,6 +147,9 @@ def main():
         solvers = g.subjects(rdflib.RDF.type, SOLVER.Solver)
 
         for solver in solvers:
+            if g.compute_qname(solver)[2] not in data["d"]["embed_maps"]:
+                continue
+
             for translator in solver_translators:
                 if translator.is_applicable(g, solver):
                     ir = translator().translate(
@@ -158,13 +163,13 @@ def main():
                     data["d"]["solvers"][ir["id"]] = ir["data"]
 
         for robot in g.subjects(rdflib.RDF.type, ROBOTS.Robot):
+
             robot_ir = RobotsTranslator().translate(
                 g, robot, solvers_data=data["d"]["solvers"]
             )
 
             data["variables"].update(robot_ir["variables"])
             data["d"]["robots"][robot_ir["id"]] = robot_ir["data"]
-
 
         # for post_condition in post_conditions:
 
@@ -187,10 +192,26 @@ def main():
     # print(json_obj)
 
     # write to file
-    file_path = os.path.join(os.path.dirname(__file__), "irs", "ir.json")
+    if not ir_out_file_name.endswith(".json"):
+        ir_out_file_name += ".json"
+    file_path = os.path.join(os.path.dirname(__file__), "irs", ir_out_file_name)
     with open(file_path, "w") as f:
         f.write(json_obj)
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(
+        description="Generate motion specification IR",
+        usage="python -m motion_spec_gen.runner -m <motion_spec_name> -o <output_file_name>",
+    )
+    # define arguments
+    parser.add_argument(
+        "-o", "--output", type=str, help="IR output file name", default="ir.json"
+    )
+    parser.add_argument(
+        "-m", "--motion-spec", type=str, help="Motion specification name"
+    )
+
+    args = parser.parse_args()
+
+    main(args.motion_spec, args.output)

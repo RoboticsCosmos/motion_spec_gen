@@ -6,7 +6,8 @@ std::filesystem::path path = __FILE__;
 std::string robot_urdf =
     (path.parent_path().parent_path() / "urdf" / "freddy.urdf").string();
 
-initialize_robot(robot_urdf, &robot);
+char *ethernet_interface = "eno1";
+initialize_robot(robot_urdf, ethernet_interface, &robot);
 >>
 
 kdl_init_sim() ::= <<
@@ -25,7 +26,7 @@ initialize_manipulator_state(<robot>_chain.getNrOfJoints(), <robot>_chain.getNrO
 >>
 
 computeForwardVelocityKinematics(measured, data) ::= <<
-computeForwardVelocityKinematics(<measured.of.entity>, <measured.asb>, <measured.wrt>, <measured.of.vector>, &<data.robot>_state, &<data.robot>_chain, <measured.of.id>);
+getLinkVelocity(<measured.of.entity>, <measured.asb>, <measured.wrt>, <measured.of.vector>, &robot, <measured.of.id>);
 >>
 
 computeForce(measured, data) ::= <<

@@ -3,15 +3,10 @@ achd_solver(id, data) ::= <<
 double <id>_beta[6]{};
 for (size_t i = 0; i \< 6; i++)
 {
-  <id>_beta[i] = <data.root_acceleration>[i];
-}
-double *<id>_ext_wrench[<data.robot>_state.ns];
-for (size_t i = 0; i \< 7; i++)
-{
-  <id>_ext_wrench[i] = new double[6] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+  <id>_beta[i] = -<data.root_acceleration>[i];
 }
 <data.beta: {b | add(<b>, <id>_beta, <id>_beta, 6);}; separator="\n">
-achd_solver(&<data.robot>_state, &<data.robot>_chain, <data.nc>, <data.root_acceleration>, <data.alpha>, <id>_beta, <id>_ext_wrench, <data.tau_ff>, <data.predicted_accelerations>, <data.output_torques>);
+achd_solver(&robot, <data.root_link>, <data.tip_link>, <data.nc>, <data.root_acceleration>, <data.alpha>, <id>_beta, <data.tau_ff>, <data.predicted_accelerations>, <data.output_torques>);
 
 >>
 

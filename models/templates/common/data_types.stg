@@ -31,7 +31,7 @@ int <name> = <if(data.value)><data.value><else>0<endif>;
 >>
 
 double(name, data) ::= <<
-double <name> = <if(data.value)><data.value><else>0.0<endif>
+double <name> = <if(data.value)><data.value><else>0.0<endif>;
 >>
 
 string(name, data) ::= <<

@@ -5,8 +5,10 @@ import "../common/controllers.stg"
 import "../common/data_types.stg"
 import "../common/embed_maps.stg"
 import "../common/solvers.stg"
+import "../common/control_loop_freq.stg"
 
 application(variables, d) ::= <<
+<kelo_motion_control_include()>
 <cpp_include()>
 <controller_include()>
 <motion_spec_utils_include()>
@@ -14,22 +16,27 @@ application(variables, d) ::= <<
 
 int main()
 {
+  <! init robot data structure !>
+  <init_robots(d.robots)>
+
   <! kdl init !>
   <kdl_init()>
-
-  <! init robot data structure !>
-  <init_robot_structs(d.robots)>
-
-  <! init robot connections !>
-  <init_robot_connections(d.robots)>
 
   // initialize variables
   <! variables !>
   <variables: {v | <variables_init(v, variables.(v))> }; separator="\n">
 
+  int count = 0;
+  <initialize_control_loop_freq()>
+
   while (true) {
+    <control_loop_freq_starter()>
+
+    count++;
+    std::cout << "count: " << count << std::endl;
+
     <! update robot state !>
-    <get_robots_data(d.robots)>
+    get_robot_data(&robot);
 
     // controllers
     <! controllers !>
@@ -45,7 +52,11 @@ int main()
 
     <! command torques !>
     <set_robot_command_torques(d.robots)>
+
+    <control_loop_freq_maintainer()>
   }
+
+  free_robot_data(&robot);
 
   return 0;
 }

@@ -1,30 +1,30 @@
 init_robots(robots_data) ::= <<
 // Initialize the robot structs
 <robots_data: {robot | <({init_<robots_data.(robot).type>})(robot, robots_data.(robot))>}; separator="\n">
+
+Freddy robot = { <robots_data: {rob | &<rob>}; separator=","> };
 >>
 
 init_Manipulator(robot, robot_data) ::= <<
 <robot_data.type>\<kinova_mediator> <robot>;
-<robot>.base_frame = <robot_data.kinematic_chain_start>;
-<robot>.tool_frame = <robot_data.kinematic_chain_end>;
+<robot>.base_frame = "<robot_data.kinematic_chain_start>";
+<robot>.tool_frame = "<robot_data.kinematic_chain_end>";
 <robot>.mediator = new kinova_mediator();
 <robot>.state = new <robot_data.type>State();
+bool <robot>_torque_control_mode_set = false;
+
 >>
 
 init_MobileBase(robot, robot_data) ::= <<
-<robot_data.type>\<Robile> <robot>;
-<robot>.mediator = new Robile();
-<robot>.state = new <robot_data.type>State();
-
 KeloBaseConfig kelo_base_config;
 kelo_base_config.nWheels = 4;
-kelo_base_config.index_to_EtherCAT = new int[4]{3, 5, 7, 9};
+kelo_base_config.index_to_EtherCAT = new int[4]{6, 7, 3, 4};
 kelo_base_config.radius = 0.052;
 kelo_base_config.castor_offset = 0.01;
 kelo_base_config.half_wheel_distance = 0.0275;
 kelo_base_config.wheel_coordinates =
     new double[8]{0.175, 0.1605, -0.175, 0.1605, -0.175, -0.1605, 0.175, -0.1605};
-kelo_base_config.pivot_angles_deviation = new double[4]{-2.5, -1.25, -2.14, 1.49};
+kelo_base_config.pivot_angles_deviation = new double[4]{5.310, 5.533, 1.563, 1.625};
 
 <robot_data.type>\<Robile> <robot>;
 Robile robile;
@@ -33,6 +33,7 @@ robile.kelo_base_config = &kelo_base_config;
 
 <robot>.mediator = &robile;
 <robot>.state = new <robot_data.type>State();
+
 >>
 
 init_robot_connections(robots_data) ::= <<
@@ -76,16 +77,35 @@ get_kelo_base_state(&<robot>_config, &<robot>_ethercat_config, <robot>_state.piv
 set_robot_command_torques(robots_data) ::= <<
 // Command the torques to the robots
 <robots_data: {robot | <({command_<robots_data.(robot).type>_torques})(robot, robots_data.(robot))>}; separator="\n">
+<robots_data: {robot | <({set_<robots_data.(robot).type>_torques})(robot, robots_data.(robot))>}; separator="\n">
 >>
 
 command_Manipulator_torques(robot, robot_data) ::= <<
 double <robot>_cmd_tau[7]{};
 <robot_data.input_command_torques: {ct | add(<ct>, <robot>_cmd_tau, <robot>_cmd_tau, 7);}; separator="\n">
-set_manipulator_torques(&<robot>_state, <robot>_mediator, <robot>_cmd_tau);
+KDL::JntArray <robot>_cmd_tau_kdl(7);
+cap_and_convert_torques(<robot>_cmd_tau, 7, <robot>_cmd_tau_kdl);
+if (!<robot>_torque_control_mode_set) {
+  robot.<robot>->mediator->set_control_mode(2);
+  <robot>_torque_control_mode_set = true;
+}
+
+>>
+
+set_Manipulator_torques(robot, robot_data) ::= <<
+set_manipulator_torques(&robot, <robot_data.kinematic_chain_start>, &<robot>_cmd_tau_kdl);
 >>
 
 command_MobileBase_torques(robot, robot_data) ::= <<
+<if(!length(robot_data.input_command_torques))>
 double <robot>_cmd_tau[8]{};
 <robot_data.input_command_torques: {ct | add(<ct>, <robot>_cmd_tau, <robot>_cmd_tau, 8);}; separator="\n">
+<endif>
+
+>>
+
+set_MobileBase_torques(robot, robot_data) ::= <<
+<if(!length(robot_data.input_command_torques))>
 set_kelo_base_torques(&<robot>_config, &<robot>_ethercat_config, <robot>_cmd_tau);
+<endif>
 >>

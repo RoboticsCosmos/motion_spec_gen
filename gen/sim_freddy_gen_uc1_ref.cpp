@@ -12,6 +12,7 @@ extern "C"
 #include <motion_spec_utils/solver_utils.hpp>
 #include <motion_spec_utils/utils.hpp>
 #include <string>
+#include <chrono>
 
 #include "kelo_motion_control/mediator.h"
 
@@ -182,9 +183,14 @@ int main()
 
   set_init_sim_data(&freddy);
 
+  const double desired_frequency = 800.0; // Hz
+  const auto desired_period = std::chrono::duration<double>(1.0 / desired_frequency); // s
+
   int count = 0;
   while (count < 1)
   {
+    auto start_time = std::chrono::high_resolution_clock::now();
+
     count++;
     printf("\n--->count: %d\n", count);
     // Get the robot structs with the data from robots
@@ -518,6 +524,7 @@ int main()
       std::cout << achd_solver_kinova_right_beta_transf[i] << " ";
     }
     std::cout << std::endl;
+    // TODO: transform root_acc before passing it to the solver
     achd_solver(&freddy, kinova_right_base_link, kinova_right_bracelet_link,
                 achd_solver_kinova_right_nc, achd_solver_kinova_right_root_acceleration,
                 achd_solver_kinova_right_alpha_transf,
@@ -609,6 +616,20 @@ int main()
 
     std::cout << "end of loop\n";
     // Command the torques to the robots
+
+    auto end_time = std::chrono::high_resolution_clock::now();
+    auto elapsed_time = std::chrono::duration<double>(end_time - start_time);
+
+    // if the elapsed time is less than the desired period, busy wait
+    while (elapsed_time < desired_period)
+    {
+      end_time = std::chrono::high_resolution_clock::now();
+      elapsed_time = std::chrono::duration<double>(end_time - start_time);
+    }
+
+    // get frequency
+    double frequency = 1.0 / elapsed_time.count();
+    printf("Frequency: %f\n", frequency);
   }
 
   free_robot_data(&freddy);

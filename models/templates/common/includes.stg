@@ -3,6 +3,7 @@ cpp_include() ::= <<
 #include \<string>
 #include \<filesystem>
 #include \<iostream>
+#include \<chrono>
 >>
 
 controller_include() ::= <<
@@ -17,5 +18,13 @@ motion_spec_utils_include() ::= <<
 
 robot_mediators_include() ::= <<
 #include \<kinova_mediator/mediator.hpp>
+>>
+
+kelo_motion_control_include() ::= <<
+extern "C"
+{
+#include "kelo_motion_control/EthercatCommunication.h"
+#include "kelo_motion_control/KeloMotionControl.h"
 #include "kelo_motion_control/mediator.h"
+}
 >>

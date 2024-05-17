@@ -31,6 +31,9 @@ class RobotsTranslator:
         robot_data["input_command_torques"] = []
 
         for solver in solvers:
+            if solver not in solvers_data:
+                continue
+
             robot_data["input_command_torques"].append(
                 solvers_data[solver]["output_torques"]
             )

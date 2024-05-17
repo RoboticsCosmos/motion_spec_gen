@@ -56,8 +56,6 @@ class PIDControllerStep:
         """
 
         constraint = g.value(node, CONTROLLER.constraint)
-
-        # *Assumption: compute using setpoint
         coordinate = g.value(constraint, CONSTRAINT.quantity)
 
         output_data = {}
