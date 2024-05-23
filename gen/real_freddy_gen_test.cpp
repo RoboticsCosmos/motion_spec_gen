@@ -17,6 +17,8 @@ extern "C"
 
 int main()
 {
+  std::string base_link = "base_link";
+
   Manipulator<kinova_mediator> kinova_right;
   kinova_right.base_frame = "kinova_right_base_link";
   kinova_right.tool_frame = "kinova_right_bracelet_link";
@@ -26,7 +28,7 @@ int main()
   Manipulator<kinova_mediator> kinova_left;
   kinova_left.base_frame = "kinova_left_base_link";
   kinova_left.tool_frame = "kinova_left_bracelet_link";
-  kinova_left.mediator = new kinova_mediator();
+  kinova_left.mediator = nullptr;
   kinova_left.state = new ManipulatorState();
 
   KeloBaseConfig kelo_base_config;
@@ -63,8 +65,7 @@ int main()
   int achd_solver_kinova_left_nj = 7;
   std::string kinova_left_base_link = "kinova_left_base_link";
   std::string kinova_left_bracelet_link = "kinova_left_bracelet_link";
-  double achd_solver_kinova_left_root_acceleration[6] = {-9.6, 0.99, 1.4,
-                                                         0.0,   0.0,   0.0};
+  double achd_solver_kinova_left_root_acceleration[6] = {-9.6, 0.99, 1.4, 0.0, 0.0, 0.0};
   double *achd_solver_kinova_left_alpha[6] = {
       new double[6]{1.0, 0.0, 0.0, 0.0, 0.0, 0.0},
       new double[6]{0.0, 1.0, 0.0, 0.0, 0.0, 0.0},
@@ -90,13 +91,14 @@ int main()
   double achd_solver_kinova_right_root_acceleration[6] = {-9.685, -1.033, 1.324,
                                                           0.0,    0.0,    0.0};
   double achd_solver_kinova_right_output_acceleration_energy[6]{};
-  double *achd_solver_kinova_right_alpha[6] = {
+  double *achd_solver_kinova_right_alpha[achd_solver_kinova_right_nc] = {
       new double[6]{1.0, 0.0, 0.0, 0.0, 0.0, 0.0},
       new double[6]{0.0, 1.0, 0.0, 0.0, 0.0, 0.0},
       new double[6]{0.0, 0.0, 1.0, 0.0, 0.0, 0.0},
       new double[6]{0.0, 0.0, 0.0, 1.0, 0.0, 0.0},
       new double[6]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0},
-      new double[6]{0.0, 0.0, 0.0, 0.0, 0.0, 1.0}};
+      new double[6]{0.0, 0.0, 0.0, 0.0, 0.0, 1.0}
+  };
   double achd_solver_kinova_right_beta[6]{};
   for (size_t i = 0; i < 6; i++)
   {
@@ -122,92 +124,121 @@ int main()
     auto start_time = std::chrono::high_resolution_clock::now();
 
     count++;
-    std::cout << "count: " << count << std::endl;
+    std::cout << "\ncount: " << count << std::endl;
     // Get the robot structs with the data from robots
     get_robot_data(&freddy);
     print_robot_data(&freddy);
-    // std::cout << std::endl;
+    std::cout << std::endl;
 
     // solvers
-    // printf("kinova right\n");
+    double *achd_solver_kinova_right_alpha_transf[achd_solver_kinova_right_nc];
+    for (size_t i = 0; i < achd_solver_kinova_right_nc; i++)
+    {
+      achd_solver_kinova_right_alpha_transf[i] = new double[6]{};
+    }
+    transform_alpha(&freddy, base_link, kinova_right_base_link,
+                    achd_solver_kinova_right_alpha, achd_solver_kinova_right_nc,
+                    achd_solver_kinova_right_alpha_transf);
     achd_solver(&freddy, kinova_right_base_link, kinova_right_bracelet_link,
                 achd_solver_kinova_right_nc, achd_solver_kinova_right_root_acceleration,
-                achd_solver_kinova_right_alpha, achd_solver_kinova_right_beta,
+                achd_solver_kinova_right_alpha_transf, achd_solver_kinova_right_beta,
                 achd_solver_kinova_right_feed_forward_torques,
                 achd_solver_kinova_right_predicted_accelerations,
                 achd_solver_kinova_right_output_torques);
-    // printf("right output torques: ");
-    // for (size_t i = 0; i < 7; i++)
-    // {
-    //   std::cout << achd_solver_kinova_right_output_torques[i] << " ";
-    // }
-    // std::cout << std::endl;
-    // std::cout << std::endl;
+    printf("[achd] kinova right torques: ");
+    for (size_t i = 0; i < 7; i++)
+    {
+      std::cout << achd_solver_kinova_right_output_torques[i] << " ";
+    }
+    std::cout << std::endl;
 
-    // double **rne_ext_wrench_right = new double *[7];
-    // for (size_t i = 0; i < 7; i++)
-    // {
-    //   rne_ext_wrench_right[i] = new double[6]{};
-    // }
+    // rne solver
+    double **rne_ext_wrench_right = new double *[7];
+    for (size_t i = 0; i < 7; i++)
+    {
+      rne_ext_wrench_right[i] = new double[6]{};
+    }
+    double rne_output_torques_right[7]{};
+    rne_solver(&freddy, kinova_right_base_link, kinova_right_bracelet_link,
+               achd_solver_kinova_right_root_acceleration, rne_ext_wrench_right,
+               rne_output_torques_right);
 
-    // // rne solver
-    // rne_solver(&freddy, kinova_right_base_link, kinova_right_bracelet_link,
-    //            achd_solver_kinova_right_root_acceleration, rne_ext_wrench_right,
-    //            achd_solver_kinova_right_output_torques);
+    std::cout << "[rne ] kinova right torques: ";
+    for (size_t i = 0; i < 7; i++)
+    {
+      std::cout << rne_output_torques_right[i] << " ";
+    }
+    std::cout << std::endl;
 
     // achd_solver
     // printf("kinova left\n");
-    achd_solver(&freddy, kinova_left_base_link, kinova_left_bracelet_link,
-                achd_solver_kinova_left_nc, achd_solver_kinova_left_root_acceleration,
-                achd_solver_kinova_left_alpha, achd_solver_kinova_left_beta,
-                achd_solver_kinova_left_feed_forward_torques,
-                achd_solver_kinova_left_predicted_accelerations,
-                achd_solver_kinova_left_output_torques);
+    // double *achd_solver_kinova_left_alpha_transf[6];
+    // for (size_t i = 0; i < 6; i++)
+    // {
+    //   achd_solver_kinova_left_alpha_transf[i] = new double[6]{};
+    // }
+    // transform_alpha(&freddy, base_link, kinova_left_base_link,
+    //                 achd_solver_kinova_left_alpha, achd_solver_kinova_left_nc,
+    //                 achd_solver_kinova_left_alpha_transf);
+    // achd_solver(&freddy, kinova_left_base_link, kinova_left_bracelet_link,
+    //             achd_solver_kinova_left_nc, achd_solver_kinova_left_root_acceleration,
+    //             achd_solver_kinova_left_alpha_transf, achd_solver_kinova_left_beta,
+    //             achd_solver_kinova_left_feed_forward_torques,
+    //             achd_solver_kinova_left_predicted_accelerations,
+    //             achd_solver_kinova_left_output_torques);
 
-    printf("achd left output torques: ");
-    for (size_t i = 0; i < 7; i++)
-    {
-      std::cout << achd_solver_kinova_left_output_torques[i] << " ";
-    }
-    std::cout << std::endl;
+    // printf("[achd] left output torques: ");
+    // for (size_t i = 0; i < 7; i++)
+    // {
+    //   std::cout << achd_solver_kinova_left_output_torques[i] << " ";
+    // }
+    // std::cout << std::endl;
 
-    double **rne_ext_wrench = new double *[7];
-    for (size_t i = 0; i < 7; i++)
-    {
-      rne_ext_wrench[i] = new double[6]{};
-    }
+    // double **rne_ext_wrench = new double *[7];
+    // for (size_t i = 0; i < 7; i++)
+    // {
+    //   rne_ext_wrench[i] = new double[6]{};
+    // }
 
-    // rne solver
-    rne_solver(&freddy, kinova_left_base_link, kinova_left_bracelet_link,
-               achd_solver_kinova_left_root_acceleration, rne_ext_wrench,
-               achd_solver_kinova_left_output_torques);
+    // // rne solver
+    // rne_solver(&freddy, kinova_left_base_link, kinova_left_bracelet_link,
+    //            achd_solver_kinova_left_root_acceleration, rne_ext_wrench,
+    //            achd_solver_kinova_left_output_torques);
+
+    // std::cout << "[rne ] kinova left torques: ";
+    // for (size_t i = 0; i < 7; i++)
+    // {
+    //   std::cout << achd_solver_kinova_left_output_torques[i] << " ";
+    // }
+    // std::cout << std::endl;
 
     // Command the torques to the robots
     KDL::JntArray kinova_right_jnt_tau(7);
-    cap_and_convert_torques(achd_solver_kinova_right_output_torques, 7, kinova_right_jnt_tau);
+    cap_and_convert_torques(achd_solver_kinova_right_output_torques, 7,
+                            kinova_right_jnt_tau);
 
-    // if (kinova_right_first_time)
-    // {
-    //   freddy.kinova_right->mediator->set_control_mode(2);
-    //   kinova_right_first_time = false;
-    // }
-    // set_manipulator_torques(&freddy, kinova_right_base_link,
-    //                         &kinova_right_jnt_tau);
-
-    KDL::JntArray kinova_left_jnt_tau(7);
-    cap_and_convert_torques(achd_solver_kinova_left_output_torques, 7, kinova_left_jnt_tau);
-
-    std::cout << "kinova left torques: " << kinova_left_jnt_tau << std::endl;
-
-    if (kinova_left_first_time)
+    if (kinova_right_first_time)
     {
-      freddy.kinova_left->mediator->set_control_mode(2);
-      kinova_left_first_time = false;
+      freddy.kinova_right->mediator->set_control_mode(2);
+      kinova_right_first_time = false;
     }
-    set_manipulator_torques(&freddy, kinova_left_base_link,
-                            &kinova_left_jnt_tau);
+    set_manipulator_torques(&freddy, kinova_right_base_link, &kinova_right_jnt_tau);
 
-    std::cout << std::endl;
+    // KDL::JntArray kinova_left_jnt_tau(7);
+    // cap_and_convert_torques(achd_solver_kinova_left_output_torques, 7,
+    // kinova_left_jnt_tau);
+
+    // std::cout << "kinova left torques: " << kinova_left_jnt_tau << std::endl;
+
+    // if (kinova_left_first_time)
+    // {
+    //   freddy.kinova_left->mediator->set_control_mode(2);
+    //   kinova_left_first_time = false;
+    // }
+    // set_manipulator_torques(&freddy, kinova_left_base_link,
+    //                         &kinova_left_jnt_tau);
+
+    // std::cout << std::endl;
 
     auto end_time = std::chrono::high_resolution_clock::now();
     auto elapsed_time = std::chrono::duration<double>(end_time - start_time);

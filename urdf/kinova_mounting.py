@@ -28,11 +28,33 @@ tf_l = tf_y * tf_lx * tf_z
 tf_r_rpy = scipy.spatial.transform.Rotation.from_euler("xyz", [ 180.0, -82.5, -45.0], degrees=True)
 tf_l_rpy = scipy.spatial.transform.Rotation.from_euler("xyz", [-135.0, -80.0, 0.0], degrees=True)
 
+# 6x6 identity matrix
+right_identity_mat = np.eye(6)
+
 print("Right arm:")
 print(tf_r.as_euler("xyz", degrees=True))
 print(tf_r.as_matrix())
 print(tf_r_rpy.as_matrix())
 print(tf_r.inv().apply(g))
+
+# Initialize an empty 6x6 matrix to store the transformed vectors
+transformed_mat = np.zeros((6, 6))
+
+# Apply the transformation to each column
+for i in range(6):
+    # Extract the i-th column
+    column = right_identity_mat[:, i]
+    
+    # Apply the transformation
+    transformed_column = tf_r.apply(column[:3])
+    
+    # Store the transformed column
+    transformed_mat[:3, i] = transformed_column
+    transformed_mat[3:, i] = column[3:]  # assuming the last 3 elements don't need transformation
+
+print("Transformed matrix:")
+print(transformed_mat)
+
 
 print()
 
