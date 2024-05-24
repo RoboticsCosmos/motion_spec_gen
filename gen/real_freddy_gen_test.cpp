@@ -97,8 +97,7 @@ int main()
       new double[6]{0.0, 0.0, 1.0, 0.0, 0.0, 0.0},
       new double[6]{0.0, 0.0, 0.0, 1.0, 0.0, 0.0},
       new double[6]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0},
-      new double[6]{0.0, 0.0, 0.0, 0.0, 0.0, 1.0}
-  };
+      new double[6]{0.0, 0.0, 0.0, 0.0, 0.0, 1.0}};
   double achd_solver_kinova_right_beta[6]{};
   for (size_t i = 0; i < 6; i++)
   {
@@ -127,8 +126,8 @@ int main()
     std::cout << "\ncount: " << count << std::endl;
     // Get the robot structs with the data from robots
     get_robot_data(&freddy);
-    print_robot_data(&freddy);
-    std::cout << std::endl;
+    // print_robot_data(&freddy);
+    // std::cout << std::endl;
 
     // solvers
     double *achd_solver_kinova_right_alpha_transf[achd_solver_kinova_right_nc];
@@ -153,22 +152,22 @@ int main()
     std::cout << std::endl;
 
     // rne solver
-    double **rne_ext_wrench_right = new double *[7];
-    for (size_t i = 0; i < 7; i++)
-    {
-      rne_ext_wrench_right[i] = new double[6]{};
-    }
-    double rne_output_torques_right[7]{};
-    rne_solver(&freddy, kinova_right_base_link, kinova_right_bracelet_link,
-               achd_solver_kinova_right_root_acceleration, rne_ext_wrench_right,
-               rne_output_torques_right);
+    // double **rne_ext_wrench_right = new double *[7];
+    // for (size_t i = 0; i < 7; i++)
+    // {
+    //   rne_ext_wrench_right[i] = new double[6]{};
+    // }
+    // double rne_output_torques_right[7]{};
+    // rne_solver(&freddy, kinova_right_base_link, kinova_right_bracelet_link,
+    //            achd_solver_kinova_right_root_acceleration, rne_ext_wrench_right,
+    //            rne_output_torques_right);
 
-    std::cout << "[rne ] kinova right torques: ";
-    for (size_t i = 0; i < 7; i++)
-    {
-      std::cout << rne_output_torques_right[i] << " ";
-    }
-    std::cout << std::endl;
+    // std::cout << "[rne ] kinova right torques: ";
+    // for (size_t i = 0; i < 7; i++)
+    // {
+    //   std::cout << rne_output_torques_right[i] << " ";
+    // }
+    // std::cout << std::endl;
 
     // achd_solver
     // printf("kinova left\n");

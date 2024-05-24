@@ -204,7 +204,7 @@
   <link name="bracelet_link">
     <inertial>
       <origin rpy="0 0 0" xyz="0.000281 0.011402 -0.029798"/>
-      <mass value="0.925"/>
+      <mass value="1.425"/>
       <inertia ixx="0.000587" ixy="3E-06" ixz="3E-06" iyy="0.000369" iyz="-0.000118" izz="0.100609"/>
     </inertial>
     <visual>

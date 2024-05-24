@@ -140,6 +140,7 @@ int main()
   double kinova_right_bracelet_base_ang_vel_y_pid_controller_error_sum = 0.0;
   double achd_solver_kinova_right_root_acceleration[6] = {-9.685, -1.033, 1.324,
                                                           0.0,    0.0,    0.0};
+  double achd_solver_kinova_gravity[6] = {0.0, 0.0, -9.81, 0.0, 0.0, 0.0};
   double kinova_right_bracelet_base_lin_vel_z_pid_controller_prev_error = 0.0;
   double kinova_right_bracelet_base_ang_vel_y_embed_map_vector[6] = {0.0, 0.0, 0.0,
                                                                      0.0, 1.0, 0.0};
@@ -274,7 +275,6 @@ int main()
     std::cout << "count: " << count << std::endl;
 
     get_robot_data(&robot);
-
     print_robot_data(&robot);
 
     // controllers
@@ -470,15 +470,6 @@ int main()
     //               kinova_left_bracelet_base_lin_vel_x_pid_controller_prev_error,
     //               kinova_left_bracelet_base_lin_vel_x_pid_controller_signal);
 
-    // // kinova_left_signals
-    // std::cout << "kinova_left_signals: ";
-    // std::cout << kinova_left_bracelet_base_lin_vel_x_pid_controller_signal << " "
-    //           << kinova_left_bracelet_base_lin_vel_y_pid_controller_signal << " "
-    //           << kinova_left_bracelet_base_lin_vel_z_pid_controller_signal << " "
-    //           << kinova_left_bracelet_base_ang_vel_x_pid_controller_signal << " "
-    //           << kinova_left_bracelet_base_ang_vel_y_pid_controller_signal << " "
-    //           << kinova_left_bracelet_base_ang_vel_z_pid_controller_signal << std::endl;
-
     // embed maps
     double kinova_right_bracelet_base_lin_vel_x_embed_map_achd_solver_kinova_right_output_acceleration_energy[6]{};
     double kinova_right_bracelet_base_lin_vel_y_twist_embed_map_achd_solver_kinova_right_output_acceleration_energy[6]{};
@@ -644,13 +635,16 @@ int main()
     {
       achd_solver_kinova_right_alpha_transf[i] = new double[6]{};
     }
-    transform_alpha_beta(&robot, base_link, kinova_right_base_link,
-                         achd_solver_kinova_right_alpha, achd_solver_kinova_right_beta,
-                         achd_solver_kinova_right_nc, achd_solver_kinova_right_alpha_transf,
-                         achd_solver_kinova_right_beta);
+    // transform_alpha_beta(&robot, base_link, kinova_right_base_link,
+    //                      achd_solver_kinova_right_alpha, achd_solver_kinova_right_beta,
+    //                      achd_solver_kinova_right_nc, achd_solver_kinova_right_alpha_transf,
+    //                      achd_solver_kinova_right_beta);
+    // transform_alpha(&robot, base_link, kinova_right_base_link,
+    //                 achd_solver_kinova_right_alpha, achd_solver_kinova_right_nc,
+    //                 achd_solver_kinova_right_alpha_transf);
     for (size_t i = 0; i < 6; i++)
     {
-      achd_solver_kinova_right_beta[i] += -achd_solver_kinova_right_root_acceleration[i];
+      achd_solver_kinova_right_beta[i] += -achd_solver_kinova_gravity[i];
     }
     achd_solver(&robot, kinova_right_base_link, kinova_right_bracelet_link,
                 achd_solver_kinova_right_nc, achd_solver_kinova_right_root_acceleration,
@@ -658,6 +652,13 @@ int main()
                 achd_solver_kinova_right_feed_forward_torques,
                 achd_solver_kinova_right_predicted_accelerations,
                 achd_solver_kinova_right_output_torques);
+
+    std::cout << "[achd] kinova_right_torques: ";
+    for (size_t i = 0; i < 7; i++)
+    {
+      std::cout << achd_solver_kinova_right_output_torques[i] << " ";
+    }
+    std::cout << std::endl;
 
     // achd_solver
     // double achd_solver_kinova_left_beta[6]{};
