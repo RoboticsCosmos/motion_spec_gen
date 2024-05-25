@@ -63,7 +63,7 @@ int main()
   initialize_robot(robot_urdf, ethernet_interface, &robot);
 
   // initialize variables
-  double kinova_right_bracelet_base_ang_vel_y_pid_controller_kd = 0.0;
+  double kinova_right_bracelet_base_ang_vel_y_pid_controller_kd = 0.5;
   double achd_solver_kinova_left_output_torques[7]{};
   double kinova_right_bracelet_base_lin_vel_z_pid_controller_signal = 0.0;
   double kinova_right_bracelet_base_ang_vel_x_pid_controller_time_step = 1;
@@ -82,31 +82,31 @@ int main()
       new double[6]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0},
       new double[6]{0.0, 0.0, 0.0, 0.0, 0.0, 1.0}};
   double kinova_left_bracelet_base_ang_vel_x_pid_controller_error_sum = 0.0;
-  double kinova_right_bracelet_base_ang_vel_y_pid_controller_kp = 20.0;
+  double kinova_right_bracelet_base_ang_vel_y_pid_controller_kp = 10.0;
   double kinova_right_bracelet_base_vel_vector_lin_x[6] = {1, 0, 0, 0, 0, 0};
-  double kinova_right_bracelet_base_ang_vel_y_pid_controller_ki = 0.0;
+  double kinova_right_bracelet_base_ang_vel_y_pid_controller_ki = 0.9;
   std::string base_link = "base_link";
   double kinova_left_bracelet_base_lin_vel_x_pid_controller_error_sum = 0.0;
   double
       kinova_left_bracelet_base_ang_vel_x_embed_map_achd_solver_kinova_left_output_acceleration_energy
           [6]{};
-  double kinova_right_bracelet_base_ang_vel_z_pid_controller_ki = 0.0;
+  double kinova_right_bracelet_base_ang_vel_z_pid_controller_ki = 0.9;
   double
       kinova_right_bracelet_base_lin_vel_z_embed_map_achd_solver_kinova_right_output_acceleration_energy
           [6]{};
   double kinova_left_bracelet_base_ang_vel_y_pid_controller_time_step = 1;
-  double kinova_right_bracelet_base_ang_vel_z_pid_controller_kp = 20.0;
+  double kinova_right_bracelet_base_ang_vel_z_pid_controller_kp = 10.0;
   double arm_bracelet_link_ang_vel_reference_value = 0.0;
   double kinova_right_bracelet_base_lin_vel_x_pid_controller_time_step = 1;
-  double kinova_right_bracelet_base_lin_vel_x_pid_controller_kd = 0.0;
+  double kinova_right_bracelet_base_lin_vel_x_pid_controller_kd = 0.5;
   double achd_solver_kinova_right_predicted_accelerations[7]{};
   double kinova_right_bracelet_base_lin_vel_y_pid_controller_time_step = 1;
-  double kinova_right_bracelet_base_lin_vel_x_pid_controller_ki = 0.0;
+  double kinova_right_bracelet_base_lin_vel_x_pid_controller_ki = 0.9;
   double kinova_left_bracelet_base_lin_vel_x_pid_controller_time_step = 1;
-  double kinova_right_bracelet_base_ang_vel_z_pid_controller_kd = 0.0;
+  double kinova_right_bracelet_base_ang_vel_z_pid_controller_kd = 0.5;
   double kinova_left_bracelet_base_lin_vel_y_pid_controller_error_sum = 0.0;
-  double kinova_right_bracelet_base_lin_vel_x_pid_controller_kp = 20.0;
-  double kinova_left_bracelet_base_lin_vel_y_pid_controller_kp = 20.0;
+  double kinova_right_bracelet_base_lin_vel_x_pid_controller_kp = 10.0;
+  double kinova_left_bracelet_base_lin_vel_y_pid_controller_kp = 10.0;
   double kinova_right_bracelet_base_ang_vel_y_pid_controller_time_step = 1;
   double kinova_right_bracelet_base_vel_vector_ang_z[6] = {0, 0, 0, 0, 0, 1};
   double kinova_right_bracelet_base_vel_vector_ang_y[6] = {0, 0, 0, 0, 1, 0};
@@ -118,22 +118,22 @@ int main()
                                                                     0.0, 0.0, 0.0};
   double kinova_right_bracelet_base_lin_vel_x_pid_controller_prev_error = 0.0;
   double achd_solver_kinova_left_predicted_accelerations[7]{};
-  double kinova_left_bracelet_base_ang_vel_z_pid_controller_kp = 20.0;
+  double kinova_left_bracelet_base_ang_vel_z_pid_controller_kp = 10.0;
   double kinova_right_bracelet_base_lin_vel_x_embed_map_vector[6] = {1.0, 0.0, 0.0,
                                                                      0.0, 0.0, 0.0};
   double kinova_left_bracelet_base_lin_vel_z_pid_controller_time_step = 1;
-  double kinova_right_bracelet_base_lin_vel_y_pid_controller_kp = 20.0;
-  double kinova_right_bracelet_base_lin_vel_y_pid_controller_ki = 0.0;
+  double kinova_right_bracelet_base_lin_vel_y_pid_controller_kp = 10.0;
+  double kinova_right_bracelet_base_lin_vel_y_pid_controller_ki = 0.9;
   double kinova_left_bracelet_base_lin_vel_z_embed_map_vector[6] = {0.0, 0.0, 1.0,
                                                                     0.0, 0.0, 0.0};
-  double kinova_left_bracelet_base_ang_vel_z_pid_controller_ki = 0.0;
+  double kinova_left_bracelet_base_ang_vel_z_pid_controller_ki = 0.9;
   double achd_solver_kinova_left_feed_forward_torques[7]{};
   double kinova_left_bracelet_base_ang_vel_z_pid_controller_prev_error = 0.0;
   double kinova_right_bracelet_base_lin_vel_y_pid_controller_prev_error = 0.0;
   double kinova_right_bracelet_base_ang_vel_z_pid_controller_error_sum = 0.0;
-  double kinova_left_bracelet_base_ang_vel_z_pid_controller_kd = 0.0;
+  double kinova_left_bracelet_base_ang_vel_z_pid_controller_kd = 0.5;
   double kinova_left_bracelet_base_lin_vel_y_pid_controller_prev_error = 0.0;
-  double kinova_right_bracelet_base_lin_vel_y_pid_controller_kd = 0.0;
+  double kinova_right_bracelet_base_lin_vel_y_pid_controller_kd = 0.5;
   double kinova_left_bracelet_base_ang_vel_z_embed_map_vector[6] = {0.0, 0.0, 0.0,
                                                                     0.0, 0.0, 1.0};
   std::string kinova_right_base_link = "kinova_right_base_link";
@@ -150,27 +150,27 @@ int main()
   double of_vel_qname_ang_y = 0.0;
   std::string kinova_left_bracelet_link = "kinova_left_bracelet_link";
   double of_vel_qname_ang_x = 0.0;
-  double kinova_left_bracelet_base_lin_vel_y_pid_controller_ki = 0.0;
+  double kinova_left_bracelet_base_lin_vel_y_pid_controller_ki = 0.9;
   double of_vel_qname_ang_z = 0.0;
-  double kinova_left_bracelet_base_lin_vel_y_pid_controller_kd = 0.0;
+  double kinova_left_bracelet_base_lin_vel_y_pid_controller_kd = 0.5;
   double
       kinova_left_bracelet_base_lin_vel_x_twist_embed_map_achd_solver_kinova_left_output_acceleration_energy
           [6]{};
   double kinova_left_bracelet_base_ang_vel_z_pid_controller_error_sum = 0.0;
-  double kinova_left_bracelet_base_ang_vel_x_pid_controller_kp = 20.0;
+  double kinova_left_bracelet_base_ang_vel_x_pid_controller_kp = 10.0;
   double kinova_right_bracelet_base_ang_vel_x_pid_controller_signal = 0.0;
   double kinova_left_bracelet_base_vel_vector_ang_x[6] = {0, 0, 0, 1, 0, 0};
   double kinova_right_bracelet_base_lin_vel_z_pid_controller_time_step = 1;
   double kinova_left_bracelet_base_lin_vel_x_twist_embed_map_vector[6] = {1.0, 0.0, 0.0,
                                                                           0.0, 0.0, 0.0};
-  double kinova_left_bracelet_base_ang_vel_x_pid_controller_kd = 0.0;
+  double kinova_left_bracelet_base_ang_vel_x_pid_controller_kd = 0.5;
   double kinova_right_bracelet_base_ang_vel_y_pid_controller_prev_error = 0.0;
   double kinova_right_bracelet_base_ang_vel_z_pid_controller_time_step = 1;
   double kinova_left_bracelet_base_vel_vector_ang_z[6] = {0, 0, 0, 0, 0, 1};
   double
       kinova_left_bracelet_base_ang_vel_y_embed_map_achd_solver_kinova_left_output_acceleration_energy
           [6]{};
-  double kinova_left_bracelet_base_ang_vel_x_pid_controller_ki = 0.0;
+  double kinova_left_bracelet_base_ang_vel_x_pid_controller_ki = 0.9;
   double kinova_left_bracelet_base_vel_vector_ang_y[6] = {0, 0, 0, 0, 1, 0};
   int achd_solver_kinova_right_nj = 7;
   double kinova_right_bracelet_base_ang_vel_z_embed_map_vector[6] = {0.0, 0.0, 0.0,
@@ -193,14 +193,14 @@ int main()
   std::string kinova_right_bracelet_link = "kinova_right_bracelet_link";
   double kinova_right_bracelet_base_lin_vel_y_pid_controller_error_sum = 0.0;
   double kinova_left_bracelet_base_lin_vel_z_pid_controller_error_sum = 0.0;
-  double kinova_left_bracelet_base_ang_vel_y_pid_controller_ki = 0.0;
-  double kinova_left_bracelet_base_ang_vel_y_pid_controller_kd = 0.0;
-  double kinova_left_bracelet_base_ang_vel_y_pid_controller_kp = 20.0;
+  double kinova_left_bracelet_base_ang_vel_y_pid_controller_ki = 0.9;
+  double kinova_left_bracelet_base_ang_vel_y_pid_controller_kd = 0.5;
+  double kinova_left_bracelet_base_ang_vel_y_pid_controller_kp = 10.0;
   double kinova_right_bracelet_base_ang_vel_x_embed_map_vector[6] = {0.0, 0.0, 0.0,
                                                                      1.0, 0.0, 0.0};
   double kinova_right_bracelet_base_lin_vel_z_pid_controller_error_sum = 0.0;
   double kinova_left_bracelet_base_ang_vel_x_pid_controller_prev_error = 0.0;
-  double kinova_right_bracelet_base_lin_vel_z_pid_controller_kd = 0.0;
+  double kinova_right_bracelet_base_lin_vel_z_pid_controller_kd = 0.5;
   double kinova_left_bracelet_base_ang_vel_x_pid_controller_signal = 0.0;
   double kinova_right_bracelet_base_lin_vel_y_twist_embed_map_vector[6] = {0.0, 1.0, 0.0,
                                                                            0.0, 0.0, 0.0};
@@ -211,15 +211,15 @@ int main()
       new double[6]{0.0, 0.0, 0.0, 1.0, 0.0, 0.0},
       new double[6]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0},
       new double[6]{0.0, 0.0, 0.0, 0.0, 0.0, 1.0}};
-  double kinova_right_bracelet_base_lin_vel_z_pid_controller_ki = 0.0;
-  double kinova_left_bracelet_base_lin_vel_z_pid_controller_ki = 0.0;
+  double kinova_right_bracelet_base_lin_vel_z_pid_controller_ki = 0.9;
+  double kinova_left_bracelet_base_lin_vel_z_pid_controller_ki = 0.9;
   double kinova_left_bracelet_base_ang_vel_y_embed_map_vector[6] = {0.0, 0.0, 0.0,
                                                                     0.0, 1.0, 0.0};
   double kinova_left_bracelet_base_ang_vel_x_pid_controller_time_step = 1;
-  double kinova_right_bracelet_base_lin_vel_z_pid_controller_kp = 20.0;
-  double kinova_left_bracelet_base_lin_vel_z_pid_controller_kd = 0.0;
+  double kinova_right_bracelet_base_lin_vel_z_pid_controller_kp = 10.0;
+  double kinova_left_bracelet_base_lin_vel_z_pid_controller_kd = 0.5;
   double kinova_left_bracelet_base_ang_vel_y_pid_controller_error_sum = 0.0;
-  double kinova_left_bracelet_base_lin_vel_x_pid_controller_kp = 20.0;
+  double kinova_left_bracelet_base_lin_vel_x_pid_controller_kp = 10.0;
   double achd_solver_kinova_left_root_acceleration[6] = {-10.6, 0.99, 1.4, 0.0, 0.0, 0.0};
   double
       kinova_left_bracelet_base_lin_vel_z_embed_map_achd_solver_kinova_left_output_acceleration_energy
@@ -230,23 +230,23 @@ int main()
   double
       kinova_left_bracelet_base_ang_vel_z_embed_map_achd_solver_kinova_left_output_acceleration_energy
           [6]{};
-  double kinova_left_bracelet_base_lin_vel_x_pid_controller_ki = 0.0;
+  double kinova_left_bracelet_base_lin_vel_x_pid_controller_ki = 0.9;
   double kinova_right_bracelet_base_vel_vector_lin_z[6] = {0, 0, 1, 0, 0, 0};
   double kinova_right_bracelet_base_vel_vector_lin_y[6] = {0, 1, 0, 0, 0, 0};
   double
       kinova_left_bracelet_base_lin_vel_y_embed_map_achd_solver_kinova_left_output_acceleration_energy
           [6]{};
-  double kinova_right_bracelet_base_ang_vel_x_pid_controller_kd = 0.0;
-  double kinova_left_bracelet_base_lin_vel_z_pid_controller_kp = 20.0;
-  double kinova_left_bracelet_base_lin_vel_x_pid_controller_kd = 0.0;
+  double kinova_right_bracelet_base_ang_vel_x_pid_controller_kd = 0.5;
+  double kinova_left_bracelet_base_lin_vel_z_pid_controller_kp = 10.0;
+  double kinova_left_bracelet_base_lin_vel_x_pid_controller_kd = 0.5;
   double of_vel_qname_lin_x = 0.0;
   double of_vel_qname_lin_y = 0.0;
-  double kinova_right_bracelet_base_ang_vel_x_pid_controller_ki = 0.0;
+  double kinova_right_bracelet_base_ang_vel_x_pid_controller_ki = 0.9;
   double achd_solver_kinova_right_feed_forward_torques[7]{};
   double of_vel_qname_lin_z = 0.0;
   double kinova_right_bracelet_base_lin_vel_z_embed_map_vector[6] = {0.0, 0.0, 1.0,
                                                                      0.0, 0.0, 0.0};
-  double kinova_right_bracelet_base_ang_vel_x_pid_controller_kp = 20.0;
+  double kinova_right_bracelet_base_ang_vel_x_pid_controller_kp = 10.0;
   double kinova_left_bracelet_base_lin_vel_z_pid_controller_signal = 0.0;
   double
       kinova_right_bracelet_base_ang_vel_y_embed_map_achd_solver_kinova_right_output_acceleration_energy
@@ -274,8 +274,17 @@ int main()
     count++;
     std::cout << "count: " << count << std::endl;
 
-    get_robot_data(&robot);
-    print_robot_data(&robot);
+    // if (!kinova_right_torque_control_mode_set)
+    // {
+    //   kinova_right_torque_control_mode_set = true;
+      get_robot_data(&robot);
+    // }
+    // else
+    // {
+    //   get_robot_data_sim(&robot, nullptr, achd_solver_kinova_right_predicted_accelerations, 0.01);
+    // }
+
+    // print_robot_data(&robot);
 
     // controllers
     // pid controller
@@ -639,13 +648,13 @@ int main()
     //                      achd_solver_kinova_right_alpha, achd_solver_kinova_right_beta,
     //                      achd_solver_kinova_right_nc, achd_solver_kinova_right_alpha_transf,
     //                      achd_solver_kinova_right_beta);
-    // transform_alpha(&robot, base_link, kinova_right_base_link,
-    //                 achd_solver_kinova_right_alpha, achd_solver_kinova_right_nc,
-    //                 achd_solver_kinova_right_alpha_transf);
-    for (size_t i = 0; i < 6; i++)
-    {
-      achd_solver_kinova_right_beta[i] += -achd_solver_kinova_gravity[i];
-    }
+    transform_alpha(&robot, base_link, kinova_right_base_link,
+                    achd_solver_kinova_right_alpha, achd_solver_kinova_right_nc,
+                    achd_solver_kinova_right_alpha_transf);
+    // for (size_t i = 0; i < 6; i++)
+    // {
+    //   achd_solver_kinova_right_beta[i] += -achd_solver_kinova_gravity[i];
+    // }
     achd_solver(&robot, kinova_right_base_link, kinova_right_bracelet_link,
                 achd_solver_kinova_right_nc, achd_solver_kinova_right_root_acceleration,
                 achd_solver_kinova_right_alpha_transf, achd_solver_kinova_right_beta,
@@ -653,12 +662,12 @@ int main()
                 achd_solver_kinova_right_predicted_accelerations,
                 achd_solver_kinova_right_output_torques);
 
-    std::cout << "[achd] kinova_right_torques: ";
-    for (size_t i = 0; i < 7; i++)
-    {
-      std::cout << achd_solver_kinova_right_output_torques[i] << " ";
-    }
-    std::cout << std::endl;
+    // std::cout << "[achd] kinova_right_torques: ";
+    // for (size_t i = 0; i < 7; i++)
+    // {
+    //   std::cout << achd_solver_kinova_right_output_torques[i] << " ";
+    // }
+    // std::cout << std::endl;
 
     // achd_solver
     // double achd_solver_kinova_left_beta[6]{};
