@@ -197,12 +197,12 @@ class ACHDSolverFextTranslator:
         root_acc_vector = list(Collection(g, root_acc_vector_collec))
         root_acc_vector = [float(q) for q in root_acc_vector]
 
-        variables[f"{id}_root_acceleration"] = {
-            "type": "array",
-            "size": 6,
-            "dtype": "double",
-            "value": root_acc_vector,
-        }
+        # variables[f"{id}_root_acceleration"] = {
+        #     "type": "array",
+        #     "size": 6,
+        #     "dtype": "double",
+        #     "value": root_acc_vector,
+        # }
 
         ext_wrench = []
 
@@ -245,7 +245,7 @@ class ACHDSolverFextTranslator:
 
         data = {
             "name": "achd_solver_fext",
-            "root_acceleration": f"{id}_root_acceleration",
+            # "root_acceleration": f"{id}_root_acceleration",
             "ext_wrench": ext_wrench,
             "nj": f"{id}_nj",
             "ns": f"{id}_ns",

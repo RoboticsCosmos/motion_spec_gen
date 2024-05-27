@@ -205,6 +205,15 @@ class ImpedanceControllerStep:
                 output_data["stiffness"]["vector"] = vec_comp
 
             if g[coordinate : rdflib.RDF.type : GEOM_COORD.DistanceCoordinate]:
+                types_of_coord = list(g.objects(coordinate, rdflib.RDF.type))
+                vec_type = [t for t in types_of_coord if "vector" in str(t).lower()][0]
+                vec_comp, suffix = get_vector_value(str(vec_type))
+
+                output_data["stiffness"]["vector"] = vec_comp
+            
+            # TODO: this is wrong. should be for distane to base controller
+            # add additional type info and update
+            if g[coordinate : rdflib.RDF.type : GEOM_COORD.VelocityTwistCoordinate]:
                 of_dist = g.value(coordinate, GEOM_COORD.of)
                 asb = g.value(coordinate, GEOM_COORD["as-seen-by"])
                 asb_qn = g.compute_qname(asb)[2]

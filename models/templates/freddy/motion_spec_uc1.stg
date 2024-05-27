@@ -33,7 +33,7 @@ int main()
     <control_loop_freq_starter()>
 
     count++;
-    std::cout << "count: " << count << std::endl;
+    std::cout \<\< "count: " \<\< count \<\< std::endl;
 
     <! update robot state !>
     get_robot_data(&robot);
@@ -42,18 +42,7 @@ int main()
     <! controllers !>
     <d.controllers: {v | <({<d.controllers.(v).name>})(v, d.controllers.(v))>}; separator="\n">
 
-    // embed maps
-    <! embed maps !>
-    <d.embed_maps: {m | <embed_maps(d.embed_maps.(m))> }; separator="\n">
-
-    // solvers
-    <! solvers !>
-    <d.solvers: {s | <({<d.solvers.(s).name>})(s, d.solvers.(s))> }; separator="\n">
-
-    <! command torques !>
-    <set_robot_command_torques(d.robots)>
-
-    <control_loop_freq_maintainer()>
+    
   }
 
   free_robot_data(&robot);

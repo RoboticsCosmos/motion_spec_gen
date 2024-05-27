@@ -25,12 +25,6 @@ void handle_signal(int sig)
   std::cout << "Received signal: " << sig << std::endl;
 }
 
-void handle_log_data(std::vector<LogDataManipulator> &log_data)
-{
-  // print length of log data
-  std::cout << "Length of log data: " << log_data.size() << std::endl;
-}
-
 int main()
 {
   // signal(SIGINT, handle_sigint);
@@ -116,8 +110,6 @@ int main()
   double achd_solver_kinova_right_predicted_accelerations[7]{};
   int achd_solver_kinova_nc = 6;
 
-  std::vector<LogDataManipulator> kinova_left_log_data;
-
   const double desired_frequency = 900.0;                                              // Hz
   const auto desired_period = std::chrono::duration<double>(1.0 / desired_frequency);  // s
 
@@ -128,7 +120,6 @@ int main()
 
     if (flag)
     {
-      handle_log_data(kinova_left_log_data);
       free_manipulator(&kinova_left);
       std::cerr << "Exiting somewhat cleanly...\n" << std::endl;
       exit(0);
@@ -155,11 +146,6 @@ int main()
     printf("[achd ] right torques: ");
     print_array(achd_solver_kinova_right_output_torques, 7);
 
-    LogDataManipulator log_data;
-    log_data.populate(&kinova_right, achd_solver_kinova_right_output_torques, nullptr,
-                      achd_solver_kinova_right_predicted_accelerations);
-    kinova_left_log_data.push_back(log_data);
-
     double **rne_ext_wrench_right = new double *[7];
     init_2d_array(rne_ext_wrench_right, 7, 6);
 
@@ -182,7 +168,6 @@ int main()
     }
   }
 
-  handle_log_data(kinova_left_log_data);
   free_manipulator(&kinova_left);
 
   std::cout << "Exiting cleanly...\n";

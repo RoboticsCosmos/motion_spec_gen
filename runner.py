@@ -61,9 +61,9 @@ def main(motion_spec_name: str = None, ir_out_file_name: str = "ir.json"):
         if file.endswith(".jsonld"):
             g.parse(models_path + file, format="json-ld")
 
-    # print(g.serialize(format="turtle"))
+    print(g.serialize(format="turtle"))
 
-    # print("**" * 20)
+    print("**" * 20)
 
     controller_steps = [PIDControllerStep, ImpedanceControllerStep]
     controller_translators = [PIDControllerTranslator, ImpedanceControllerTranslator]
@@ -106,7 +106,6 @@ def main(motion_spec_name: str = None, ir_out_file_name: str = "ir.json"):
         #     data["d"]["monitors"]["pre"][ir["id"]] = ir["data"]
 
         for per_condition in per_conditions:
-
             val = g.value(predicate=CONTROLLER.constraint, object=per_condition)
 
             if g[val : rdflib.RDF.type : CONTROLLER.Controller]:
