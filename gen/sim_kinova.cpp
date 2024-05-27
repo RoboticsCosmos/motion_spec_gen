@@ -14,9 +14,39 @@ extern "C"
 #include <motion_spec_utils/utils.hpp>
 #include <string>
 #include <chrono>
+#include <csignal>
+#include <cstdlib>
+
+volatile sig_atomic_t flag = 0;
+
+void handle_signal(int sig)
+{
+  flag = 1;
+  std::cout << "Received signal: " << sig << std::endl;
+}
+
+void handle_log_data(std::vector<LogDataManipulator> &log_data)
+{
+  // print length of log data
+  std::cout << "Length of log data: " << log_data.size() << std::endl;
+}
 
 int main()
 {
+  // signal(SIGINT, handle_sigint);
+  struct sigaction sa;
+  sa.sa_handler = handle_signal;
+  sigemptyset(&sa.sa_mask);
+  sa.sa_flags = 0;
+
+  for (int i = 1; i < NSIG; ++i)
+  {
+    if (sigaction(i, &sa, NULL) == -1)
+    {
+      perror("sigaction");
+    }
+  }
+
   Manipulator<kinova_mediator> kinova_left;
   kinova_left.base_frame = "kinova_left_base_link";
   kinova_left.tool_frame = "kinova_left_bracelet_link";
@@ -59,7 +89,8 @@ int main()
   //                                6.05833, 1.49967,   3.14005};
 
   // 4.45017 -0.729692 0.17848 -1.66177 0.139995 1.59106 3.02416
-  double init_angles_right[7] = {4.45017, -0.729692, 0.17848, -1.66177, 0.139995, 1.59106, 3.02416};
+  double init_angles_right[7] = {4.45017,  -0.729692, 0.17848, -1.66177,
+                                 0.139995, 1.59106,   3.02416};
 
   for (size_t i = 0; i < kinova_right.chain.getNrOfJoints(); i++)
   {
@@ -85,13 +116,23 @@ int main()
   double achd_solver_kinova_right_predicted_accelerations[7]{};
   int achd_solver_kinova_nc = 6;
 
+  std::vector<LogDataManipulator> kinova_left_log_data;
+
   const double desired_frequency = 900.0;                                              // Hz
   const auto desired_period = std::chrono::duration<double>(1.0 / desired_frequency);  // s
 
   int count = 0;
-  while (count < 25)
+  while (count < 2500)
   {
     auto start_time = std::chrono::high_resolution_clock::now();
+
+    if (flag)
+    {
+      handle_log_data(kinova_left_log_data);
+      free_manipulator(&kinova_left);
+      std::cerr << "Exiting somewhat cleanly...\n" << std::endl;
+      exit(0);
+    }
 
     count++;
     printf("\n------------------------------------------\n> count: %d\n", count);
@@ -113,6 +154,11 @@ int main()
 
     printf("[achd ] right torques: ");
     print_array(achd_solver_kinova_right_output_torques, 7);
+
+    LogDataManipulator log_data;
+    log_data.populate(&kinova_right, achd_solver_kinova_right_output_torques, nullptr,
+                      achd_solver_kinova_right_predicted_accelerations);
+    kinova_left_log_data.push_back(log_data);
 
     double **rne_ext_wrench_right = new double *[7];
     init_2d_array(rne_ext_wrench_right, 7, 6);
@@ -136,7 +182,10 @@ int main()
     }
   }
 
+  handle_log_data(kinova_left_log_data);
   free_manipulator(&kinova_left);
+
+  std::cout << "Exiting cleanly...\n";
 
   return 0;
 }
