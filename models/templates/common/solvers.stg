@@ -12,16 +12,20 @@ achd_solver(&robot, <data.root_link>, <data.tip_link>, <data.nc>, <data.root_acc
 
 achd_solver_fext(id, data) ::= <<
 // achd_solver_fext
-double *<id>_ext_wrench[<data.robot>_state.ns];
-for (size_t i = 0; i \< <data.robot>_state.ns - 1; i++)
+double *<id>_ext_wrenches[7];
+for (size_t i = 0; i \< 7; i++)
 {
-  <id>_ext_wrench[i] = new double[6] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+  <id>_ext_wrenches[i] = new double[6] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 }
-double <id>_ext_wrench_tool[6]{};
-<data.ext_wrench: {w | add(<w>, <id>_ext_wrench_tool, <id>_ext_wrench_tool, 6);}; separator="\n">
-<id>_ext_wrench[<data.robot>_state.ns - 1] = <id>_ext_wrench_tool;
-achd_solver_fext(&<data.robot>_state, &<data.robot>_chain, <id>_ext_wrench, <data.output_torques>);
+int link_id = -1;
+<data.ext_wrench: {ew | <handle_external_wrench(id, ew)> }; separator="\n">
+achd_solver_fext(&robot, <id>_ext_wrenches, <data.output_torques>);
 
+>>
+
+handle_external_wrench(id, data) ::= <<
+getLinkId(&robot, <data.link>, link_id);
+<id>_ext_wrenches[link_id] = <data.wrench>;
 >>
 
 base_fd_solver(id, data) ::= <<

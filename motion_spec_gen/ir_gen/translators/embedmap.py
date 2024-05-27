@@ -32,6 +32,16 @@ class EmbedMapTranslator:
             output = g.compute_qname(em_output_ew)[2]
             output_type = "external-wrench"
 
+            ew_applied_to = g.value(node, EMBED_MAP["output-wrench-applied-to"])
+            if ew_applied_to:
+                ato = g.compute_qname(ew_applied_to)[2]
+                variables[ato] = {
+                    "type": None,
+                    "dtype": "string",
+                    "value": ato,
+                }
+                data["output_wrench_applied_to"] = ato
+
         # vector
         vector_id = None
         vector_info = None

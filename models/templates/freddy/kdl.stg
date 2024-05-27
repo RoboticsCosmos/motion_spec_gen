@@ -30,9 +30,13 @@ getLinkVelocity(<measured.of.entity>, <measured.asb>, <measured.wrt>, <measured.
 >>
 
 computeForce(measured, data) ::= <<
-computeForce(<measured.of.applied_by_entity>, <measured.of.applied_to_entity>, <measured.asb>, <measured.of.vector>, &<data.robot>_state, &<data.robot>_chain, <measured.of.id>);
+computeForce(<measured.of.applied_by_entity>, <measured.of.applied_to_entity>, <measured.asb>, <measured.of.vector>, &robot, <measured.of.id>);
 >>
 
 computeDistance(measured, data) ::= <<
-computeDistance(new std::string[2]{ <measured.of.entities: {ent | <ent>}; separator=", "> }, <measured.asb>, &<data.robot>_state, &<data.robot>_chain, <measured.of.id>);
+computeDistance(new std::string[2]{ <measured.of.entities: {ent | <ent>}; separator=", "> }, <measured.asb>, &robot, <measured.of.id>);
+>>
+
+computeDistance1D(measured, data) ::= <<
+computeDistance1D(new std::string[2]{ <measured.of.entities: {ent | <ent>}; separator=", "> }, <measured.of.axis>, <measured.asb>, &robot, <measured.of.id>);
 >>

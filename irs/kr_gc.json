@@ -343,6 +343,12 @@
       "dtype": "double",
       "value": "0.8"
     },
+    "kr_elbow_base_distance_axis": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [0, 0, 1]
+    },
     "kr_elbow_base_distance": {
       "type": null,
       "dtype": "double",
@@ -643,15 +649,20 @@
         "stiffness": {
           "error": "kr_elbow_base_base_distance_z_impedance_controller_stiffness_error",
           "reference_value": "kr_elbow_base_z_distance_reference_value",
-          "measure_variable": "computeDistance",
+          "measure_variable": "computeDistance1D",
           "diag_mat": "kr_elbow_base_base_distance_z_impedance_controller_stiffness_diag_mat",
           "measured": {
             "of": {
               "id": "kr_elbow_base_distance",
-              "entities": ["kinova_right_half_arm_2_link", "base_link"]
+              "entities": ["kinova_right_half_arm_2_link", "base_link"],
+              "axis": "kr_elbow_base_distance_axis"
             },
             "asb": "base_link"
           }
+        },
+        "force": {
+          "id": "kr_elbow_force_z",
+          "applied_to": "kinova_right_half_arm_2_link"
         },
         "name": "impedance_controller",
         "damping": null,
@@ -718,6 +729,7 @@
       ],
       "kr_achd_solver_fext": [
         {
+          "output_wrench_applied_to": "kinova_right_half_arm_2_link",
           "name": "embed_map",
           "input": "kr_elbow_base_base_distance_z_impedance_controller_signal",
           "output": "kr_elbow_base_base_distance_z_embed_map_kr_achd_solver_fext_output_external_wrench",
@@ -755,7 +767,10 @@
       "kr_achd_solver_fext": {
         "name": "achd_solver_fext",
         "ext_wrench": [
-          "kr_elbow_base_base_distance_z_embed_map_kr_achd_solver_fext_output_external_wrench"
+          {
+            "link": "kinova_right_half_arm_2_link",
+            "wrench": "kr_elbow_base_base_distance_z_embed_map_kr_achd_solver_fext_output_external_wrench"
+          }
         ],
         "nj": "kr_achd_solver_fext_nj",
         "ns": "kr_achd_solver_fext_ns",

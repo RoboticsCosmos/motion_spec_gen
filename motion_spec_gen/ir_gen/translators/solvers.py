@@ -216,7 +216,10 @@ class ACHDSolverFextTranslator:
                     "value": None,
                 }
 
-                ext_wrench.append(embed_map["output"])
+                ext_wrench.append({
+                    "link": embed_map["output_wrench_applied_to"] if "output_wrench_applied_to" in embed_map else None,
+                    "wrench": embed_map["output"]
+                })
 
         # TODO: get num of joints from the robot model
         nj = 7

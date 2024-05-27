@@ -53,6 +53,7 @@ class IMPEDANCE_CONTROLLER(DefinedNamespace):
 
     stiffness: URIRef
     damping: URIRef
+    force: URIRef
 
     _extras = [
         "position-constraint",
@@ -202,6 +203,8 @@ class NEWTONIAN_RBD_REL(DefinedNamespace):
 
     Force: URIRef
     ContactForce: URIRef
+    VirtualForce: URIRef
+
     Torque: URIRef
     Wrench: URIRef
 
@@ -228,6 +231,10 @@ class GEOM_ENT(DefinedNamespace):
     Frame: URIRef
 
     origin: URIRef
+
+    _extras = [
+        "1D",
+    ]
 
     _NS = Namespace(
         "https://comp-rob2b.github.io/metamodels/geometry/structural-entities#"
@@ -287,6 +294,7 @@ class EMBED_MAP(DefinedNamespace):
 
     _extras = [
         "output-external-wrench",
+        "output-wrench-applied-to",
         "output-acceleration-energy",
         "stiffness-vector",
         "damping-vector",

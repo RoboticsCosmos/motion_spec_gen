@@ -4,6 +4,7 @@ from motion_spec_gen.namespaces import (
     CONSTRAINT,
     GEOM_COORD,
     GEOM_REL,
+    GEOM_ENT,
     NEWTONIAN_RBD_REL,
     NEWTONIAN_RBD_COORD,
 )
@@ -119,11 +120,27 @@ class CoordinatesTranslator:
                 data["wrt"] = wrt_qname
 
             elif g[node : rdflib.RDF.type : GEOM_COORD.DistanceCoordinate]:
-                data["type"] = "Distance"
+                of_dist = g.value(node, GEOM_COORD.of)
+                of_dist_qname = g.compute_qname(of_dist)[2]
+
+                if g[node : rdflib.RDF.type : GEOM_ENT["1D"]]:
+                    data["type"] = "Distance1D"
+
+                    axis_name = f"{of_dist_qname}_axis"
+
+                    variables[axis_name] = {
+                        "type": "array",
+                        "size": 6,
+                        "dtype": "double",
+                        "value": vec_comp,
+                    }
+
+                    data["axis"] = axis_name
+                else:
+                    data["type"] = "Distance"
 
                 # TODO: validate the entities
 
-                of_dist = g.value(node, GEOM_COORD.of)
                 # TODO: as-seen-by is assumed to be base_link for now
                 asb = g.value(node, GEOM_COORD["as-seen-by"])
                 # TODO: get units
@@ -132,7 +149,6 @@ class CoordinatesTranslator:
                 dist_bw = g.objects(of_dist, GEOM_REL["between-entities"])
                 dist_bw = [g.compute_qname(e)[2] for e in dist_bw]
 
-                of_dist_qname = g.compute_qname(of_dist)[2]
                 asb_qname = g.compute_qname(asb)[2]
 
                 variables[of_dist_qname] = {
@@ -266,7 +282,7 @@ class CoordinatesTranslator:
 
                 of_force_qname = g.compute_qname(of_force)[2]
 
-                variables[f'{of_force_qname}_vector_{suffix}'] = {
+                variables[f"{of_force_qname}_vector_{suffix}"] = {
                     "type": "array",
                     "size": 6,
                     "dtype": "double",

@@ -13,9 +13,32 @@ application(variables, d) ::= <<
 <controller_include()>
 <motion_spec_utils_include()>
 <robot_mediators_include()>
+#include \<csignal>
+
+volatile sig_atomic_t flag = 0;
+
+void handle_signal(int sig)
+{
+  flag = 1;
+  printf("Caught signal %d\n", sig);
+}
 
 int main()
 {
+  // handle signals
+  struct sigaction sa;
+  sa.sa_handler = handle_signal;
+  sigemptyset(&sa.sa_mask);
+  sa.sa_flags = 0;
+
+  for (int i = 1; i \< NSIG; ++i)
+  {
+    if (sigaction(i, &sa, NULL) == -1)
+    {
+      perror("sigaction");
+    }
+  }
+  
   <! init robot data structure !>
   <init_robots(d.robots)>
 
@@ -32,8 +55,15 @@ int main()
   while (true) {
     <control_loop_freq_starter()>
 
+    if (flag)
+    {
+      free_robot_data(&robot);
+      printf("Exiting somewhat cleanly...\n");
+      exit(0);
+    }
+
     count++;
-    std::cout \<\< "count: " \<\< count \<\< std::endl;
+    printf("count: %d\n", count);
 
     <! update robot state !>
     get_robot_data(&robot);
@@ -42,7 +72,18 @@ int main()
     <! controllers !>
     <d.controllers: {v | <({<d.controllers.(v).name>})(v, d.controllers.(v))>}; separator="\n">
 
-    
+    // embed maps
+    <! embed maps !>
+    <d.embed_maps: {m | <embed_maps(d.embed_maps.(m))> }; separator="\n">
+
+    // solvers
+    <! solvers !>
+    <d.solvers: {s | <({<d.solvers.(s).name>})(s, d.solvers.(s))> }; separator="\n">
+
+    <! command torques !>
+    <set_robot_command_torques(d.robots)>
+
+    <control_loop_freq_maintainer()>
   }
 
   free_robot_data(&robot);

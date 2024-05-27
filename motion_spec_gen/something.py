@@ -13,6 +13,7 @@ from motion_spec_gen.namespaces import (
     ACHD_SOLVER,
     BASE_FD_SOLVER,
     EMBED_MAP,
+    NEWTONIAN_RBD_REL
 )
 
 
@@ -183,7 +184,20 @@ class ImpedanceControllerStep:
                     output_data["output"]["var_name"],
                 )
             )
-            
+
+        force = g.value(node, IMPEDANCE_CONTROLLER.force)
+
+        if force is None:
+            raise ValueError("Force not defined")
+        
+        output_data["output"]["force"] = force
+
+        if g[force : rdflib.RDF.type : NEWTONIAN_RBD_REL.VirtualForce]:
+            force_applied_to = g.value(force, NEWTONIAN_RBD_REL["applied-to"])
+
+            output_data["output"]["force_applied_to"] = rdflib.URIRef(
+                f"{prefix}{force_applied_to}"
+            )
 
         stiffness = g.value(node, IMPEDANCE_CONTROLLER.stiffness)
         damping = g.value(node, IMPEDANCE_CONTROLLER.damping)
@@ -279,3 +293,11 @@ class ImpedanceControllerStep:
                     output_data["output"]["var_name"],
                 )
             )
+            if "force_applied_to" in output_data["output"]:
+                g.add(
+                    (
+                        embed_map,
+                        EMBED_MAP["output-wrench-applied-to"],
+                        output_data["output"]["force_applied_to"],
+                    )
+                )

@@ -263,8 +263,17 @@ class ImpedanceControllerTranslator:
 
             coord_type = measured_coord_ir["data"]["type"]
 
+            measured = {}
+
             if coord_type == "Distance":
                 measure_variable = "computeDistance"
+            elif coord_type == "Distance1D":
+                measure_variable = "computeDistance1D"
+                measured = {
+                    "of": measured_coord_ir["data"]["of"],
+                    "asb": measured_coord_ir["data"]["asb"],
+                }
+                measured["of"]["axis"] = measured_coord_ir["data"]["axis"]
 
             # vector
             vector_id = f"{g.compute_qname(embedded_map)[2]}_vector"
@@ -280,22 +289,30 @@ class ImpedanceControllerTranslator:
                 "reference_value": ref_val_id,
                 "measure_variable": measure_variable,
                 "diag_mat": f"{id}_stiffness_diag_mat",
-                "measured": {
-                    "of": measured_coord_ir["data"]["of"],
-                    "asb": measured_coord_ir["data"]["asb"],
-                },
+                "measured": measured,
+            }
+
+        force = g.value(node, IMPEDANCE_CONTROLLER.force)
+
+        if g[force : rdflib.RDF.type : NEWTONIAN_RBD_REL.VirtualForce]:
+            force_applied_to = g.value(force, NEWTONIAN_RBD_REL["applied-to"])
+            force_applied_to = g.compute_qname(force_applied_to)[2]
+
+            variables[force_applied_to] = {
+                "type": None,
+                "dtype": "string",
+                "value": force_applied_to,
+            }
+
+            data["force"] = {
+                "id": g.compute_qname(force)[2],
+                "applied_to": force_applied_to,
             }
 
         data["name"] = "impedance_controller"
         data["damping"] = None
         data["signal"] = signal_qname
         data["vector"] = vector_id
-
-        # TODO: this is just a temp hack
-        if "kinova_left" in id:
-            data["robot"] = "kinova_left"
-        elif "kinova_right" in id:
-            data["robot"] = "kinova_right"
 
         return {
             "id": id,
