@@ -204,6 +204,25 @@ class ACHDSolverFextTranslator:
         #     "value": root_acc_vector,
         # }
 
+        # root and tip links
+        root_link = g.value(node, ACHD_SOLVER["root-link"])
+        tip_link = g.value(node, ACHD_SOLVER["tip-link"])
+
+        root_link_name = g.compute_qname(root_link)[2]
+        tip_link_name = g.compute_qname(tip_link)[2]
+
+        variables[root_link_name] = {
+            "type": None,
+            "dtype": "string",
+            "value": root_link_name,
+        }
+
+        variables[tip_link_name] = {
+            "type": None,
+            "dtype": "string",
+            "value": tip_link_name,
+        }
+
         ext_wrench = []
 
         for embed_map in embed_maps_for_solver:
@@ -249,6 +268,8 @@ class ACHDSolverFextTranslator:
         data = {
             "name": "achd_solver_fext",
             # "root_acceleration": f"{id}_root_acceleration",
+            "root_link": root_link_name,
+            "tip_link": tip_link_name,
             "ext_wrench": ext_wrench,
             "nj": f"{id}_nj",
             "ns": f"{id}_ns",

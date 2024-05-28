@@ -215,6 +215,13 @@ int main()
 
 
     // embed maps
+    double pid_kr_vel_lin_x_twist_embed_map_kr_achd_solver_output_acceleration_energy[6]{};
+    double pid_kr_vel_lin_y_twist_embed_map_kr_achd_solver_output_acceleration_energy[6]{};
+    double pid_kr_vel_lin_z_twist_embed_map_kr_achd_solver_output_acceleration_energy[6]{};
+    double pid_kr_vel_ang_x_twist_embed_map_kr_achd_solver_output_acceleration_energy[6]{};
+    double pid_kr_vel_ang_y_twist_embed_map_kr_achd_solver_output_acceleration_energy[6]{};
+    double pid_kr_vel_ang_z_twist_embed_map_kr_achd_solver_output_acceleration_energy[6]{};
+
     for (size_t i = 0; i < sizeof(pid_kr_vel_lin_x_twist_embed_map_vector)/sizeof(pid_kr_vel_lin_x_twist_embed_map_vector[0]); i++)
     {
       if (pid_kr_vel_lin_x_twist_embed_map_vector[i] != 0.0)
@@ -257,6 +264,8 @@ int main()
         pid_kr_vel_ang_z_twist_embed_map_kr_achd_solver_output_acceleration_energy[i] += kr_vel_twist_ang_z_pid_controller_signal;
       }
     } 
+    double kr_elbow_base_base_distance_z_embed_map_kr_achd_solver_fext_output_external_wrench[6]{};
+
     for (size_t i = 0; i < sizeof(kr_elbow_base_base_distance_z_embed_map_vector)/sizeof(kr_elbow_base_base_distance_z_embed_map_vector[0]); i++)
     {
       if (kr_elbow_base_base_distance_z_embed_map_vector[i] != 0.0)
@@ -268,28 +277,30 @@ int main()
     // solvers
     // achd_solver
     double kr_achd_solver_beta[6]{};
-    for (size_t i = 0; i < 6; i++)
-    {
-      kr_achd_solver_beta[i] = -kr_achd_solver_root_acceleration[i];
-    }
     add(pid_kr_vel_lin_x_twist_embed_map_kr_achd_solver_output_acceleration_energy, kr_achd_solver_beta, kr_achd_solver_beta, 6);
     add(pid_kr_vel_lin_y_twist_embed_map_kr_achd_solver_output_acceleration_energy, kr_achd_solver_beta, kr_achd_solver_beta, 6);
     add(pid_kr_vel_lin_z_twist_embed_map_kr_achd_solver_output_acceleration_energy, kr_achd_solver_beta, kr_achd_solver_beta, 6);
     add(pid_kr_vel_ang_x_twist_embed_map_kr_achd_solver_output_acceleration_energy, kr_achd_solver_beta, kr_achd_solver_beta, 6);
     add(pid_kr_vel_ang_y_twist_embed_map_kr_achd_solver_output_acceleration_energy, kr_achd_solver_beta, kr_achd_solver_beta, 6);
     add(pid_kr_vel_ang_z_twist_embed_map_kr_achd_solver_output_acceleration_energy, kr_achd_solver_beta, kr_achd_solver_beta, 6);
-    achd_solver(&robot, kinova_right_base_link, kinova_right_bracelet_link, kr_achd_solver_nc, kr_achd_solver_root_acceleration, kr_achd_solver_alpha, kr_achd_solver_beta, kr_achd_solver_feed_forward_torques, kr_achd_solver_predicted_accelerations, kr_achd_solver_output_torques);
+    double *kr_achd_solver_alpha_transf[kr_achd_solver_nc];
+    for (size_t i = 0; i < kr_achd_solver_nc; i++)
+    {
+      kr_achd_solver_alpha_transf[i] = new double[6]{};
+    }
+    transform_alpha(&robot, base_link, kinova_right_base_link, kr_achd_solver_alpha, kr_achd_solver_nc, kr_achd_solver_alpha_transf);
+    achd_solver(&robot, kinova_right_base_link, kinova_right_bracelet_link, kr_achd_solver_nc, kr_achd_solver_root_acceleration, kr_achd_solver_alpha_transf, kr_achd_solver_beta, kr_achd_solver_feed_forward_torques, kr_achd_solver_predicted_accelerations, kr_achd_solver_output_torques);
      
     // achd_solver_fext
     double *kr_achd_solver_fext_ext_wrenches[7];
     for (size_t i = 0; i < 7; i++)
     {
-      kr_achd_solver_fext_ext_wrenches[i] = new double[6] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+      kr_achd_solver_fext_ext_wrenches[i] = new double[6]{};
     }
     int link_id = -1;
-    getLinkId(&robot, kinova_right_half_arm_2_link, link_id);
+    getLinkId(&robot, kinova_right_base_link, kinova_right_bracelet_link, kinova_right_half_arm_2_link, link_id);
     kr_achd_solver_fext_ext_wrenches[link_id] = kr_elbow_base_base_distance_z_embed_map_kr_achd_solver_fext_output_external_wrench; 
-    achd_solver_fext(&robot, kr_achd_solver_fext_ext_wrenches, kr_achd_solver_fext_output_torques);
+    achd_solver_fext(&robot, kinova_right_base_link, kinova_right_bracelet_link, kr_achd_solver_fext_ext_wrenches, kr_achd_solver_fext_output_torques);
      
 
     // Command the torques to the robots

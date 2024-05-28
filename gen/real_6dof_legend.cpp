@@ -27,18 +27,18 @@ void handle_signal(int sig)
 int main()
 {
   // signal(SIGINT, handle_sigint);
-  struct sigaction sa;
-  sa.sa_handler = handle_signal;
-  sigemptyset(&sa.sa_mask);
-  sa.sa_flags = 0;
+//   struct sigaction sa;
+//   sa.sa_handler = handle_signal;
+//   sigemptyset(&sa.sa_mask);
+//   sa.sa_flags = 0;
 
-  for (int i = 1; i < NSIG; ++i)
-  {
-    if (sigaction(i, &sa, NULL) == -1)
-    {
-      perror("sigaction");
-    }
-  }
+//   for (int i = 1; i < NSIG; ++i)
+//   {
+//     if (sigaction(i, &sa, NULL) == -1)
+//     {
+//       perror("sigaction");
+//     }
+//   }
 
   // Initialize the robot structs
   Manipulator<kinova_mediator> kinova_right;
@@ -267,24 +267,24 @@ int main()
   double kinova_left_bracelet_base_ang_vel_z_pid_controller_signal = 0.0;
 
   // log data
-  const char *log_dir = "../../logs/data//6dof";
-  char log_dir_name[100];
-  get_new_folder_name(log_dir, log_dir_name);
-  std::filesystem::create_directories(log_dir_name);
+//   const char *log_dir = "../../logs/data//6dof";
+//   char log_dir_name[100];
+//   get_new_folder_name(log_dir, log_dir_name);
+//   std::filesystem::create_directories(log_dir_name);
 
-  // control data logs
-  LogControlDataVector kinova_right_bracelet_base_lin_vel_x_pid_controller_data(
-      "kinova_right_bracelet_base_lin_vel_x", log_dir_name);
-  LogControlDataVector kinova_right_bracelet_base_lin_vel_y_pid_controller_data(
-      "kinova_right_bracelet_base_lin_vel_y", log_dir_name);
-  LogControlDataVector kinova_right_bracelet_base_lin_vel_z_pid_controller_data(
-      "kinova_right_bracelet_base_lin_vel_z", log_dir_name);
-  LogControlDataVector kinova_right_bracelet_base_ang_vel_x_pid_controller_data(
-      "kinova_right_bracelet_base_ang_vel_x", log_dir_name);
-  LogControlDataVector kinova_right_bracelet_base_ang_vel_y_pid_controller_data(
-      "kinova_right_bracelet_base_ang_vel_y", log_dir_name);
-  LogControlDataVector kinova_right_bracelet_base_ang_vel_z_pid_controller_data(
-      "kinova_right_bracelet_base_ang_vel_z", log_dir_name);
+//   // control data logs
+//   LogControlDataVector kinova_right_bracelet_base_lin_vel_x_pid_controller_data(
+//       "kinova_right_bracelet_base_lin_vel_x", log_dir_name);
+//   LogControlDataVector kinova_right_bracelet_base_lin_vel_y_pid_controller_data(
+//       "kinova_right_bracelet_base_lin_vel_y", log_dir_name);
+//   LogControlDataVector kinova_right_bracelet_base_lin_vel_z_pid_controller_data(
+//       "kinova_right_bracelet_base_lin_vel_z", log_dir_name);
+//   LogControlDataVector kinova_right_bracelet_base_ang_vel_x_pid_controller_data(
+//       "kinova_right_bracelet_base_ang_vel_x", log_dir_name);
+//   LogControlDataVector kinova_right_bracelet_base_ang_vel_y_pid_controller_data(
+//       "kinova_right_bracelet_base_ang_vel_y", log_dir_name);
+//   LogControlDataVector kinova_right_bracelet_base_ang_vel_z_pid_controller_data(
+//       "kinova_right_bracelet_base_ang_vel_z", log_dir_name);
   
   int count = 0;
 
@@ -297,7 +297,7 @@ int main()
 
     if (flag)
     {
-      kinova_right_bracelet_base_lin_vel_x_pid_controller_data.writeToOpenFile();
+    //   kinova_right_bracelet_base_lin_vel_x_pid_controller_data.writeToOpenFile();
       free_manipulator(&kinova_left);
       std::cerr << "Exiting somewhat cleanly...\n" << std::endl;
       exit(0);
@@ -357,9 +357,9 @@ int main()
                   kinova_right_bracelet_base_lin_vel_x_pid_controller_error_sum,
                   kinova_right_bracelet_base_lin_vel_x_pid_controller_prev_error,
                   kinova_right_bracelet_base_lin_vel_x_pid_controller_signal);
-    kinova_right_bracelet_base_lin_vel_x_pid_controller_data.addControlData(
-        of_vel_qname_lin_x, arm_bracelet_link_lin_vel_reference_value,
-        kinova_right_bracelet_base_lin_vel_x_pid_controller_signal);
+    // kinova_right_bracelet_base_lin_vel_x_pid_controller_data.addControlData(
+    //     of_vel_qname_lin_x, arm_bracelet_link_lin_vel_reference_value,
+    //     kinova_right_bracelet_base_lin_vel_x_pid_controller_signal);
 
     // pid controller
     getLinkVelocity(kinova_right_bracelet_link, base_link, base_link,
@@ -375,9 +375,9 @@ int main()
                   kinova_right_bracelet_base_lin_vel_y_pid_controller_error_sum,
                   kinova_right_bracelet_base_lin_vel_y_pid_controller_prev_error,
                   kinova_right_bracelet_base_lin_vel_y_pid_controller_signal);
-    kinova_right_bracelet_base_lin_vel_y_pid_controller_data.addControlData(
-        of_vel_qname_lin_y, arm_bracelet_link_lin_vel_reference_value,
-        kinova_right_bracelet_base_lin_vel_y_pid_controller_signal);
+    // kinova_right_bracelet_base_lin_vel_y_pid_controller_data.addControlData(
+    //     of_vel_qname_lin_y, arm_bracelet_link_lin_vel_reference_value,
+    //     kinova_right_bracelet_base_lin_vel_y_pid_controller_signal);
 
     // // pid controller
     // getLinkVelocity(kinova_left_bracelet_link, base_link, base_link,
@@ -441,9 +441,9 @@ int main()
                   kinova_right_bracelet_base_ang_vel_y_pid_controller_error_sum,
                   kinova_right_bracelet_base_ang_vel_y_pid_controller_prev_error,
                   kinova_right_bracelet_base_ang_vel_y_pid_controller_signal);
-    kinova_right_bracelet_base_ang_vel_y_pid_controller_data.addControlData(
-        of_vel_qname_ang_y, arm_bracelet_link_ang_vel_reference_value,
-        kinova_right_bracelet_base_ang_vel_y_pid_controller_signal);
+    // kinova_right_bracelet_base_ang_vel_y_pid_controller_data.addControlData(
+    //     of_vel_qname_ang_y, arm_bracelet_link_ang_vel_reference_value,
+    //     kinova_right_bracelet_base_ang_vel_y_pid_controller_signal);
 
     // pid controller
     getLinkVelocity(kinova_right_bracelet_link, base_link, base_link,
@@ -459,9 +459,9 @@ int main()
                   kinova_right_bracelet_base_lin_vel_z_pid_controller_error_sum,
                   kinova_right_bracelet_base_lin_vel_z_pid_controller_prev_error,
                   kinova_right_bracelet_base_lin_vel_z_pid_controller_signal);
-    kinova_right_bracelet_base_lin_vel_z_pid_controller_data.addControlData(
-        of_vel_qname_lin_z, arm_bracelet_link_lin_vel_reference_value,
-        kinova_right_bracelet_base_lin_vel_z_pid_controller_signal);
+    // kinova_right_bracelet_base_lin_vel_z_pid_controller_data.addControlData(
+    //     of_vel_qname_lin_z, arm_bracelet_link_lin_vel_reference_value,
+    //     kinova_right_bracelet_base_lin_vel_z_pid_controller_signal);
 
     // pid controller
     getLinkVelocity(kinova_right_bracelet_link, base_link, base_link,
@@ -477,9 +477,9 @@ int main()
                   kinova_right_bracelet_base_ang_vel_z_pid_controller_error_sum,
                   kinova_right_bracelet_base_ang_vel_z_pid_controller_prev_error,
                   kinova_right_bracelet_base_ang_vel_z_pid_controller_signal);
-    kinova_right_bracelet_base_ang_vel_z_pid_controller_data.addControlData(
-        of_vel_qname_ang_z, arm_bracelet_link_ang_vel_reference_value,
-        kinova_right_bracelet_base_ang_vel_z_pid_controller_signal);
+    // kinova_right_bracelet_base_ang_vel_z_pid_controller_data.addControlData(
+    //     of_vel_qname_ang_z, arm_bracelet_link_ang_vel_reference_value,
+    //     kinova_right_bracelet_base_ang_vel_z_pid_controller_signal);
 
     // // pid controller
     // getLinkVelocity(kinova_left_bracelet_link, base_link, base_link,
@@ -511,9 +511,9 @@ int main()
                   kinova_right_bracelet_base_ang_vel_x_pid_controller_error_sum,
                   kinova_right_bracelet_base_ang_vel_x_pid_controller_prev_error,
                   kinova_right_bracelet_base_ang_vel_x_pid_controller_signal);
-    kinova_right_bracelet_base_ang_vel_x_pid_controller_data.addControlData(
-        of_vel_qname_ang_x, arm_bracelet_link_ang_vel_reference_value,
-        kinova_right_bracelet_base_ang_vel_x_pid_controller_signal);
+    // kinova_right_bracelet_base_ang_vel_x_pid_controller_data.addControlData(
+    //     of_vel_qname_ang_x, arm_bracelet_link_ang_vel_reference_value,
+    //     kinova_right_bracelet_base_ang_vel_x_pid_controller_signal);
 
     // // pid controller
     // getLinkVelocity(kinova_left_bracelet_link, base_link, base_link,
@@ -763,6 +763,13 @@ int main()
     KDL::JntArray kinova_right_cmd_tau_kdl(7);
     cap_and_convert_torques(kinova_right_cmd_tau, 7, kinova_right_cmd_tau_kdl);
 
+    printf("kinova_right_cmd_tau_kdl: ");
+    for (size_t i = 0; i < 7; i++)
+    {
+      printf("%f ", achd_solver_kinova_right_output_torques[i]);
+    }
+    printf("\n");
+
     // double kinova_left_cmd_tau[7]{};
     // add(achd_solver_kinova_left_output_torques, kinova_left_cmd_tau, kinova_left_cmd_tau,
     //     7);
@@ -771,16 +778,16 @@ int main()
 
     // std::cout << "kinova_left_cmd_tau_kdl: " << kinova_left_cmd_tau_kdl << std::endl;
 
-    if (!kinova_right_torque_control_mode_set)
-    {
-      robot.kinova_right->mediator->set_control_mode(2);
-      kinova_right_torque_control_mode_set = true;
-    }
-    int r = set_manipulator_torques(&robot, kinova_right_base_link, &kinova_right_cmd_tau_kdl);
-    if (r != 0)
-    {
-        flag = true;
-    }
+    // if (!kinova_right_torque_control_mode_set)
+    // {
+    //   robot.kinova_right->mediator->set_control_mode(2);
+    //   kinova_right_torque_control_mode_set = true;
+    // }
+    // int r = set_manipulator_torques(&robot, kinova_right_base_link, &kinova_right_cmd_tau_kdl);
+    // if (r != 0)
+    // {
+    //     flag = true;
+    // }
 
     // if (!kinova_left_torque_control_mode_set)
     // {

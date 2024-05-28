@@ -24,7 +24,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [1, 0, 0, 0, 0, 0]
+      "value": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
     },
     "of_vel_qname_lin_x": {
       "type": null,
@@ -65,7 +72,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      "value": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
     },
     "kr_vel_twist_lin_y_pid_controller_signal": {
       "type": null,
@@ -76,7 +90,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0, 1, 0, 0, 0, 0]
+      "value": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
     },
     "of_vel_qname_lin_y": {
       "type": null,
@@ -117,7 +138,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
+      "value": [
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
     },
     "kr_vel_twist_lin_z_pid_controller_signal": {
       "type": null,
@@ -128,7 +156,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0, 0, 1, 0, 0, 0]
+      "value": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
     },
     "of_vel_qname_lin_z": {
       "type": null,
@@ -169,7 +204,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0.0, 0.0, 1.0, 0.0, 0.0, 0.0]
+      "value": [
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
     },
     "kr_vel_twist_ang_x_pid_controller_signal": {
       "type": null,
@@ -180,7 +222,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0, 0, 0, 1, 0, 0]
+      "value": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        0
+      ]
     },
     "of_vel_qname_ang_x": {
       "type": null,
@@ -221,7 +270,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0.0, 0.0, 0.0, 1.0, 0.0, 0.0]
+      "value": [
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ]
     },
     "kr_vel_twist_ang_y_pid_controller_signal": {
       "type": null,
@@ -232,7 +288,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0, 0, 0, 0, 1, 0]
+      "value": [
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+      ]
     },
     "of_vel_qname_ang_y": {
       "type": null,
@@ -273,7 +336,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0.0, 0.0, 0.0, 0.0, 1.0, 0.0]
+      "value": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ]
     },
     "kr_vel_twist_ang_z_pid_controller_signal": {
       "type": null,
@@ -284,7 +354,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0, 0, 0, 0, 0, 1]
+      "value": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ]
     },
     "of_vel_qname_ang_z": {
       "type": null,
@@ -325,7 +402,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0.0, 0.0, 0.0, 0.0, 0.0, 1.0]
+      "value": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
     },
     "kr_elbow_base_base_distance_z_impedance_controller_signal": {
       "type": null,
@@ -336,7 +420,9 @@
       "type": "array",
       "size": 1,
       "dtype": "double",
-      "value": [10.0]
+      "value": [
+        10.0
+      ]
     },
     "kr_elbow_base_z_distance_reference_value": {
       "type": null,
@@ -347,7 +433,11 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0, 0, 1]
+      "value": [
+        0,
+        0,
+        1
+      ]
     },
     "kr_elbow_base_distance": {
       "type": null,
@@ -363,13 +453,24 @@
       "type": "array",
       "size": 3,
       "dtype": "double",
-      "value": [0.0, 0.0, 1.0]
+      "value": [
+        0.0,
+        0.0,
+        1.0
+      ]
     },
     "kr_achd_solver_root_acceleration": {
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [-9.685, -1.033, 1.324, 0.0, 0.0, 0.0]
+      "value": [
+        -9.685,
+        -1.033,
+        1.324,
+        0.0,
+        0.0,
+        0.0
+      ]
     },
     "kinova_right_base_link": {
       "type": null,
@@ -428,12 +529,54 @@
       "cols": 6,
       "dtype": "double",
       "value": [
-        [1.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-        [0.0, 1.0, 0.0, 0.0, 0.0, 0.0],
-        [0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
-        [0.0, 0.0, 0.0, 1.0, 0.0, 0.0],
-        [0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
-        [0.0, 0.0, 0.0, 0.0, 0.0, 1.0]
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
       ]
     },
     "kr_achd_solver_feed_forward_torques": {
@@ -654,7 +797,10 @@
           "measured": {
             "of": {
               "id": "kr_elbow_base_distance",
-              "entities": ["kinova_right_half_arm_2_link", "base_link"],
+              "entities": [
+                "kinova_right_half_arm_2_link",
+                "base_link"
+              ],
               "axis": "kr_elbow_base_distance_axis"
             },
             "asb": "base_link"
@@ -766,6 +912,8 @@
       },
       "kr_achd_solver_fext": {
         "name": "achd_solver_fext",
+        "root_link": "kinova_right_base_link",
+        "tip_link": "kinova_right_bracelet_link",
         "ext_wrench": [
           {
             "link": "kinova_right_half_arm_2_link",

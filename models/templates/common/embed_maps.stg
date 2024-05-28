@@ -1,5 +1,7 @@
 
 embed_maps(data) ::= <<
+<data: {m | double <m.output>[6]{\};}; separator="\n">
+
 <data: {m | <if(m.vector)><embed_mapping_vector(m)><else><embed_mapping_vector_info(m)><endif>}; separator="\n">
 >> 
 

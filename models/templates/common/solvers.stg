@@ -1,12 +1,14 @@
 achd_solver(id, data) ::= <<
 // achd_solver
 double <id>_beta[6]{};
-for (size_t i = 0; i \< 6; i++)
-{
-  <id>_beta[i] = -<data.root_acceleration>[i];
-}
 <data.beta: {b | add(<b>, <id>_beta, <id>_beta, 6);}; separator="\n">
-achd_solver(&robot, <data.root_link>, <data.tip_link>, <data.nc>, <data.root_acceleration>, <data.alpha>, <id>_beta, <data.tau_ff>, <data.predicted_accelerations>, <data.output_torques>);
+double *<data.alpha>_transf[<data.nc>];
+for (size_t i = 0; i \< <data.nc>; i++)
+{
+  <data.alpha>_transf[i] = new double[6]{};
+}
+transform_alpha(&robot, base_link, <data.root_link>, <data.alpha>, <data.nc>, <data.alpha>_transf);
+achd_solver(&robot, <data.root_link>, <data.tip_link>, <data.nc>, <data.root_acceleration>, <data.alpha>_transf, <id>_beta, <data.tau_ff>, <data.predicted_accelerations>, <data.output_torques>);
 
 >>
 
@@ -15,17 +17,17 @@ achd_solver_fext(id, data) ::= <<
 double *<id>_ext_wrenches[7];
 for (size_t i = 0; i \< 7; i++)
 {
-  <id>_ext_wrenches[i] = new double[6] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+  <id>_ext_wrenches[i] = new double[6]{};
 }
 int link_id = -1;
-<data.ext_wrench: {ew | <handle_external_wrench(id, ew)> }; separator="\n">
-achd_solver_fext(&robot, <id>_ext_wrenches, <data.output_torques>);
+<data.ext_wrench: {ew | <handle_external_wrench(id, ew, data)> }; separator="\n">
+achd_solver_fext(&robot, <data.root_link>, <data.tip_link>, <id>_ext_wrenches, <data.output_torques>);
 
 >>
 
-handle_external_wrench(id, data) ::= <<
-getLinkId(&robot, <data.link>, link_id);
-<id>_ext_wrenches[link_id] = <data.wrench>;
+handle_external_wrench(id, ew, data) ::= <<
+getLinkId(&robot, <data.root_link>, <data.tip_link>, <ew.link>, link_id);
+<id>_ext_wrenches[link_id] = <ew.wrench>;
 >>
 
 base_fd_solver(id, data) ::= <<
