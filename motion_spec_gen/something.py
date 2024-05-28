@@ -40,9 +40,9 @@ def get_vector_value(input_string):
 
     input_string = input_string.lower()
 
-    if "linear" in input_string or "force" in input_string:
+    if "linear" in input_string or "force" in input_string or "position" in input_string:
         return vec_comp + (0, 0, 0), f"lin_{suffix.lower()}"
-    elif "angular" in input_string or "torque" in input_string:
+    elif "angular" in input_string or "torque" in input_string or "orientation" in input_string:
         return (0, 0, 0) + vec_comp, f"ang_{suffix.lower()}"
     else:
         return vec_comp, suffix.lower()
@@ -72,7 +72,9 @@ class PIDControllerStep:
 
         # TOOD: check for a better way
         is_geom_coord = (
-            g[coordinate : rdflib.RDF.type : GEOM_COORD.PositionCoordinate]
+            g[coordinate : rdflib.RDF.type : GEOM_COORD.PoseCoordinate]
+            or g[coordinate : rdflib.RDF.type : GEOM_COORD.PositionCoordinate]
+            or g[coordinate : rdflib.RDF.type : GEOM_COORD.OrientationCoordinate]
             or g[coordinate : rdflib.RDF.type : GEOM_COORD.DistanceCoordinate]
             or g[coordinate : rdflib.RDF.type : GEOM_COORD.VelocityTwistCoordinate]
             or g[coordinate : rdflib.RDF.type : GEOM_COORD.AccelerationTwistCoordinate]

@@ -4,6 +4,8 @@ from rdflib.term import URIRef
 
 class QUDT(DefinedNamespace):
 
+    Quantity: URIRef
+
     unit: URIRef
     value: URIRef
     hasQuantityKind: URIRef
@@ -82,6 +84,7 @@ class THRESHOLD(DefinedNamespace):
 class CONSTRAINT(DefinedNamespace):
 
     Constraint: URIRef
+    PoseConstraint: URIRef
     DistanceConstraint: URIRef
     VelocityConstraint: URIRef
     VelocityTwistConstraint: URIRef
@@ -116,6 +119,14 @@ class GEOM_COORD(DefinedNamespace):
     DistanceCoordinate: URIRef
 
     VelocityTwistCoordinate: URIRef
+
+    PositionVectorX: URIRef
+    PositionVectorY: URIRef
+    PositionVectorZ: URIRef
+
+    OrientationVectorX: URIRef
+    OrientationVectorY: URIRef
+    OrientationVectorZ: URIRef
 
     LinearVelocityVectorX: URIRef
     LinearVelocityVectorY: URIRef

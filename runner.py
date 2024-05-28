@@ -75,6 +75,7 @@ def main(motion_spec_name: str = None, ir_out_file_name: str = "ir.json"):
 
     data = {
         "variables": {},
+        "compute_variables": {},
         "d": {
             "monitors": {
                 "pre": {},
@@ -130,6 +131,9 @@ def main(motion_spec_name: str = None, ir_out_file_name: str = "ir.json"):
 
                     data["variables"].update(ir["variables"])
                     data["d"]["controllers"][ir["id"]] = ir["data"]
+
+                    if "compute_variables" in ir:
+                        data["compute_variables"].update(ir["compute_variables"])
 
             embed_map = g.value(predicate=EMBED_MAP.controller, object=controller)
             embed_map_ir = EmbedMapTranslator().translate(g, embed_map)

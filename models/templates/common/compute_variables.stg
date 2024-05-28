@@ -1,0 +1,3 @@
+compute_variables_init(id, data) ::= <<
+<({<data.measure_variable>})(data.measured, data)>
+>>

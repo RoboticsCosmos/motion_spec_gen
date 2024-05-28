@@ -30,12 +30,14 @@ def get_vector_value(input_string):
 
     vec_comp = vector_components.get(suffix, None)
 
+    input_string = input_string.lower()
+
     if vec_comp is None:
         raise ValueError("Invalid suffix")
 
-    if "linear" in input_string.lower():
+    if "linear" in input_string or "position" in input_string:
         return vec_comp + (0, 0, 0), f"lin_{suffix.lower()}"
-    elif "angular" in input_string.lower():
+    elif "angular" in input_string or "orientation" in input_string:
         return (0, 0, 0) + vec_comp, f"ang_{suffix.lower()}"
     else:
         return vec_comp, suffix.lower()
@@ -49,8 +51,12 @@ class CoordinatesTranslator:
 
         prefix = kwargs.get("prefix", "")
 
+        node_qname = g.compute_qname(node)[2]
+
         is_geom_coord = (
-            g[node : rdflib.RDF.type : GEOM_COORD.PositionCoordinate]
+            g[node : rdflib.RDF.type : GEOM_COORD.PoseCoordinate]
+            or g[node : rdflib.RDF.type : GEOM_COORD.PositionCoordinate]
+            or g[node : rdflib.RDF.type : GEOM_COORD.OrientationCoordinate]
             or g[node : rdflib.RDF.type : GEOM_COORD.DistanceCoordinate]
             or g[node : rdflib.RDF.type : GEOM_COORD.VelocityTwistCoordinate]
             or g[node : rdflib.RDF.type : GEOM_COORD.AccelerationTwistCoordinate]
@@ -63,8 +69,71 @@ class CoordinatesTranslator:
         vec_comp, suffix = get_vector_value(str(vector_type))
 
         if is_geom_coord:
+            if g[node : rdflib.RDF.type : GEOM_COORD.PoseCoordinate]:
+                data["type"] = "Pose"
 
-            if g[node : rdflib.RDF.type : GEOM_COORD.PositionCoordinate]:
+                of_pose = g.value(node, GEOM_COORD.of)
+                # TODO: do something with this
+                asb = g.value(node, GEOM_COORD["as-seen-by"])
+
+                # get position
+                of = g.value(of_pose, GEOM_REL["of-entity"])
+                wrt = g.value(of_pose, GEOM_REL["with-respect-to"])
+
+                of_pose_qname = g.compute_qname(of_pose)[2]
+                asb_qname = g.compute_qname(asb)[2]
+                of_qname = g.compute_qname(of)[2]
+                wrt_qname = g.compute_qname(wrt)[2]
+                
+                # *assumption*: pose is a 1D vector
+                variables[node_qname] = {
+                    "type": None,
+                    "dtype": "double",
+                    "value": None,
+                }
+
+                variables[f"{node_qname}_vector"] = {
+                    "type": "array",
+                    "size": 6,
+                    "dtype": "double",
+                    "value": vec_comp,
+                }
+
+                variables[of_qname] = {
+                    "type": None,
+                    "dtype": "string",
+                    "value": of_qname,
+                }
+
+                variables[wrt_qname] = {
+                    "type": None,
+                    "dtype": "string",
+                    "value": wrt_qname,
+                }
+
+                variables[asb_qname] = {
+                    "type": None,
+                    "dtype": "string",
+                    "value": asb_qname,
+                }
+
+                # if g[node : rdflib.RDF.type : GEOM_COORD.VectorXYZ]:
+                #     x = g.value(of_pose, GEOM_COORD.x).toPython()
+                #     y = g.value(of_pose, GEOM_COORD.y).toPython()
+                #     z = g.value(of_pose, GEOM_COORD.z).toPython()
+
+                #     variables[of_pose_qname]["value"] = [x, y, z]
+
+                data["of"] = {
+                    "id": node_qname,
+                    "entity": of_qname,
+                    "type": "pose",
+                    "vector": f"{node_qname}_vector",
+                }
+                data["asb"] = asb_qname
+                data["wrt"] = wrt_qname
+
+            elif g[node : rdflib.RDF.type : GEOM_COORD.PositionCoordinate]:
                 data["type"] = "Position"
 
                 of_pos = g.value(node, GEOM_COORD.of)
@@ -126,7 +195,7 @@ class CoordinatesTranslator:
                 if g[node : rdflib.RDF.type : GEOM_ENT["1D"]]:
                     data["type"] = "Distance1D"
 
-                    axis_name = f"{of_dist_qname}_axis"
+                    axis_name = f"{node_qname}_axis"
 
                     variables[axis_name] = {
                         "type": "array",
@@ -151,7 +220,7 @@ class CoordinatesTranslator:
 
                 asb_qname = g.compute_qname(asb)[2]
 
-                variables[of_dist_qname] = {
+                variables[node_qname] = {
                     "type": None,
                     "dtype": "double",
                     "value": None,
@@ -171,7 +240,7 @@ class CoordinatesTranslator:
                     }
 
                 data["of"] = {
-                    "id": of_dist_qname,
+                    "id": node_qname,
                     "entities": dist_bw,
                 }
                 data["asb"] = asb_qname
@@ -212,7 +281,7 @@ class CoordinatesTranslator:
                     "value": vel_of_qname,
                 }
 
-                variables[f"{of_vel_qname}_vector_{suffix}"] = {
+                variables[f"{node_qname}_vector"] = {
                     "type": "array",
                     "size": 6,
                     "dtype": "double",
@@ -220,15 +289,15 @@ class CoordinatesTranslator:
                 }
 
                 data["of"] = {
-                    "id": f"of_vel_qname_{suffix}",
+                    "id": node_qname,
                     "entity": vel_of_qname,
                     "type": "twist",
-                    "vector": f"{of_vel_qname}_vector_{suffix}",
+                    "vector": f"{node_qname}_vector",
                 }
 
                 # TODO: units are not considered for now as it is assumed to be m/s and rad/s
 
-                variables[f"of_vel_qname_{suffix}"] = {
+                variables[node_qname] = {
                     "type": None,
                     "dtype": "double",
                     "value": None,

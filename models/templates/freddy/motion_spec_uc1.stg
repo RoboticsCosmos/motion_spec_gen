@@ -3,11 +3,12 @@ import "robots.stg"
 import "../common/includes.stg"
 import "../common/controllers.stg"
 import "../common/data_types.stg"
+import "../common/compute_variables.stg"
 import "../common/embed_maps.stg"
 import "../common/solvers.stg"
 import "../common/control_loop_freq.stg"
 
-application(variables, d) ::= <<
+application(variables, compute_variables, d) ::= <<
 <kelo_motion_control_include()>
 <cpp_include()>
 <controller_include()>
@@ -48,6 +49,13 @@ int main()
   // initialize variables
   <! variables !>
   <variables: {v | <variables_init(v, variables.(v))> }; separator="\n">
+
+  <! update robot state !>
+  get_robot_data(&robot);
+
+  // update compute variables
+  <! cmpute variables !>
+  <compute_variables: {v | <compute_variables_init(v, compute_variables.(v))> }; separator="\n">
 
   int count = 0;
   <initialize_control_loop_freq()>

@@ -1,0 +1,1125 @@
+{
+  "variables": {
+    "kr_bl_position_lin_x_pid_controller_signal": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_position_coord_lin_x_initial": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_position_coord_lin_x_initial_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "kinova_right_bracelet_link": {
+      "type": null,
+      "dtype": "string",
+      "value": "kinova_right_bracelet_link"
+    },
+    "base_link": {
+      "type": null,
+      "dtype": "string",
+      "value": "base_link"
+    },
+    "kr_bl_position_coord_lin_x": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_position_coord_lin_x_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "kr_bl_position_lin_x_pid_controller_time_step": {
+      "type": null,
+      "dtype": "double",
+      "value": "1"
+    },
+    "kr_bl_position_lin_x_pid_controller_kp": {
+      "type": null,
+      "dtype": "double",
+      "value": "10.0"
+    },
+    "kr_bl_position_lin_x_pid_controller_ki": {
+      "type": null,
+      "dtype": "double",
+      "value": "0.9"
+    },
+    "kr_bl_position_lin_x_pid_controller_kd": {
+      "type": null,
+      "dtype": "double",
+      "value": "1.0"
+    },
+    "kr_bl_position_lin_x_pid_controller_error_sum": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_position_lin_x_pid_controller_prev_error": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_position_lin_x_twist_embed_map_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "kr_bl_position_lin_y_pid_controller_signal": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_position_coord_lin_y_initial": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_position_coord_lin_y_initial_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "kr_bl_position_coord_lin_y": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_position_coord_lin_y_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "kr_bl_position_lin_y_pid_controller_time_step": {
+      "type": null,
+      "dtype": "double",
+      "value": "1"
+    },
+    "kr_bl_position_lin_y_pid_controller_kp": {
+      "type": null,
+      "dtype": "double",
+      "value": "10.0"
+    },
+    "kr_bl_position_lin_y_pid_controller_ki": {
+      "type": null,
+      "dtype": "double",
+      "value": "0.9"
+    },
+    "kr_bl_position_lin_y_pid_controller_kd": {
+      "type": null,
+      "dtype": "double",
+      "value": "1.0"
+    },
+    "kr_bl_position_lin_y_pid_controller_error_sum": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_position_lin_y_pid_controller_prev_error": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_position_lin_y_twist_embed_map_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "kr_bl_position_lin_z_pid_controller_signal": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_position_coord_lin_z_initial": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_position_coord_lin_z_initial_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    "kr_bl_position_coord_lin_z": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_position_coord_lin_z_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    "kr_bl_position_lin_z_pid_controller_time_step": {
+      "type": null,
+      "dtype": "double",
+      "value": "1"
+    },
+    "kr_bl_position_lin_z_pid_controller_kp": {
+      "type": null,
+      "dtype": "double",
+      "value": "10.0"
+    },
+    "kr_bl_position_lin_z_pid_controller_ki": {
+      "type": null,
+      "dtype": "double",
+      "value": "0.9"
+    },
+    "kr_bl_position_lin_z_pid_controller_kd": {
+      "type": null,
+      "dtype": "double",
+      "value": "1.0"
+    },
+    "kr_bl_position_lin_z_pid_controller_error_sum": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_position_lin_z_pid_controller_prev_error": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_position_lin_z_twist_embed_map_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "kr_bl_orientation_ang_x_pid_controller_signal": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_orientation_coord_ang_x_initial": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_orientation_coord_ang_x_initial_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        0
+      ]
+    },
+    "kr_bl_orientation_coord_ang_x": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_orientation_coord_ang_x_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        0
+      ]
+    },
+    "kr_bl_orientation_ang_x_pid_controller_time_step": {
+      "type": null,
+      "dtype": "double",
+      "value": "1"
+    },
+    "kr_bl_orientation_ang_x_pid_controller_kp": {
+      "type": null,
+      "dtype": "double",
+      "value": "10.0"
+    },
+    "kr_bl_orientation_ang_x_pid_controller_ki": {
+      "type": null,
+      "dtype": "double",
+      "value": "0.9"
+    },
+    "kr_bl_orientation_ang_x_pid_controller_kd": {
+      "type": null,
+      "dtype": "double",
+      "value": "1.0"
+    },
+    "kr_bl_orientation_ang_x_pid_controller_error_sum": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_orientation_ang_x_pid_controller_prev_error": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_orientation_ang_x_twist_embed_map_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ]
+    },
+    "kr_bl_orientation_ang_y_pid_controller_signal": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_orientation_coord_ang_y_initial": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_orientation_coord_ang_y_initial_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+      ]
+    },
+    "kr_bl_orientation_coord_ang_y": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_orientation_coord_ang_y_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+      ]
+    },
+    "kr_bl_orientation_ang_y_pid_controller_time_step": {
+      "type": null,
+      "dtype": "double",
+      "value": "1"
+    },
+    "kr_bl_orientation_ang_y_pid_controller_kp": {
+      "type": null,
+      "dtype": "double",
+      "value": "10.0"
+    },
+    "kr_bl_orientation_ang_y_pid_controller_ki": {
+      "type": null,
+      "dtype": "double",
+      "value": "0.9"
+    },
+    "kr_bl_orientation_ang_y_pid_controller_kd": {
+      "type": null,
+      "dtype": "double",
+      "value": "1.0"
+    },
+    "kr_bl_orientation_ang_y_pid_controller_error_sum": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_orientation_ang_y_pid_controller_prev_error": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_orientation_ang_y_twist_embed_map_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ]
+    },
+    "kr_bl_orientation_ang_z_pid_controller_signal": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_orientation_coord_ang_z_initial": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_orientation_coord_ang_z_initial_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ]
+    },
+    "kr_bl_orientation_coord_ang_z": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_orientation_coord_ang_z_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ]
+    },
+    "kr_bl_orientation_ang_z_pid_controller_time_step": {
+      "type": null,
+      "dtype": "double",
+      "value": "1"
+    },
+    "kr_bl_orientation_ang_z_pid_controller_kp": {
+      "type": null,
+      "dtype": "double",
+      "value": "20.0"
+    },
+    "kr_bl_orientation_ang_z_pid_controller_ki": {
+      "type": null,
+      "dtype": "double",
+      "value": "1.5"
+    },
+    "kr_bl_orientation_ang_z_pid_controller_kd": {
+      "type": null,
+      "dtype": "double",
+      "value": "2.0"
+    },
+    "kr_bl_orientation_ang_z_pid_controller_error_sum": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_orientation_ang_z_pid_controller_prev_error": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_orientation_ang_z_twist_embed_map_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    },
+    "kr_elbow_base_base_distance_z_impedance_controller_signal": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_elbow_base_base_distance_z_impedance_controller_stiffness_diag_mat": {
+      "type": "array",
+      "size": 1,
+      "dtype": "double",
+      "value": [
+        200.0
+      ]
+    },
+    "kr_elbow_base_z_distance_reference_value": {
+      "type": null,
+      "dtype": "double",
+      "value": "1.1"
+    },
+    "kr_elbow_base_distance_coord_lin_z_axis": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0,
+        0,
+        1
+      ]
+    },
+    "kr_elbow_base_distance_coord_lin_z": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kinova_right_half_arm_2_link": {
+      "type": null,
+      "dtype": "string",
+      "value": "kinova_right_half_arm_2_link"
+    },
+    "kr_elbow_base_base_distance_z_embed_map_vector": {
+      "type": "array",
+      "size": 3,
+      "dtype": "double",
+      "value": [
+        0.0,
+        0.0,
+        1.0
+      ]
+    },
+    "kr_achd_solver_root_acceleration": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        -9.685,
+        -1.033,
+        1.324,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "kinova_right_base_link": {
+      "type": null,
+      "dtype": "string",
+      "value": "kinova_right_base_link"
+    },
+    "kr_bl_position_lin_x_twist_embed_map_kr_achd_solver_output_acceleration_energy": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_position_lin_y_twist_embed_map_kr_achd_solver_output_acceleration_energy": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_position_lin_z_twist_embed_map_kr_achd_solver_output_acceleration_energy": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_orientation_ang_x_twist_embed_map_kr_achd_solver_output_acceleration_energy": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_orientation_ang_y_twist_embed_map_kr_achd_solver_output_acceleration_energy": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_orientation_ang_z_twist_embed_map_kr_achd_solver_output_acceleration_energy": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_achd_solver_nc": {
+      "type": null,
+      "dtype": "int",
+      "value": 6
+    },
+    "kr_achd_solver_nj": {
+      "type": null,
+      "dtype": "int",
+      "value": 7
+    },
+    "kr_achd_solver_alpha": {
+      "type": "array_2d",
+      "rows": 6,
+      "cols": 6,
+      "dtype": "double",
+      "value": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    "kr_achd_solver_feed_forward_torques": {
+      "type": "array",
+      "size": 7,
+      "dim": 1,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_achd_solver_predicted_accelerations": {
+      "type": "array",
+      "size": 7,
+      "dim": 1,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_achd_solver_output_torques": {
+      "type": "array",
+      "size": 7,
+      "dim": 1,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_elbow_base_base_distance_z_embed_map_kr_achd_solver_fext_output_external_wrench": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_achd_solver_fext_nj": {
+      "type": null,
+      "dtype": "int",
+      "value": 7
+    },
+    "kr_achd_solver_fext_output_torques": {
+      "type": "array",
+      "size": 7,
+      "dim": 1,
+      "dtype": "double",
+      "value": null
+    }
+  },
+  "compute_variables": {
+    "kr_bl_position_coord_lin_x_initial": {
+      "measured": {
+        "of": {
+          "id": "kr_bl_position_coord_lin_x_initial",
+          "entity": "kinova_right_bracelet_link",
+          "type": "pose",
+          "vector": "kr_bl_position_coord_lin_x_initial_vector"
+        },
+        "asb": "base_link",
+        "wrt": "base_link"
+      },
+      "measure_variable": "computeForwardPoseKinematics"
+    },
+    "kr_bl_position_coord_lin_y_initial": {
+      "measured": {
+        "of": {
+          "id": "kr_bl_position_coord_lin_y_initial",
+          "entity": "kinova_right_bracelet_link",
+          "type": "pose",
+          "vector": "kr_bl_position_coord_lin_y_initial_vector"
+        },
+        "asb": "base_link",
+        "wrt": "base_link"
+      },
+      "measure_variable": "computeForwardPoseKinematics"
+    },
+    "kr_bl_position_coord_lin_z_initial": {
+      "measured": {
+        "of": {
+          "id": "kr_bl_position_coord_lin_z_initial",
+          "entity": "kinova_right_bracelet_link",
+          "type": "pose",
+          "vector": "kr_bl_position_coord_lin_z_initial_vector"
+        },
+        "asb": "base_link",
+        "wrt": "base_link"
+      },
+      "measure_variable": "computeForwardPoseKinematics"
+    },
+    "kr_bl_orientation_coord_ang_x_initial": {
+      "measured": {
+        "of": {
+          "id": "kr_bl_orientation_coord_ang_x_initial",
+          "entity": "kinova_right_bracelet_link",
+          "type": "pose",
+          "vector": "kr_bl_orientation_coord_ang_x_initial_vector"
+        },
+        "asb": "base_link",
+        "wrt": "base_link"
+      },
+      "measure_variable": "computeForwardPoseKinematics"
+    },
+    "kr_bl_orientation_coord_ang_y_initial": {
+      "measured": {
+        "of": {
+          "id": "kr_bl_orientation_coord_ang_y_initial",
+          "entity": "kinova_right_bracelet_link",
+          "type": "pose",
+          "vector": "kr_bl_orientation_coord_ang_y_initial_vector"
+        },
+        "asb": "base_link",
+        "wrt": "base_link"
+      },
+      "measure_variable": "computeForwardPoseKinematics"
+    },
+    "kr_bl_orientation_coord_ang_z_initial": {
+      "measured": {
+        "of": {
+          "id": "kr_bl_orientation_coord_ang_z_initial",
+          "entity": "kinova_right_bracelet_link",
+          "type": "pose",
+          "vector": "kr_bl_orientation_coord_ang_z_initial_vector"
+        },
+        "asb": "base_link",
+        "wrt": "base_link"
+      },
+      "measure_variable": "computeForwardPoseKinematics"
+    }
+  },
+  "d": {
+    "monitors": {
+      "pre": {},
+      "post": {}
+    },
+    "controllers": {
+      "kr_bl_position_lin_x_pid_controller": {
+        "measured": {
+          "wrt": "base_link",
+          "of": {
+            "id": "kr_bl_position_coord_lin_x",
+            "entity": "kinova_right_bracelet_link",
+            "type": "pose",
+            "vector": "kr_bl_position_coord_lin_x_vector"
+          },
+          "asb": "base_link"
+        },
+        "operator": "Equal",
+        "reference_value": "kr_bl_position_coord_lin_x_initial",
+        "name": "pid_controller",
+        "error": "kr_bl_position_lin_x_pid_controller_error",
+        "measure_variable": "computeForwardPoseKinematics",
+        "dt": "kr_bl_position_lin_x_pid_controller_time_step",
+        "gains": {
+          "kp": "kr_bl_position_lin_x_pid_controller_kp",
+          "ki": "kr_bl_position_lin_x_pid_controller_ki",
+          "kd": "kr_bl_position_lin_x_pid_controller_kd"
+        },
+        "signal": "kr_bl_position_lin_x_pid_controller_signal",
+        "vector": "kr_bl_position_lin_x_twist_embed_map_vector",
+        "error_sum": "kr_bl_position_lin_x_pid_controller_error_sum",
+        "last_error": "kr_bl_position_lin_x_pid_controller_prev_error"
+      },
+      "kr_bl_position_lin_y_pid_controller": {
+        "measured": {
+          "wrt": "base_link",
+          "of": {
+            "id": "kr_bl_position_coord_lin_y",
+            "entity": "kinova_right_bracelet_link",
+            "type": "pose",
+            "vector": "kr_bl_position_coord_lin_y_vector"
+          },
+          "asb": "base_link"
+        },
+        "operator": "Equal",
+        "reference_value": "kr_bl_position_coord_lin_y_initial",
+        "name": "pid_controller",
+        "error": "kr_bl_position_lin_y_pid_controller_error",
+        "measure_variable": "computeForwardPoseKinematics",
+        "dt": "kr_bl_position_lin_y_pid_controller_time_step",
+        "gains": {
+          "kp": "kr_bl_position_lin_y_pid_controller_kp",
+          "ki": "kr_bl_position_lin_y_pid_controller_ki",
+          "kd": "kr_bl_position_lin_y_pid_controller_kd"
+        },
+        "signal": "kr_bl_position_lin_y_pid_controller_signal",
+        "vector": "kr_bl_position_lin_y_twist_embed_map_vector",
+        "error_sum": "kr_bl_position_lin_y_pid_controller_error_sum",
+        "last_error": "kr_bl_position_lin_y_pid_controller_prev_error"
+      },
+      "kr_bl_position_lin_z_pid_controller": {
+        "measured": {
+          "wrt": "base_link",
+          "of": {
+            "id": "kr_bl_position_coord_lin_z",
+            "entity": "kinova_right_bracelet_link",
+            "type": "pose",
+            "vector": "kr_bl_position_coord_lin_z_vector"
+          },
+          "asb": "base_link"
+        },
+        "operator": "Equal",
+        "reference_value": "kr_bl_position_coord_lin_z_initial",
+        "name": "pid_controller",
+        "error": "kr_bl_position_lin_z_pid_controller_error",
+        "measure_variable": "computeForwardPoseKinematics",
+        "dt": "kr_bl_position_lin_z_pid_controller_time_step",
+        "gains": {
+          "kp": "kr_bl_position_lin_z_pid_controller_kp",
+          "ki": "kr_bl_position_lin_z_pid_controller_ki",
+          "kd": "kr_bl_position_lin_z_pid_controller_kd"
+        },
+        "signal": "kr_bl_position_lin_z_pid_controller_signal",
+        "vector": "kr_bl_position_lin_z_twist_embed_map_vector",
+        "error_sum": "kr_bl_position_lin_z_pid_controller_error_sum",
+        "last_error": "kr_bl_position_lin_z_pid_controller_prev_error"
+      },
+      "kr_bl_orientation_ang_x_pid_controller": {
+        "measured": {
+          "wrt": "base_link",
+          "of": {
+            "id": "kr_bl_orientation_coord_ang_x",
+            "entity": "kinova_right_bracelet_link",
+            "type": "pose",
+            "vector": "kr_bl_orientation_coord_ang_x_vector"
+          },
+          "asb": "base_link"
+        },
+        "operator": "Equal",
+        "reference_value": "kr_bl_orientation_coord_ang_x_initial",
+        "name": "pid_controller",
+        "error": "kr_bl_orientation_ang_x_pid_controller_error",
+        "measure_variable": "computeForwardPoseKinematics",
+        "dt": "kr_bl_orientation_ang_x_pid_controller_time_step",
+        "gains": {
+          "kp": "kr_bl_orientation_ang_x_pid_controller_kp",
+          "ki": "kr_bl_orientation_ang_x_pid_controller_ki",
+          "kd": "kr_bl_orientation_ang_x_pid_controller_kd"
+        },
+        "signal": "kr_bl_orientation_ang_x_pid_controller_signal",
+        "vector": "kr_bl_orientation_ang_x_twist_embed_map_vector",
+        "error_sum": "kr_bl_orientation_ang_x_pid_controller_error_sum",
+        "last_error": "kr_bl_orientation_ang_x_pid_controller_prev_error"
+      },
+      "kr_bl_orientation_ang_y_pid_controller": {
+        "measured": {
+          "wrt": "base_link",
+          "of": {
+            "id": "kr_bl_orientation_coord_ang_y",
+            "entity": "kinova_right_bracelet_link",
+            "type": "pose",
+            "vector": "kr_bl_orientation_coord_ang_y_vector"
+          },
+          "asb": "base_link"
+        },
+        "operator": "Equal",
+        "reference_value": "kr_bl_orientation_coord_ang_y_initial",
+        "name": "pid_controller",
+        "error": "kr_bl_orientation_ang_y_pid_controller_error",
+        "measure_variable": "computeForwardPoseKinematics",
+        "dt": "kr_bl_orientation_ang_y_pid_controller_time_step",
+        "gains": {
+          "kp": "kr_bl_orientation_ang_y_pid_controller_kp",
+          "ki": "kr_bl_orientation_ang_y_pid_controller_ki",
+          "kd": "kr_bl_orientation_ang_y_pid_controller_kd"
+        },
+        "signal": "kr_bl_orientation_ang_y_pid_controller_signal",
+        "vector": "kr_bl_orientation_ang_y_twist_embed_map_vector",
+        "error_sum": "kr_bl_orientation_ang_y_pid_controller_error_sum",
+        "last_error": "kr_bl_orientation_ang_y_pid_controller_prev_error"
+      },
+      "kr_bl_orientation_ang_z_pid_controller": {
+        "measured": {
+          "wrt": "base_link",
+          "of": {
+            "id": "kr_bl_orientation_coord_ang_z",
+            "entity": "kinova_right_bracelet_link",
+            "type": "pose",
+            "vector": "kr_bl_orientation_coord_ang_z_vector"
+          },
+          "asb": "base_link"
+        },
+        "operator": "Equal",
+        "reference_value": "kr_bl_orientation_coord_ang_z_initial",
+        "name": "pid_controller",
+        "error": "kr_bl_orientation_ang_z_pid_controller_error",
+        "measure_variable": "computeForwardPoseKinematics",
+        "dt": "kr_bl_orientation_ang_z_pid_controller_time_step",
+        "gains": {
+          "kp": "kr_bl_orientation_ang_z_pid_controller_kp",
+          "ki": "kr_bl_orientation_ang_z_pid_controller_ki",
+          "kd": "kr_bl_orientation_ang_z_pid_controller_kd"
+        },
+        "signal": "kr_bl_orientation_ang_z_pid_controller_signal",
+        "vector": "kr_bl_orientation_ang_z_twist_embed_map_vector",
+        "error_sum": "kr_bl_orientation_ang_z_pid_controller_error_sum",
+        "last_error": "kr_bl_orientation_ang_z_pid_controller_prev_error"
+      },
+      "kr_elbow_base_base_distance_z_impedance_controller": {
+        "operator": "Equal",
+        "stiffness": {
+          "error": "kr_elbow_base_base_distance_z_impedance_controller_stiffness_error",
+          "reference_value": "kr_elbow_base_z_distance_reference_value",
+          "measure_variable": "computeDistance1D",
+          "diag_mat": "kr_elbow_base_base_distance_z_impedance_controller_stiffness_diag_mat",
+          "measured": {
+            "of": {
+              "id": "kr_elbow_base_distance_coord_lin_z",
+              "entities": [
+                "kinova_right_half_arm_2_link",
+                "base_link"
+              ],
+              "axis": "kr_elbow_base_distance_coord_lin_z_axis"
+            },
+            "asb": "base_link"
+          }
+        },
+        "force": {
+          "id": "kr_elbow_force_z",
+          "applied_to": "kinova_right_half_arm_2_link"
+        },
+        "name": "impedance_controller",
+        "damping": null,
+        "signal": "kr_elbow_base_base_distance_z_impedance_controller_signal",
+        "vector": "kr_elbow_base_base_distance_z_embed_map_vector"
+      }
+    },
+    "embed_maps": {
+      "kr_achd_solver": [
+        {
+          "name": "embed_map",
+          "input": "kr_bl_position_lin_x_pid_controller_signal",
+          "output": "kr_bl_position_lin_x_twist_embed_map_kr_achd_solver_output_acceleration_energy",
+          "output_type": "acceleration-energy",
+          "vector": "kr_bl_position_lin_x_twist_embed_map_vector",
+          "vector_info": null,
+          "return": null
+        },
+        {
+          "name": "embed_map",
+          "input": "kr_bl_position_lin_y_pid_controller_signal",
+          "output": "kr_bl_position_lin_y_twist_embed_map_kr_achd_solver_output_acceleration_energy",
+          "output_type": "acceleration-energy",
+          "vector": "kr_bl_position_lin_y_twist_embed_map_vector",
+          "vector_info": null,
+          "return": null
+        },
+        {
+          "name": "embed_map",
+          "input": "kr_bl_position_lin_z_pid_controller_signal",
+          "output": "kr_bl_position_lin_z_twist_embed_map_kr_achd_solver_output_acceleration_energy",
+          "output_type": "acceleration-energy",
+          "vector": "kr_bl_position_lin_z_twist_embed_map_vector",
+          "vector_info": null,
+          "return": null
+        },
+        {
+          "name": "embed_map",
+          "input": "kr_bl_orientation_ang_x_pid_controller_signal",
+          "output": "kr_bl_orientation_ang_x_twist_embed_map_kr_achd_solver_output_acceleration_energy",
+          "output_type": "acceleration-energy",
+          "vector": "kr_bl_orientation_ang_x_twist_embed_map_vector",
+          "vector_info": null,
+          "return": null
+        },
+        {
+          "name": "embed_map",
+          "input": "kr_bl_orientation_ang_y_pid_controller_signal",
+          "output": "kr_bl_orientation_ang_y_twist_embed_map_kr_achd_solver_output_acceleration_energy",
+          "output_type": "acceleration-energy",
+          "vector": "kr_bl_orientation_ang_y_twist_embed_map_vector",
+          "vector_info": null,
+          "return": null
+        },
+        {
+          "name": "embed_map",
+          "input": "kr_bl_orientation_ang_z_pid_controller_signal",
+          "output": "kr_bl_orientation_ang_z_twist_embed_map_kr_achd_solver_output_acceleration_energy",
+          "output_type": "acceleration-energy",
+          "vector": "kr_bl_orientation_ang_z_twist_embed_map_vector",
+          "vector_info": null,
+          "return": null
+        }
+      ],
+      "kr_achd_solver_fext": [
+        {
+          "output_wrench_applied_to": "kinova_right_half_arm_2_link",
+          "name": "embed_map",
+          "input": "kr_elbow_base_base_distance_z_impedance_controller_signal",
+          "output": "kr_elbow_base_base_distance_z_embed_map_kr_achd_solver_fext_output_external_wrench",
+          "output_type": "external-wrench",
+          "vector": "kr_elbow_base_base_distance_z_embed_map_vector",
+          "vector_info": null,
+          "return": null
+        }
+      ]
+    },
+    "solvers": {
+      "kr_achd_solver": {
+        "name": "achd_solver",
+        "root_acceleration": "kr_achd_solver_root_acceleration",
+        "alpha": "kr_achd_solver_alpha",
+        "beta": [
+          "kr_bl_position_lin_x_twist_embed_map_kr_achd_solver_output_acceleration_energy",
+          "kr_bl_position_lin_y_twist_embed_map_kr_achd_solver_output_acceleration_energy",
+          "kr_bl_position_lin_z_twist_embed_map_kr_achd_solver_output_acceleration_energy",
+          "kr_bl_orientation_ang_x_twist_embed_map_kr_achd_solver_output_acceleration_energy",
+          "kr_bl_orientation_ang_y_twist_embed_map_kr_achd_solver_output_acceleration_energy",
+          "kr_bl_orientation_ang_z_twist_embed_map_kr_achd_solver_output_acceleration_energy"
+        ],
+        "ext_wrench": [],
+        "nc": "kr_achd_solver_nc",
+        "nj": "kr_achd_solver_nj",
+        "ns": "kr_achd_solver_ns",
+        "tau_ff": "kr_achd_solver_feed_forward_torques",
+        "output_torques": "kr_achd_solver_output_torques",
+        "predicted_accelerations": "kr_achd_solver_predicted_accelerations",
+        "root_link": "kinova_right_base_link",
+        "tip_link": "kinova_right_bracelet_link",
+        "return": null
+      },
+      "kr_achd_solver_fext": {
+        "name": "achd_solver_fext",
+        "root_link": "kinova_right_base_link",
+        "tip_link": "kinova_right_bracelet_link",
+        "ext_wrench": [
+          {
+            "link": "kinova_right_half_arm_2_link",
+            "wrench": "kr_elbow_base_base_distance_z_embed_map_kr_achd_solver_fext_output_external_wrench"
+          }
+        ],
+        "nj": "kr_achd_solver_fext_nj",
+        "ns": "kr_achd_solver_fext_ns",
+        "output_torques": "kr_achd_solver_fext_output_torques",
+        "predicted_accelerations": null,
+        "return": null
+      }
+    },
+    "robots": {
+      "kinova_right": {
+        "type": "Manipulator",
+        "kinematic_chain_start": "kinova_right_base_link",
+        "kinematic_chain_end": "kinova_right_bracelet_link",
+        "input_command_torques": [
+          "kr_achd_solver_output_torques",
+          "kr_achd_solver_fext_output_torques"
+        ]
+      }
+    }
+  }
+}

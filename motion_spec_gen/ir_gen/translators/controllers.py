@@ -24,6 +24,7 @@ class PIDControllerTranslator:
 
     def translate(self, g: rdflib.Graph, node) -> dict:
 
+        compute_variables = {}
         variables = {}
         data = {
             "measured": {},
@@ -67,19 +68,59 @@ class PIDControllerTranslator:
             if reference_value is None:
                 raise ValueError("Reference value not found")
 
-            # TODO: check quantity kind of reference value is same as that of the quantity
-            rv_quant_kind = g.value(reference_value, QUDT.hasQuantityKind)
+            if g[reference_value : rdflib.RDF.type : QUDT.Quantity]:
 
-            unit = g.value(reference_value, QUDT.unit)
-            value = g.value(reference_value, QUDT["value"])
+                # TODO: check quantity kind of reference value is same as that of the quantity
+                rv_quant_kind = g.value(reference_value, QUDT.hasQuantityKind)
 
-            ref_val_id = g.compute_qname(reference_value)[2]
-            variables[ref_val_id] = {
-                "type": None,
-                "dtype": "double",
-                "value": value,
-            }
-            data["reference_value"] = ref_val_id
+                unit = g.value(reference_value, QUDT.unit)
+                value = g.value(reference_value, QUDT["value"])
+
+                ref_val_id = g.compute_qname(reference_value)[2]
+                variables[ref_val_id] = {
+                    "type": None,
+                    "dtype": "double",
+                    "value": value,
+                }
+                data["reference_value"] = ref_val_id
+
+            else:
+                # *assumption*: will be a coordinate
+                ref_coord_ir = CoordinatesTranslator().translate(
+                    g, reference_value, prefix=""
+                )
+
+                # print(f'ref {reference_value} coord vars: {ref_coord_ir["variables"]}')
+                ref_coord_var_id = ref_coord_ir["data"]["of"]["id"]
+                if ref_coord_ir["variables"][ref_coord_var_id]["value"] is None:
+
+                    # pop the value from variables
+                    ref_coord_var = ref_coord_ir["variables"].pop(ref_coord_var_id)
+
+                    ref_coord_var = {
+                        "type": None,
+                        "dtype": "double",
+                        "value": None,
+                    }
+
+                    variables[ref_coord_var_id] = ref_coord_var
+
+                    if ref_coord_ir["data"]["type"] == "Pose":
+                        measure_variable = "computeForwardPoseKinematics"
+
+                    # add it to compute_variables
+                    compute_variables[ref_coord_var_id] = {
+                        "measured": {
+                            "of": ref_coord_ir["data"]["of"],
+                            "asb": ref_coord_ir["data"]["asb"],
+                            "wrt": ref_coord_ir["data"]["wrt"],
+                        },
+                        "measure_variable": measure_variable,
+                    }
+
+                    data["reference_value"] = ref_coord_var_id
+
+                variables.update(ref_coord_ir["variables"])
 
         else:
             raise ValueError("Operator type not supported")
@@ -90,10 +131,14 @@ class PIDControllerTranslator:
 
         coord_type = measured_coord_ir["data"]["type"]
 
-        if coord_type == "VelocityTwist":
-            measure_variable = "computeForwardVelocityKinematics"
-
+        if coord_type == "Pose":
+            measure_variable = "computeForwardPoseKinematics"
             data["measured"]["wrt"] = measured_coord_ir["data"]["wrt"]
+
+        elif coord_type == "VelocityTwist":
+            measure_variable = "computeForwardVelocityKinematics"
+            data["measured"]["wrt"] = measured_coord_ir["data"]["wrt"]
+
         elif coord_type == "Force":
             measure_variable = "computeForce"
 
@@ -167,16 +212,11 @@ class PIDControllerTranslator:
         data["error_sum"] = f"{id}_error_sum"
         data["last_error"] = f"{id}_prev_error"
 
-        # TODO: this is just a temp hack
-        if "kinova_left" in id:
-            data["robot"] = "kinova_left"
-        elif "kinova_right" in id:
-            data["robot"] = "kinova_right"
-
         return {
             "id": id,
             "data": data,
             "variables": variables,
+            "compute_variables": compute_variables,
         }
 
 
@@ -256,9 +296,11 @@ class ImpedanceControllerTranslator:
 
             else:
                 raise ValueError("Operator type not supported")
-            
+
             # measured coordinate
-            measured_coord_ir = CoordinatesTranslator().translate(g, quantity, prefix="")
+            measured_coord_ir = CoordinatesTranslator().translate(
+                g, quantity, prefix=""
+            )
             variables.update(measured_coord_ir["variables"])
 
             coord_type = measured_coord_ir["data"]["type"]
@@ -319,4 +361,3 @@ class ImpedanceControllerTranslator:
             "data": data,
             "variables": variables,
         }
-

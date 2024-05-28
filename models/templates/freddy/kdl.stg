@@ -25,6 +25,10 @@ init_Manipulator_struct(robot) ::= <<
 initialize_manipulator_state(<robot>_chain.getNrOfJoints(), <robot>_chain.getNrOfSegments(), &<robot>_state);
 >>
 
+computeForwardPoseKinematics(measured, data) ::= <<
+getLinkPose(<measured.of.entity>, <measured.asb>, <measured.wrt>, <measured.of.vector>, &robot, <measured.of.id>);
+>>
+
 computeForwardVelocityKinematics(measured, data) ::= <<
 getLinkVelocity(<measured.of.entity>, <measured.asb>, <measured.wrt>, <measured.of.vector>, &robot, <measured.of.id>);
 >>
