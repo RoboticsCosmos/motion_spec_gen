@@ -767,7 +767,7 @@ int main()
 
     if (!kinova_left_torque_control_mode_set)
     {
-      robot.kinova_left->mediator->set_control_mode(2);
+      robot.kinova_left->mediator->set_control_mode(2, nullptr);
       kinova_left_torque_control_mode_set = true;
     }
     set_manipulator_torques(&robot, kinova_left_base_link, &kinova_left_cmd_tau_kdl);

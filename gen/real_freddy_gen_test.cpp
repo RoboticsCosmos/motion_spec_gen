@@ -218,7 +218,7 @@ int main()
 
     if (kinova_right_first_time)
     {
-      freddy.kinova_right->mediator->set_control_mode(2);
+      freddy.kinova_right->mediator->set_control_mode(2, nullptr);
       kinova_right_first_time = false;
     }
     set_manipulator_torques(&freddy, kinova_right_base_link, &kinova_right_jnt_tau);

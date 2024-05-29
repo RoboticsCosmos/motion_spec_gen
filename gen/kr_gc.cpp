@@ -310,7 +310,7 @@ int main()
     KDL::JntArray kinova_right_cmd_tau_kdl(7);
     cap_and_convert_torques(kinova_right_cmd_tau, 7, kinova_right_cmd_tau_kdl);
     if (!kinova_right_torque_control_mode_set) {
-      robot.kinova_right->mediator->set_control_mode(2);
+      robot.kinova_right->mediator->set_control_mode(2, nullptr);
       kinova_right_torque_control_mode_set = true;
     }
 
