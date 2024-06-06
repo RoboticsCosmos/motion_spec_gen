@@ -402,14 +402,12 @@ int main()
                       kl_bl_orientation_coord_ang_quat);
 
     // find diff using kdl
-    KDL::Rotation rot3 = KDL::Rotation::Quaternion(kl_bl_orientation_coord_ang_quat[0],
-                                     kl_bl_orientation_coord_ang_quat[1],
-                                     kl_bl_orientation_coord_ang_quat[2],
-                                     kl_bl_orientation_coord_ang_quat[3]);
-    KDL::Rotation rot4 = KDL::Rotation::Quaternion(kl_bl_orientation_coord_ang_quat_initial[0],
-                                      kl_bl_orientation_coord_ang_quat_initial[1],
-                                      kl_bl_orientation_coord_ang_quat_initial[2],
-                                      kl_bl_orientation_coord_ang_quat_initial[3]);
+    KDL::Rotation rot3 = KDL::Rotation::Quaternion(
+        kl_bl_orientation_coord_ang_quat[0], kl_bl_orientation_coord_ang_quat[1],
+        kl_bl_orientation_coord_ang_quat[2], kl_bl_orientation_coord_ang_quat[3]);
+    KDL::Rotation rot4 = KDL::Rotation::Quaternion(
+        kl_bl_orientation_coord_ang_quat_initial[0], kl_bl_orientation_coord_ang_quat_initial[1],
+        kl_bl_orientation_coord_ang_quat_initial[2], kl_bl_orientation_coord_ang_quat_initial[3]);
 
     KDL::Vector diff2 = KDL::diff(rot3, rot4);
 
@@ -801,7 +799,7 @@ int main()
         kr_achd_solver_beta, kr_achd_solver_beta, 6);
     add(kr_bl_orientation_ang_z_twist_embed_map_kr_achd_solver_output_acceleration_energy,
         kr_achd_solver_beta, kr_achd_solver_beta, 6);
-    
+
     double *kr_achd_solver_alpha_transf[kr_achd_solver_nc];
     for (size_t i = 0; i < kr_achd_solver_nc; i++)
     {
@@ -841,20 +839,20 @@ int main()
     add(kr_achd_solver_fext_output_torques, kinova_right_cmd_tau, kinova_right_cmd_tau, 7);
     KDL::JntArray kinova_right_cmd_tau_kdl(7);
     cap_and_convert_torques(kinova_right_cmd_tau, 7, kinova_right_cmd_tau_kdl);
-    
+
     double kinova_left_cmd_tau[7]{};
     add(kl_achd_solver_output_torques, kinova_left_cmd_tau, kinova_left_cmd_tau, 7);
     add(kl_achd_solver_fext_output_torques, kinova_left_cmd_tau, kinova_left_cmd_tau, 7);
     KDL::JntArray kinova_left_cmd_tau_kdl(7);
     cap_and_convert_torques(kinova_left_cmd_tau, 7, kinova_left_cmd_tau_kdl);
-    
+
     if (!kinova_left_torque_control_mode_set)
     {
       robot.kinova_left->mediator->set_control_mode(2, rne_output_torques_left);
       kinova_left_torque_control_mode_set = true;
     }
     set_manipulator_torques(&robot, kinova_left_base_link, &kinova_left_cmd_tau_kdl);
-    
+
     if (!kinova_right_torque_control_mode_set)
     {
       robot.kinova_right->mediator->set_control_mode(2, rne_output_torques_right);
