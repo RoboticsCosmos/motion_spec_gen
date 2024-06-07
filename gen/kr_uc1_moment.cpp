@@ -219,17 +219,19 @@ int main()
   rne_solver(&robot, kinova_right.base_frame, kinova_right.tool_frame,
              kr_achd_solver_root_acceleration, rne_ext_wrench_right, rne_output_torques_right);
 
-  
-  std::vector<std::array<double, 3>> base_odom_data;
+  // std::vector<std::array<double, 3>> base_odom_data;
+  // std::vector<std::array<double, 3>> base_vel_data;
 
-  const char *log_dir = "../../logs/data/odom";
-  char log_dir_name[100];
-  get_new_folder_name(log_dir, log_dir_name);
-  std::filesystem::create_directories(log_dir_name);
+  // const char *log_dir = "../../logs/data/odom";
+  // char log_dir_name[100];
+  // get_new_folder_name(log_dir, log_dir_name);
+  // std::filesystem::create_directories(log_dir_name);
 
-  const char *log_file = "base_odom_data.csv";
+  // const char *log_file = "base_odom_data.csv";
+  // const char *log_file1 = "base_vel_data.csv";
 
-  FILE *base_odom_file = fopen((std::string(log_dir_name) + "/" + log_file).c_str(), "w");
+  // FILE *base_odom_file = fopen((std::string(log_dir_name) + "/" + log_file).c_str(), "w");
+  // FILE *base_vel_file = fopen((std::string(log_dir_name) + "/" + log_file1).c_str(), "w");
 
   int count = 0;
   const double desired_frequency = 1000.0;                                             // Hz
@@ -241,7 +243,8 @@ int main()
 
     if (flag)
     {
-      write_odom_data_to_open_file(base_odom_file, base_odom_data);
+      // write_odom_data_to_open_file(base_odom_file, base_odom_data);
+      // write_odom_data_to_open_file(base_vel_file, base_vel_data);
 
       free_robot_data(&robot);
       printf("Exiting somewhat cleanly...\n");
@@ -253,27 +256,51 @@ int main()
 
     get_robot_data(&robot);
 
-    std::cout << "[base x]: ";
-    print_array(robot.mobile_base->state->x_platform, 3);
-    base_odom_data.push_back({robot.mobile_base->state->x_platform[0],
-                              robot.mobile_base->state->x_platform[1],
-                              robot.mobile_base->state->x_platform[2]});
+    double tool_wrench[6]{};
+    wrench_estimator(&robot, kinova_right.base_frame, kinova_right.tool_frame,
+                     kr_achd_solver_root_acceleration, robot.kinova_right->state->tau_measured,
+                     tool_wrench);
 
     double *kr_bl_vel = robot.kinova_right->state->s_dot[robot.kinova_right->state->ns - 1];
     double *kr_bl_vel_in_bl = new double[6];
     transformSdot(&robot, base_link, robot.kinova_right->tool_frame, kr_bl_vel, kr_bl_vel_in_bl);
 
+    // base odom
+    double base_wrt_world_pose[7]{};
+    base_wrt_world_pose[0] = robot.mobile_base->state->x_platform[0];
+    base_wrt_world_pose[1] = robot.mobile_base->state->x_platform[1];
+
+    KDL::Rotation rot = KDL::Rotation::RotZ(robot.mobile_base->state->x_platform[2]);
+
+    rot.GetQuaternion(base_wrt_world_pose[3], base_wrt_world_pose[4], base_wrt_world_pose[5],
+                      base_wrt_world_pose[6]);
+
+    double sample_pose[7]{};
+    double sample_pose_in_world[7]{};
+    transform_with_frame(sample_pose, base_wrt_world_pose, sample_pose_in_world);
+
     // controllers
     // pid controller
-    double ang_ref = 0.0;
+    getLinkQuaternion(kinova_right_bracelet_link, base_link, base_link, &robot,
+                      kr_bl_orientation_coord_ang_quat);
+
+    // find diff using kdl
+    KDL::Rotation rot1 = KDL::Rotation::Quaternion(
+        kr_bl_orientation_coord_ang_quat[0], kr_bl_orientation_coord_ang_quat[1],
+        kr_bl_orientation_coord_ang_quat[2], kr_bl_orientation_coord_ang_quat[3]);
+    KDL::Rotation rot2 = KDL::Rotation::Quaternion(
+        kr_bl_orientation_coord_ang_quat_initial[0], kr_bl_orientation_coord_ang_quat_initial[1],
+        kr_bl_orientation_coord_ang_quat_initial[2], kr_bl_orientation_coord_ang_quat_initial[3]);
+
+    KDL::Vector diff = KDL::diff(rot1, rot2);
 
     double kr_bl_orientation_ang_x_pid_controller_error = 0;
     double kr_bl_orientation_ang_y_pid_controller_error = 0;
     double kr_bl_orientation_ang_z_pid_controller_error = 0;
 
-    kr_bl_orientation_ang_x_pid_controller_error = ang_ref - kr_bl_vel_in_bl[3];
-    kr_bl_orientation_ang_y_pid_controller_error = ang_ref - kr_bl_vel_in_bl[4];
-    kr_bl_orientation_ang_z_pid_controller_error = ang_ref - kr_bl_vel_in_bl[5];
+    kr_bl_orientation_ang_x_pid_controller_error = diff.x();
+    kr_bl_orientation_ang_y_pid_controller_error = diff.y();
+    kr_bl_orientation_ang_z_pid_controller_error = diff.z();
 
     pidController(
         kr_bl_orientation_ang_x_pid_controller_error, kr_bl_orientation_ang_x_pid_controller_kp,
