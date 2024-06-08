@@ -9,12 +9,14 @@ extern "C"
 #include <filesystem>
 #include <iostream>
 #include <chrono>
+#include <csignal>
+
 #include <controllers/pid_controller.hpp>
 #include <motion_spec_utils/utils.hpp>
 #include <motion_spec_utils/math_utils.hpp>
 #include <motion_spec_utils/solver_utils.hpp>
 #include <kinova_mediator/mediator.hpp>
-#include <csignal>
+#include "motion_spec_utils/log_structs.hpp"
 
 volatile sig_atomic_t flag = 0;
 
@@ -187,6 +189,8 @@ int main()
   double kr_bl_orientation_coord_ang_z_initial_vector[6] = {0, 0, 0, 0, 0, 1};
   double kr_bl_orientation_ang_x_pid_controller_ki = 0.5;
 
+  double control_loop_dt = 0.001;
+
   get_robot_data(&robot);
   print_robot_data(&robot);
 
@@ -219,19 +223,13 @@ int main()
   rne_solver(&robot, kinova_right.base_frame, kinova_right.tool_frame,
              kr_achd_solver_root_acceleration, rne_ext_wrench_right, rne_output_torques_right);
 
-  // std::vector<std::array<double, 3>> base_odom_data;
-  // std::vector<std::array<double, 3>> base_vel_data;
 
-  // const char *log_dir = "../../logs/data/odom";
-  // char log_dir_name[100];
-  // get_new_folder_name(log_dir, log_dir_name);
-  // std::filesystem::create_directories(log_dir_name);
+  const char *log_dir = "../../logs/data/kr_uc1_world";
+  char log_dir_name[100];
+  get_new_folder_name(log_dir, log_dir_name);
+  std::filesystem::create_directories(log_dir_name);
 
-  // const char *log_file = "base_odom_data.csv";
-  // const char *log_file1 = "base_vel_data.csv";
-
-  // FILE *base_odom_file = fopen((std::string(log_dir_name) + "/" + log_file).c_str(), "w");
-  // FILE *base_vel_file = fopen((std::string(log_dir_name) + "/" + log_file1).c_str(), "w");
+  LogManipulatorDataVector kr_log_data_vector("kinova_right", log_dir_name);
 
   int count = 0;
   const double desired_frequency = 1000.0;                                             // Hz
@@ -243,8 +241,7 @@ int main()
 
     if (flag)
     {
-      // write_odom_data_to_open_file(base_odom_file, base_odom_data);
-      // write_odom_data_to_open_file(base_vel_file, base_vel_data);
+      kr_log_data_vector.writeToOpenFile();
 
       free_robot_data(&robot);
       printf("Exiting somewhat cleanly...\n");
@@ -254,7 +251,7 @@ int main()
     count++;
     // printf("count: %d\n", count);
 
-    get_robot_data(&robot);
+    get_robot_data(&robot, control_loop_dt);
 
     double tool_wrench[6]{};
     wrench_estimator(&robot, kinova_right.base_frame, kinova_right.tool_frame,
@@ -536,6 +533,9 @@ int main()
     add(kr_achd_solver_output_torques, kinova_right_cmd_tau, kinova_right_cmd_tau, 7);
     add(kr_achd_solver_fext_output_torques, kinova_right_cmd_tau, kinova_right_cmd_tau, 7);
 
+    kr_log_data_vector.addManipulatorData(robot.kinova_right, kr_achd_solver_beta, kinova_right_cmd_tau,
+                                          nullptr);
+
     KDL::JntArray kinova_right_cmd_tau_kdl(7);
     cap_and_convert_torques(kinova_right_cmd_tau, 7, kinova_right_cmd_tau_kdl);
 
@@ -550,11 +550,15 @@ int main()
     auto end_time = std::chrono::high_resolution_clock::now();
     auto elapsed_time = std::chrono::duration<double>(end_time - start_time);
 
+    control_loop_dt = elapsed_time.count();
+
     // if the elapsed time is less than the desired period, busy wait
     while (elapsed_time < desired_period)
     {
       end_time = std::chrono::high_resolution_clock::now();
       elapsed_time = std::chrono::duration<double>(end_time - start_time);
+
+      control_loop_dt = elapsed_time.count();
     }
   }
 

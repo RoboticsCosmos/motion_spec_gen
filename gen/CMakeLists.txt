@@ -43,9 +43,10 @@ foreach(source ${SOURCES})
   add_executable(${name} ${source})
   target_link_libraries(${name}
     Eigen3::Eigen 
-    motion_spec_utils::mutils 
     motion_spec_utils::math_utils 
     motion_spec_utils::solver_utils
+    motion_spec_utils::tf_utils
+    motion_spec_utils::mutils 
     controllers::pid_controller
     gsl
 	  gslcblas
