@@ -15,8 +15,9 @@ extern "C"
 #include <motion_spec_utils/utils.hpp>
 #include <motion_spec_utils/math_utils.hpp>
 #include <motion_spec_utils/solver_utils.hpp>
-#include <kinova_mediator/mediator.hpp>
+#include <motion_spec_utils/tf_utils.hpp>
 #include "motion_spec_utils/log_structs.hpp"
+#include <kinova_mediator/mediator.hpp>
 
 volatile sig_atomic_t flag = 0;
 
@@ -29,18 +30,18 @@ void handle_signal(int sig)
 int main()
 {
   // handle signals
-  struct sigaction sa;
-  sa.sa_handler = handle_signal;
-  sigemptyset(&sa.sa_mask);
-  sa.sa_flags = 0;
+  // struct sigaction sa;
+  // sa.sa_handler = handle_signal;
+  // sigemptyset(&sa.sa_mask);
+  // sa.sa_flags = 0;
 
-  for (int i = 1; i < NSIG; ++i)
-  {
-    if (sigaction(i, &sa, NULL) == -1)
-    {
-      perror("sigaction");
-    }
-  }
+  // for (int i = 1; i < NSIG; ++i)
+  // {
+  //   if (sigaction(i, &sa, NULL) == -1)
+  //   {
+  //     perror("sigaction");
+  //   }
+  // }
 
   // Initialize the robot structs
   Manipulator<kinova_mediator> kinova_right;
@@ -53,11 +54,14 @@ int main()
   KeloBaseConfig kelo_base_config;
   kelo_base_config.nWheels = 4;
   kelo_base_config.index_to_EtherCAT = new int[4]{6, 7, 3, 4};
-  kelo_base_config.radius = 0.052;
+  kelo_base_config.radius = 0.115 / 2;
   kelo_base_config.castor_offset = 0.01;
-  kelo_base_config.half_wheel_distance = 0.0275;
+  kelo_base_config.half_wheel_distance = 0.0775 / 2;
   kelo_base_config.wheel_coordinates =
-      new double[8]{0.175, 0.1605, -0.175, 0.1605, -0.175, -0.1605, 0.175, -0.1605};
+      new double[8]{0.188, 0.2075,
+                   -0.188, 0.2075, 
+                   -0.188, -0.2075, 
+                    0.188, -0.2075};
   kelo_base_config.pivot_angles_deviation = new double[4]{5.310, 5.533, 1.563, 1.625};
 
   MobileBase<Robile> freddy_base;
@@ -191,7 +195,7 @@ int main()
 
   double control_loop_dt = 0.001;
 
-  get_robot_data(&robot);
+  get_robot_data(&robot, control_loop_dt);
   print_robot_data(&robot);
 
   // update compute variables
@@ -224,16 +228,24 @@ int main()
              kr_achd_solver_root_acceleration, rne_ext_wrench_right, rne_output_torques_right);
 
 
-  const char *log_dir = "../../logs/data/kr_uc1_world";
+  std::string log_dir = "../../logs/data/kr_uc1_world";
   char log_dir_name[100];
-  get_new_folder_name(log_dir, log_dir_name);
+  get_new_folder_name(log_dir.c_str(), log_dir_name);
   std::filesystem::create_directories(log_dir_name);
+  std::filesystem::permissions(log_dir_name, std::filesystem::perms::all);
 
   LogManipulatorDataVector kr_log_data_vector("kinova_right", log_dir_name);
+  LogMobileBaseDataVector mobile_base_log_data_vector(log_dir_name);
 
   int count = 0;
   const double desired_frequency = 1000.0;                                             // Hz
   const auto desired_period = std::chrono::duration<double>(1.0 / desired_frequency);  // s
+
+  robot.mobile_base->state->x_platform = new double[3] {0.0, 0.0, 0.0};
+  robot.mobile_base->state->xd_platform = new double[3] {0.0, 0.0, 0.0};
+
+  std::cout << "odom: " << robot.mobile_base->state->x_platform[0] << " " << robot.mobile_base->state->x_platform[1] << " "
+              << RAD2DEG(robot.mobile_base->state->x_platform[2]) << std::endl;
 
   while (true)
   {
@@ -242,6 +254,7 @@ int main()
     if (flag)
     {
       kr_log_data_vector.writeToOpenFile();
+      mobile_base_log_data_vector.writeToOpenFile();
 
       free_robot_data(&robot);
       printf("Exiting somewhat cleanly...\n");
@@ -251,7 +264,16 @@ int main()
     count++;
     // printf("count: %d\n", count);
 
+    if (count == 0)
+    {
+      robot.mobile_base->state->x_platform = new double[3] {0.0, 0.0, 0.0};
+      robot.mobile_base->state->xd_platform = new double[3] {0.0, 0.0, 0.0};
+    }
+
     get_robot_data(&robot, control_loop_dt);
+
+    mobile_base_log_data_vector.addMobileBaseData(robot.mobile_base, robot.mobile_base->state->x_platform,
+                                                  robot.mobile_base->state->xd_platform);
 
     double tool_wrench[6]{};
     wrench_estimator(&robot, kinova_right.base_frame, kinova_right.tool_frame,
@@ -263,18 +285,43 @@ int main()
     transformSdot(&robot, base_link, robot.kinova_right->tool_frame, kr_bl_vel, kr_bl_vel_in_bl);
 
     // base odom
-    double base_wrt_world_pose[7]{};
-    base_wrt_world_pose[0] = robot.mobile_base->state->x_platform[0];
-    base_wrt_world_pose[1] = robot.mobile_base->state->x_platform[1];
+    // double base_wrt_world_pose[7]{};
+    // base_wrt_world_pose[0] = robot.mobile_base->state->x_platform[0];
+    // base_wrt_world_pose[1] = robot.mobile_base->state->x_platform[1];
 
-    KDL::Rotation rot = KDL::Rotation::RotZ(robot.mobile_base->state->x_platform[2]);
+    // KDL::Rotation rot = KDL::Rotation::RotZ(robot.mobile_base->state->x_platform[2]);
 
-    rot.GetQuaternion(base_wrt_world_pose[3], base_wrt_world_pose[4], base_wrt_world_pose[5],
-                      base_wrt_world_pose[6]);
+    
 
-    double sample_pose[7]{};
-    double sample_pose_in_world[7]{};
-    transform_with_frame(sample_pose, base_wrt_world_pose, sample_pose_in_world);
+    // double r, p, y;
+    // rot.GetRPY(r, p, y);
+    // std::cout << "[base in world]: ";
+    // std::cout << base_wrt_world_pose[0] << " " << base_wrt_world_pose[1] << " "
+    //           << RAD2DEG(y) << std::endl;
+
+
+    // rot.GetQuaternion(base_wrt_world_pose[3], base_wrt_world_pose[4], base_wrt_world_pose[5],
+    //                   base_wrt_world_pose[6]);
+
+    // double *tool_wrt_base_pose = robot.kinova_right->state->s[robot.kinova_right->state->ns - 1];
+    
+
+    // KDL::Rotation rot_tool_wrt_base = KDL::Rotation::Quaternion(
+    //     tool_wrt_base_pose[3], tool_wrt_base_pose[4], tool_wrt_base_pose[5], tool_wrt_base_pose[6]);
+    // rot_tool_wrt_base.GetRPY(r, p, y);
+    // std::cout << "[tool in base ]: ";
+    // print_array(tool_wrt_base_pose, 3);
+    // std::cout << "[rpy]: " << RAD2DEG(r) << " " << RAD2DEG(p) << " " << RAD2DEG(y) << std::endl;
+
+    // double tool_wrt_world[7]{};
+    // transform_with_frame(tool_wrt_base_pose, base_wrt_world_pose, tool_wrt_world);
+
+    // KDL::Rotation rot_tool_wrt_world = KDL::Rotation::Quaternion(
+    //     tool_wrt_world[3], tool_wrt_world[4], tool_wrt_world[5], tool_wrt_world[6]);
+    // rot_tool_wrt_world.GetRPY(r, p, y);
+    // std::cout << "[tool in world]: ";
+    // print_array(tool_wrt_world, 3);
+    // std::cout << "[rpy]: " << RAD2DEG(r) << " " << RAD2DEG(p) << " " << RAD2DEG(y) << std::endl;
 
     // controllers
     // pid controller
