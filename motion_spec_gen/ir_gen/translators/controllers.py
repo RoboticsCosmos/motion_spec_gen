@@ -307,14 +307,15 @@ class ImpedanceControllerTranslator:
 
             measured = {}
 
+            measured = {
+                "of": measured_coord_ir["data"]["of"],
+                "asb": measured_coord_ir["data"]["asb"],
+            }
+
             if coord_type == "Distance":
                 measure_variable = "computeDistance"
             elif coord_type == "Distance1D":
                 measure_variable = "computeDistance1D"
-                measured = {
-                    "of": measured_coord_ir["data"]["of"],
-                    "asb": measured_coord_ir["data"]["asb"],
-                }
                 measured["of"]["axis"] = measured_coord_ir["data"]["axis"]
 
             # vector

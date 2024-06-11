@@ -25,7 +25,13 @@ def get_vector_value(input_string):
     }
 
     # Extract the suffix after "Vector" in the input string
-    suffix_start = input_string.find("Vector") + len("Vector")
+    if "Vector" in input_string:
+        suffix_start = input_string.find("Vector") + len("Vector")
+    elif "AngleAbout" in input_string:
+        suffix_start = input_string.find("AngleAbout") + len("AngleAbout")
+    else:
+        raise ValueError("Invalid input string")
+
     suffix = input_string[suffix_start:]
 
     vec_comp = vector_components.get(suffix, None)
@@ -37,7 +43,11 @@ def get_vector_value(input_string):
 
     if "linear" in input_string or "position" in input_string:
         return vec_comp + (0, 0, 0), f"lin_{suffix.lower()}"
-    elif "angular" in input_string or "orientation" in input_string:
+    elif (
+        "angular" in input_string
+        or "orientation" in input_string
+        or "angle" in input_string
+    ):
         return (0, 0, 0) + vec_comp, f"ang_{suffix.lower()}"
     else:
         return vec_comp, suffix.lower()
@@ -58,6 +68,7 @@ class CoordinatesTranslator:
             or g[node : rdflib.RDF.type : GEOM_COORD.PositionCoordinate]
             or g[node : rdflib.RDF.type : GEOM_COORD.OrientationCoordinate]
             or g[node : rdflib.RDF.type : GEOM_COORD.DistanceCoordinate]
+            or g[node : rdflib.RDF.type : GEOM_COORD.AngularDistanceCoordinate]
             or g[node : rdflib.RDF.type : GEOM_COORD.VelocityTwistCoordinate]
             or g[node : rdflib.RDF.type : GEOM_COORD.AccelerationTwistCoordinate]
         )
@@ -65,7 +76,11 @@ class CoordinatesTranslator:
         # get the types of coordinates
         coord_types = g.objects(node, rdflib.RDF.type)
         # get the type with vector in it
-        vector_type = [t for t in coord_types if "vector" in str(t).lower()][0]
+        vector_type = [
+            t
+            for t in coord_types
+            if "vector" in str(t).lower() or "angleabout" in str(t).lower()
+        ][0]
         vec_comp, suffix = get_vector_value(str(vector_type))
 
         if is_geom_coord:
@@ -84,7 +99,7 @@ class CoordinatesTranslator:
                 asb_qname = g.compute_qname(asb)[2]
                 of_qname = g.compute_qname(of)[2]
                 wrt_qname = g.compute_qname(wrt)[2]
-                
+
                 # *assumption*: pose is a 1D vector
                 variables[node_qname] = {
                     "type": None,
@@ -244,6 +259,63 @@ class CoordinatesTranslator:
                     "entities": dist_bw,
                 }
                 data["asb"] = asb_qname
+
+            elif g[node : rdflib.RDF.type : GEOM_COORD.AngularDistanceCoordinate]:
+                of_ang_dist = g.value(node, GEOM_COORD.of)
+                of_ang_dist_qname = g.compute_qname(of_ang_dist)[2]
+
+                asb = g.value(node, GEOM_COORD["as-seen-by"])
+                asb_qname = g.compute_qname(asb)[2]
+
+                if not g[
+                    of_ang_dist : rdflib.RDF.type : GEOM_REL.AngularDistanceBetweenLines
+                ]:
+                    raise ValueError("Invalid angular distance type")
+
+                print(f'of_ang_dist: {of_ang_dist}')
+
+                # get the lines
+                lines = g.objects(of_ang_dist, GEOM_REL["between-entities"])
+
+                # TODO: validate the entities
+
+                query = f"""
+                        SELECT ?pos ?pos_coord
+                        WHERE {{
+                            ?point a geom:Point .
+                            
+                            ?pos a ?type ;
+                                geom-rel:of-entity ?point .
+                            
+                            FILTER (?type IN (geom-rel:Position, geom-rel:Pose))
+
+                            ?pos_coord a ?type2 ;
+                                geom-coord:of ?pos .
+
+                            FILTER (?type2 IN (geom-coord:PositionCoordinate, geom-coord:PoseCoordinate))
+                        }}
+                        """
+                
+                lines_coords = {}
+
+                for line in lines:
+                    # get points
+                    points = g.objects(line, GEOM_ENT.points)
+
+                    lines_coords[line] = []
+
+                    # check if a position or pose relation exists
+                    for point in points:
+                        res = g.query(query, initBindings={"point": point})
+
+                        res = res.bindings[0]
+
+                        # pos = res["pos"]
+                        pos_coord = res["pos_coord"]
+
+                        lines_coords[line].append((pos_coord))
+
+                
 
             elif g[node : rdflib.RDF.type : GEOM_COORD.VelocityTwistCoordinate]:
                 data["type"] = "VelocityTwist"

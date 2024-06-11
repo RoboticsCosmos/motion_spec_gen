@@ -13,7 +13,7 @@ from motion_spec_gen.namespaces import (
     ACHD_SOLVER,
     BASE_FD_SOLVER,
     EMBED_MAP,
-    NEWTONIAN_RBD_REL
+    NEWTONIAN_RBD_REL,
 )
 
 
@@ -30,7 +30,13 @@ def get_vector_value(input_string):
     }
 
     # Extract the suffix after "Vector" in the input string
-    suffix_start = input_string.find("Vector") + len("Vector")
+    if "Vector" in input_string:
+        suffix_start = input_string.find("Vector") + len("Vector")
+    elif "AngleAbout" in input_string:
+        suffix_start = input_string.find("AngleAbout") + len("AngleAbout")
+    else:
+        raise ValueError("Invalid input string")
+
     suffix = input_string[suffix_start:]
 
     vec_comp = vector_components.get(suffix, None)
@@ -40,9 +46,18 @@ def get_vector_value(input_string):
 
     input_string = input_string.lower()
 
-    if "linear" in input_string or "force" in input_string or "position" in input_string:
+    if (
+        "linear" in input_string
+        or "force" in input_string
+        or "position" in input_string
+    ):
         return vec_comp + (0, 0, 0), f"lin_{suffix.lower()}"
-    elif "angular" in input_string or "torque" in input_string or "orientation" in input_string:
+    elif (
+        "angular" in input_string
+        or "torque" in input_string
+        or "orientation" in input_string
+        or "angle" in input_string
+    ):
         return (0, 0, 0) + vec_comp, f"ang_{suffix.lower()}"
     else:
         return vec_comp, suffix.lower()
@@ -191,7 +206,7 @@ class ImpedanceControllerStep:
 
         if force is None:
             raise ValueError("Force not defined")
-        
+
         output_data["output"]["force"] = force
 
         if g[force : rdflib.RDF.type : NEWTONIAN_RBD_REL.VirtualForce]:
@@ -226,7 +241,7 @@ class ImpedanceControllerStep:
                 vec_comp, suffix = get_vector_value(str(vec_type))
 
                 output_data["stiffness"]["vector"] = vec_comp
-            
+
             # TODO: this is wrong. should be for distane to base controller
             # add additional type info and update
             if g[coordinate : rdflib.RDF.type : GEOM_COORD.VelocityTwistCoordinate]:
@@ -262,7 +277,7 @@ class ImpedanceControllerStep:
             g.add((embed_map, EMBED_MAP["vector"], vector_collection))
             # vector direction
             if "vector_direction" in output_data["stiffness"]:
-                # add type 
+                # add type
                 g.add((embed_map, rdflib.RDF.type, EMBED_MAP.DirectionVector))
                 g.add(
                     (

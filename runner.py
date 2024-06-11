@@ -28,6 +28,7 @@ from motion_spec_gen.ir_gen.translators import (
     BaseFDSolverTranslator,
     ACHDSolverFextTranslator,
     RobotsTranslator,
+    CoordinatesTranslator
 )
 
 
@@ -145,6 +146,10 @@ def main(motion_spec_name: str = None, ir_out_file_name: str = "ir.json"):
                 + [embed_map_ir["data"]]
             )
             data["variables"].update(embed_map_ir["variables"])
+
+        for coord in g.subjects(rdflib.RDF.type, GEOM_COORD.AngularDistanceCoordinate):
+            print(coord)
+            CoordinatesTranslator().translate(g, coord)
 
         # get solvers
         solvers = g.subjects(rdflib.RDF.type, SOLVER.Solver)

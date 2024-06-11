@@ -12,6 +12,7 @@ class QUDT(DefinedNamespace):
 
     _NS = Namespace("http://qudt.org/schema/qudt/")
 
+
 class MONITOR(DefinedNamespace):
 
     Monitor: URIRef
@@ -71,12 +72,7 @@ class THRESHOLD(DefinedNamespace):
 
     Threshold: URIRef
 
-    _extras = [
-        "reference-value",
-        "threshold",
-        "upper-threshold",
-        "lower-threshold"
-    ]
+    _extras = ["reference-value", "threshold", "upper-threshold", "lower-threshold"]
 
     _NS = Namespace("https://roboticscosmos.github.io/metamodels/thresholds#")
 
@@ -117,6 +113,7 @@ class GEOM_COORD(DefinedNamespace):
     PoseCoordinate: URIRef
 
     DistanceCoordinate: URIRef
+    AngularDistanceCoordinate: URIRef
 
     VelocityTwistCoordinate: URIRef
 
@@ -150,6 +147,8 @@ class GEOM_COORD(DefinedNamespace):
 
     VectorXYZ: URIRef
 
+    AngleAboutZ: URIRef
+
     of: URIRef
 
     _extras = [
@@ -167,9 +166,11 @@ class GEOM_REL(DefinedNamespace):
     Pose: URIRef
 
     EuclideanDistance: URIRef
-    PointToPointDistance: URIRef
     LinearDistance: URIRef
     AngularDistance: URIRef
+
+    PointToPointDistance: URIRef
+    AngularDistanceBetweenLines: URIRef
 
     VelocityTwist: URIRef
 
@@ -182,6 +183,24 @@ class GEOM_REL(DefinedNamespace):
 
     _NS = Namespace(
         "https://comp-rob2b.github.io/metamodels/geometry/spatial-relations#"
+    )
+
+
+class GEOM_ENT(DefinedNamespace):
+
+    Point: URIRef
+    Frame: URIRef
+    Line: URIRef
+
+    origin: URIRef
+    points: URIRef
+
+    _extras = [
+        "1D",
+    ]
+
+    _NS = Namespace(
+        "https://comp-rob2b.github.io/metamodels/geometry/structural-entities#"
     )
 
 
@@ -236,22 +255,6 @@ class NEWTONIAN_RBD_REL(DefinedNamespace):
     )
 
 
-class GEOM_ENT(DefinedNamespace):
-
-    Point: URIRef
-    Frame: URIRef
-
-    origin: URIRef
-
-    _extras = [
-        "1D",
-    ]
-
-    _NS = Namespace(
-        "https://comp-rob2b.github.io/metamodels/geometry/structural-entities#"
-    )
-
-
 class SOLVER(DefinedNamespace):
 
     Solver: URIRef
@@ -272,9 +275,8 @@ class ACHD_SOLVER(DefinedNamespace):
         "alpha-constraints",
         "acceleration-energy",
         "external-wrench",
-
         "root-link",
-        "tip-link"
+        "tip-link",
     ]
 
     _NS = Namespace(
@@ -311,7 +313,7 @@ class EMBED_MAP(DefinedNamespace):
         "damping-vector",
         "vector-direction-from",
         "vector-direction-to",
-        "vector-direction-asb"
+        "vector-direction-asb",
     ]
 
     _NS = Namespace(
@@ -333,7 +335,7 @@ class ROBOTS(DefinedNamespace):
     Robot: URIRef
     Manipulator: URIRef
     MobileBase: URIRef
-    
+
     solvers: URIRef
 
     _extras = [
