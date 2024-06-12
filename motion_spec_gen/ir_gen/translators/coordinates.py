@@ -1,3 +1,4 @@
+import json
 from motion_spec_gen.namespaces import (
     PID_CONTROLLER,
     THRESHOLD,
@@ -73,16 +74,6 @@ class CoordinatesTranslator:
             or g[node : rdflib.RDF.type : GEOM_COORD.AccelerationTwistCoordinate]
         )
 
-        # get the types of coordinates
-        coord_types = g.objects(node, rdflib.RDF.type)
-        # get the type with vector in it
-        vector_type = [
-            t
-            for t in coord_types
-            if "vector" in str(t).lower() or "angleabout" in str(t).lower()
-        ][0]
-        vec_comp, suffix = get_vector_value(str(vector_type))
-
         if is_geom_coord:
             if g[node : rdflib.RDF.type : GEOM_COORD.PoseCoordinate]:
                 data["type"] = "Pose"
@@ -117,13 +108,13 @@ class CoordinatesTranslator:
                 variables[of_qname] = {
                     "type": None,
                     "dtype": "string",
-                    "value": of_qname,
+                    "value": of_qname.replace("_origin_point", ""),
                 }
 
                 variables[wrt_qname] = {
                     "type": None,
                     "dtype": "string",
-                    "value": wrt_qname,
+                    "value": wrt_qname.replace("_origin_point", ""),
                 }
 
                 variables[asb_qname] = {
@@ -174,13 +165,13 @@ class CoordinatesTranslator:
                 variables[of_qname] = {
                     "type": None,
                     "dtype": "string",
-                    "value": of_qname,
+                    "value": of_qname.replace("_origin_point", ""),
                 }
 
                 variables[wrt_qname] = {
                     "type": None,
                     "dtype": "string",
-                    "value": wrt_qname,
+                    "value": wrt_qname.replace("_origin_point", ""),
                 }
 
                 variables[asb_qname] = {
@@ -204,6 +195,16 @@ class CoordinatesTranslator:
                 data["wrt"] = wrt_qname
 
             elif g[node : rdflib.RDF.type : GEOM_COORD.DistanceCoordinate]:
+                # get the types of coordinates
+                coord_types = g.objects(node, rdflib.RDF.type)
+                # get the type with vector in it
+                vector_type = [
+                    t
+                    for t in coord_types
+                    if "vector" in str(t).lower() or "angleabout" in str(t).lower()
+                ][0]
+                vec_comp, suffix = get_vector_value(str(vector_type))
+
                 of_dist = g.value(node, GEOM_COORD.of)
                 of_dist_qname = g.compute_qname(of_dist)[2]
 
@@ -244,14 +245,14 @@ class CoordinatesTranslator:
                 variables[asb_qname] = {
                     "type": None,
                     "dtype": "string",
-                    "value": asb_qname,
+                    "value": asb_qname.replace("_origin_point", ""),
                 }
 
                 for entity in dist_bw:
                     variables[entity] = {
                         "type": None,
                         "dtype": "string",
-                        "value": entity,
+                        "value": entity.replace("_origin_point", ""),
                     }
 
                 data["of"] = {
@@ -261,6 +262,16 @@ class CoordinatesTranslator:
                 data["asb"] = asb_qname
 
             elif g[node : rdflib.RDF.type : GEOM_COORD.AngularDistanceCoordinate]:
+                # get the types of coordinates
+                coord_types = g.objects(node, rdflib.RDF.type)
+                # get the type with vector in it
+                vector_type = [
+                    t
+                    for t in coord_types
+                    if "vector" in str(t).lower() or "angleabout" in str(t).lower()
+                ][0]
+                vec_comp, suffix = get_vector_value(str(vector_type))
+
                 of_ang_dist = g.value(node, GEOM_COORD.of)
                 of_ang_dist_qname = g.compute_qname(of_ang_dist)[2]
 
@@ -301,8 +312,9 @@ class CoordinatesTranslator:
                 for line in lines:
                     # get points
                     points = g.objects(line, GEOM_ENT.points)
+                    line_qname = g.compute_qname(line)[2]
 
-                    lines_coords[line] = []
+                    lines_coords[line_qname] = []
 
                     # check if a position or pose relation exists
                     for point in points:
@@ -310,14 +322,36 @@ class CoordinatesTranslator:
 
                         res = res.bindings[0]
 
+                        if not res:
+                            raise ValueError("Invalid entities")
+
                         # pos = res["pos"]
                         pos_coord = res["pos_coord"]
 
-                        lines_coords[line].append((pos_coord))
+                        coord_ir = self.translate(g, pos_coord, prefix=prefix)
 
-                
+                        variables.update(coord_ir["variables"])
+
+                        lines_coords[line_qname].append(coord_ir["data"])
+
+                data["of"] = {
+                    "id": node_qname,
+                    "entities": lines_coords,
+                }
+                data["asb"] = asb_qname
+                data["angle_about"] = f"{node_qname}_{suffix}"
 
             elif g[node : rdflib.RDF.type : GEOM_COORD.VelocityTwistCoordinate]:
+                # get the types of coordinates
+                coord_types = g.objects(node, rdflib.RDF.type)
+                # get the type with vector in it
+                vector_type = [
+                    t
+                    for t in coord_types
+                    if "vector" in str(t).lower() or "angleabout" in str(t).lower()
+                ][0]
+                vec_comp, suffix = get_vector_value(str(vector_type))
+
                 data["type"] = "VelocityTwist"
 
                 # TODO: validate the entities
@@ -341,7 +375,7 @@ class CoordinatesTranslator:
                 variables[vel_wrt] = {
                     "type": None,
                     "dtype": "string",
-                    "value": vel_wrt,
+                    "value": vel_wrt.replace("_origin_point", ""),
                 }
 
                 of_vel_qname = f"{g.compute_qname(of_vel)[2]}{prefix}"
@@ -383,6 +417,16 @@ class CoordinatesTranslator:
 
         else:
             if g[node : rdflib.RDF.type : NEWTONIAN_RBD_COORD.ForceCoordinate]:
+                # get the types of coordinates
+                coord_types = g.objects(node, rdflib.RDF.type)
+                # get the type with vector in it
+                vector_type = [
+                    t
+                    for t in coord_types
+                    if "vector" in str(t).lower() or "angleabout" in str(t).lower()
+                ][0]
+                vec_comp, suffix = get_vector_value(str(vector_type))
+
                 data["type"] = "Force"
 
                 of_force = g.value(node, NEWTONIAN_RBD_COORD.of)
@@ -406,19 +450,19 @@ class CoordinatesTranslator:
                 variables[asb_qname] = {
                     "type": None,
                     "dtype": "string",
-                    "value": asb_qname,
+                    "value": asb_qname.replace("_origin_point", ""),
                 }
 
                 variables[ab_qname] = {
                     "type": None,
                     "dtype": "string",
-                    "value": ab_qname,
+                    "value": ab_qname.replace("_origin_point", ""),
                 }
 
                 variables[at_qname] = {
                     "type": None,
                     "dtype": "string",
-                    "value": at_qname,
+                    "value": at_qname.replace("_origin_point", ""),
                 }
 
                 of_force_qname = g.compute_qname(of_force)[2]

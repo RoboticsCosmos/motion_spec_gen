@@ -164,7 +164,7 @@
     "base_link_origin_point": {
       "type": null,
       "dtype": "string",
-      "value": "base_link_origin_point"
+      "value": "base_link"
     },
     "kinova_right_bracelet_base_lin_vel_coord_z_vector": {
       "type": "array",
