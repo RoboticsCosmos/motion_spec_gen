@@ -66,10 +66,21 @@ def get_vector_value(input_string):
 @for_type(PID_CONTROLLER.PIDController)
 class PIDControllerStep:
 
-    def emit(self, g: rdflib.Graph, node: rdflib.URIRef, **kwargs) -> dict:
+    def emit(
+        self, g: rdflib.Graph, node: rdflib.URIRef, verbose=False, **kwargs
+    ) -> dict:
         """
         Add an output node to the graph for pid controller
         """
+        verbose_padding: int = 0
+        # Get the verbose padding from the kwargs
+        if "verbose_padding" in kwargs:
+            verbose_padding = kwargs["verbose_padding"]
+
+        if verbose:
+            print(
+                f"{'-'*verbose_padding} [PIDControllerStep]: {g.compute_qname(node)[2]}"
+            )
 
         constraint = g.value(node, CONTROLLER.constraint)
         coordinate = g.value(constraint, CONSTRAINT.quantity)
@@ -162,10 +173,21 @@ class PIDControllerStep:
 @for_type(IMPEDANCE_CONTROLLER.ImpedanceController)
 class ImpedanceControllerStep:
 
-    def emit(self, g: rdflib.Graph, node: rdflib.URIRef, **kwargs) -> dict:
+    def emit(
+        self, g: rdflib.Graph, node: rdflib.URIRef, verbose=False, **kwargs
+    ) -> dict:
         """
         Add an output node to the graph for impedance controller
         """
+        verbose_padding: int = 0
+        # Get the verbose padding from the kwargs
+        if "verbose_padding" in kwargs:
+            verbose_padding = kwargs["verbose_padding"]
+
+        if verbose:
+            print(
+                f"{'-'*verbose_padding} [ImpedanceControllerStep]: {g.compute_qname(node)[2]}"
+            )
 
         output_data = {
             "stiffness": {},

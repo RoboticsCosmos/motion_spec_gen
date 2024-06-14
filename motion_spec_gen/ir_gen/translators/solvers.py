@@ -6,7 +6,7 @@ from motion_spec_gen.namespaces import (
     EMBED_MAP,
     SOLVER,
     ACHD_SOLVER,
-    BASE_FD_SOLVER
+    BASE_FD_SOLVER,
 )
 import rdflib
 from rdflib.collection import Collection
@@ -21,7 +21,15 @@ import warnings
 @for_type(ACHD_SOLVER.ACHDSolver)
 class ACHDSolverTranslator:
 
-    def translate(self, g: rdflib.Graph, node, **kwargs) -> dict:
+    def translate(self, g: rdflib.Graph, node, verbose=False, **kwargs) -> dict:
+        verbose_padding: int = 0
+        # Get the verbose padding from the kwargs
+        if "verbose_padding" in kwargs:
+            verbose_padding = kwargs["verbose_padding"]
+        if verbose:
+            print(
+                f"{'-'*verbose_padding} Translating ACHD Solver: {g.compute_qname(node)[2]}"
+            )
 
         variables = {}
 
@@ -178,7 +186,15 @@ class ACHDSolverTranslator:
 @for_type(ACHD_SOLVER.ACHDSolverFext)
 class ACHDSolverFextTranslator:
 
-    def translate(self, g: rdflib.Graph, node, **kwargs) -> dict:
+    def translate(self, g: rdflib.Graph, node, verbose=False, **kwargs) -> dict:
+        verbose_padding: int = 0
+        # Get the verbose padding from the kwargs
+        if "verbose_padding" in kwargs:
+            verbose_padding = kwargs["verbose_padding"]
+        if verbose:
+            print(
+                f"{'-'*verbose_padding} Translating ACHD Solver Fext: {g.compute_qname(node)[2]}"
+            )
 
         variables = {}
 
@@ -235,10 +251,16 @@ class ACHDSolverFextTranslator:
                     "value": None,
                 }
 
-                ext_wrench.append({
-                    "link": embed_map["output_wrench_applied_to"] if "output_wrench_applied_to" in embed_map else None,
-                    "wrench": embed_map["output"]
-                })
+                ext_wrench.append(
+                    {
+                        "link": (
+                            embed_map["output_wrench_applied_to"]
+                            if "output_wrench_applied_to" in embed_map
+                            else None
+                        ),
+                        "wrench": embed_map["output"],
+                    }
+                )
 
         # TODO: get num of joints from the robot model
         nj = 7
@@ -284,10 +306,19 @@ class ACHDSolverFextTranslator:
             "variables": variables,
         }
 
+
 @for_type(BASE_FD_SOLVER.BaseFDSolver)
 class BaseFDSolverTranslator:
 
-    def translate(self, g: rdflib.Graph, node, **kwargs) -> dict:
+    def translate(self, g: rdflib.Graph, node, verbose=False, **kwargs) -> dict:
+        verbose_padding: int = 0
+        # Get the verbose padding from the kwargs
+        if "verbose_padding" in kwargs:
+            verbose_padding = kwargs["verbose_padding"]
+        if verbose:
+            print(
+                f"{'-'*verbose_padding} Translating Base FD Solver: {g.compute_qname(node)[2]}"
+            )
 
         variables = {}
         data = {}
@@ -347,7 +378,7 @@ class BaseFDSolverTranslator:
             "name": "base_fd_solver",
             "root_acceleration": f"{id}_root_acceleration",
             "platform_force": platform_force,
-            "output_torques": f'{id}_output_torques',
+            "output_torques": f"{id}_output_torques",
             "predicted_accelerations": None,
             "return": None,
         }

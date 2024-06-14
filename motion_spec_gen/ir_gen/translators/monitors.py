@@ -12,7 +12,7 @@ from motion_spec_gen.ir_gen.translators.coordinates import CoordinatesTranslator
 
 class MonitorTranslator:
 
-    def translate(self, g: rdflib.Graph, node) -> dict:
+    def translate(self, g: rdflib.Graph, node, verbose=False, **kwargs) -> dict:
 
         variables = {}
         data = {}

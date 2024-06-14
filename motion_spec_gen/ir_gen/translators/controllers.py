@@ -22,7 +22,15 @@ from motion_spec_gen.utility.helpers import for_type
 @for_type(PID_CONTROLLER.PIDController)
 class PIDControllerTranslator:
 
-    def translate(self, g: rdflib.Graph, node) -> dict:
+    def translate(self, g: rdflib.Graph, node, verbose=False, **kwargs) -> dict:
+        verbose_padding: int = 0
+        # Get the verbose padding from the kwargs
+        if "verbose_padding" in kwargs:
+            verbose_padding = kwargs["verbose_padding"]
+        if verbose:
+            print(
+                f"{'-'*verbose_padding} Translating PID Controller: {g.compute_qname(node)[2]}"
+            )
 
         compute_variables = {}
         variables = {}
@@ -87,7 +95,7 @@ class PIDControllerTranslator:
             else:
                 # *assumption*: will be a coordinate
                 ref_coord_ir = CoordinatesTranslator().translate(
-                    g, reference_value, prefix=""
+                    g, reference_value, prefix="", verbose=verbose, verbose_padding=4
                 )
 
                 # print(f'ref {reference_value} coord vars: {ref_coord_ir["variables"]}')
@@ -126,7 +134,9 @@ class PIDControllerTranslator:
             raise ValueError("Operator type not supported")
 
         # measured coordinate
-        measured_coord_ir = CoordinatesTranslator().translate(g, quantity, prefix="")
+        measured_coord_ir = CoordinatesTranslator().translate(
+            g, quantity, prefix="", verbose=verbose, verbose_padding=4
+        )
         variables.update(measured_coord_ir["variables"])
 
         coord_type = measured_coord_ir["data"]["type"]
@@ -223,7 +233,7 @@ class PIDControllerTranslator:
 @for_type(IMPEDANCE_CONTROLLER.ImpedanceController)
 class ImpedanceControllerTranslator:
 
-    def translate(self, g: rdflib.Graph, node) -> dict:
+    def translate(self, g: rdflib.Graph, node, verbose=False, **kwargs) -> dict:
 
         variables = {}
         data = {}
@@ -299,7 +309,7 @@ class ImpedanceControllerTranslator:
 
             # measured coordinate
             measured_coord_ir = CoordinatesTranslator().translate(
-                g, quantity, prefix=""
+                g, quantity, prefix="", verbose=verbose, verbose_padding=4
             )
             variables.update(measured_coord_ir["variables"])
 

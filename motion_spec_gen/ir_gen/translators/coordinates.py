@@ -55,9 +55,17 @@ def get_vector_value(input_string):
 
 
 class CoordinatesTranslator:
-    def translate(self, g: rdflib.Graph, node, **kwargs) -> dict:
-        variables = {}
+    def translate(self, g: rdflib.Graph, node, verbose=False, **kwargs) -> dict:
+        verbose_padding: int = 0
+        # Get the verbose padding from the kwargs
+        if "verbose_padding" in kwargs:
+            verbose_padding = kwargs["verbose_padding"]
+        if verbose:
+            print(
+                f"{'-'*verbose_padding} Translating coordinates: {g.compute_qname(node)[2]}"
+            )
 
+        variables = {}
         data = {}
 
         prefix = kwargs.get("prefix", "")
@@ -77,6 +85,16 @@ class CoordinatesTranslator:
         if is_geom_coord:
             if g[node : rdflib.RDF.type : GEOM_COORD.PoseCoordinate]:
                 data["type"] = "Pose"
+
+                # get the types of coordinates
+                coord_types = g.objects(node, rdflib.RDF.type)
+                # get the type with vector in it
+                vector_type = [
+                    t
+                    for t in coord_types
+                    if "vector" in str(t).lower() or "angleabout" in str(t).lower()
+                ][0]
+                vec_comp, suffix = get_vector_value(str(vector_type))
 
                 of_pose = g.value(node, GEOM_COORD.of)
                 # TODO: do something with this
@@ -283,7 +301,7 @@ class CoordinatesTranslator:
                 ]:
                     raise ValueError("Invalid angular distance type")
 
-                print(f'of_ang_dist: {of_ang_dist}')
+                print(f"of_ang_dist: {of_ang_dist}")
 
                 # get the lines
                 lines = g.objects(of_ang_dist, GEOM_REL["between-entities"])
@@ -306,7 +324,7 @@ class CoordinatesTranslator:
                             FILTER (?type2 IN (geom-coord:PositionCoordinate, geom-coord:PoseCoordinate))
                         }}
                         """
-                
+
                 lines_coords = {}
 
                 for line in lines:

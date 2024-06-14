@@ -4,7 +4,15 @@ from motion_spec_gen.namespaces import ROBOTS
 
 class RobotsTranslator:
 
-    def translate(self, g: rdflib.Graph, node, **kwargs):
+    def translate(self, g: rdflib.Graph, node, verbose=False, **kwargs):
+        verbose_padding: int = 0
+        # Get the verbose padding from the kwargs
+        if "verbose_padding" in kwargs:
+            verbose_padding = kwargs["verbose_padding"]
+        if verbose:
+            print(
+                f"{'-'*verbose_padding}  Translating Robot: {g.compute_qname(node)[2]}"
+            )
 
         solvers_data = kwargs.get("solvers_data")
 

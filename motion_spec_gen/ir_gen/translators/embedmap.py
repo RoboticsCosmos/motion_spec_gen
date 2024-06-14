@@ -1,14 +1,19 @@
-from motion_spec_gen.namespaces import (
-    EMBED_MAP,
-    BASE_FD_SOLVER
-)
+from motion_spec_gen.namespaces import EMBED_MAP, BASE_FD_SOLVER
 import rdflib
 from rdflib.collection import Collection
 
 
 class EmbedMapTranslator:
 
-    def translate(self, g: rdflib.Graph, node) -> dict:
+    def translate(self, g: rdflib.Graph, node, verbose=False, **kwargs) -> dict:
+        verbose_padding: int = 0
+        # Get the verbose padding from the kwargs
+        if "verbose_padding" in kwargs:
+            verbose_padding = kwargs["verbose_padding"]
+        if verbose:
+            print(
+                f"{'-'*verbose_padding} Translating EmbedMap: {g.compute_qname(node)[2]}"
+            )
 
         variables = {}
         data = {}
@@ -66,7 +71,7 @@ class EmbedMapTranslator:
             vector_direction_asb = g.value(node, EMBED_MAP["vector-direction-asb"])
 
             vector_id = None
-            
+
             vector_info = {
                 "from": g.compute_qname(vector_direction_from)[2],
                 "to": g.compute_qname(vector_direction_to)[2],
@@ -75,11 +80,11 @@ class EmbedMapTranslator:
 
         data["name"] = "embed_map"
         data["input"] = g.compute_qname(em_input)[2]
-        data["output"] = f'{id}_{output}'
+        data["output"] = f"{id}_{output}"
         data["output_type"] = output_type
         data["vector"] = vector_id
         data["vector_info"] = vector_info
-        
+
         data["return"] = None
 
         return {

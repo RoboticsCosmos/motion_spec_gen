@@ -32,7 +32,7 @@ from motion_spec_gen.ir_gen.translators import (
 )
 
 
-def main(motion_spec_name: str = None, ir_out_file_name: str = "ir.json"):
+def main(motion_spec_name: str = None, ir_out_file_name: str = "ir.json", verbose: bool = False, print_graph: bool = False):
 
     if motion_spec_name is None:
         raise ValueError("Motion specification name is required")
@@ -62,9 +62,9 @@ def main(motion_spec_name: str = None, ir_out_file_name: str = "ir.json"):
         if file.endswith(".jsonld"):
             g.parse(models_path + file, format="json-ld")
 
-    print(g.serialize(format="turtle"))
-
-    print("**" * 20)
+    if print_graph:
+        print(g.serialize(format="turtle"))
+        print("**" * 20)
 
     controller_steps = [PIDControllerStep, ImpedanceControllerStep]
     controller_translators = [PIDControllerTranslator, ImpedanceControllerTranslator]
@@ -108,6 +108,9 @@ def main(motion_spec_name: str = None, ir_out_file_name: str = "ir.json"):
         #     data["d"]["monitors"]["pre"][ir["id"]] = ir["data"]
 
         for per_condition in per_conditions:
+            if verbose:
+                print(f"Translating per condition: {g.compute_qname(per_condition)[2]}")
+            
             val = g.value(predicate=CONTROLLER.constraint, object=per_condition)
 
             if g[val : rdflib.RDF.type : CONTROLLER.Controller]:
@@ -124,11 +127,11 @@ def main(motion_spec_name: str = None, ir_out_file_name: str = "ir.json"):
 
             for step in controller_steps:
                 if step.is_applicable(g, controller):
-                    step().emit(g, controller)
+                    step().emit(g, controller, verbose=verbose, verbose_padding=2)
 
             for translator in controller_translators:
                 if translator.is_applicable(g, controller):
-                    ir = translator().translate(g, controller)
+                    ir = translator().translate(g, controller, verbose=verbose, verbose_padding=2)
 
                     data["variables"].update(ir["variables"])
                     data["d"]["controllers"][ir["id"]] = ir["data"]
@@ -147,14 +150,19 @@ def main(motion_spec_name: str = None, ir_out_file_name: str = "ir.json"):
             )
             data["variables"].update(embed_map_ir["variables"])
 
-        for coord in g.subjects(rdflib.RDF.type, GEOM_COORD.AngularDistanceCoordinate):
-            print(coord)
-            CoordinatesTranslator().translate(g, coord)
+            if verbose:
+                print()
+
+        # for coord in g.subjects(rdflib.RDF.type, GEOM_COORD.AngularDistanceCoordinate):
+        #     CoordinatesTranslator().translate(g, coord)
 
         # get solvers
         solvers = g.subjects(rdflib.RDF.type, SOLVER.Solver)
 
         for solver in solvers:
+            if verbose:
+                print(f"Translating solver: {g.compute_qname(solver)[2]}")
+            
             if g.compute_qname(solver)[2] not in data["d"]["embed_maps"]:
                 continue
 
@@ -165,10 +173,15 @@ def main(motion_spec_name: str = None, ir_out_file_name: str = "ir.json"):
                         solver,
                         embed_maps=data["d"]["embed_maps"],
                         variables=data["variables"],
+                        verbose=verbose,
+                        verbose_padding=2,
                     )
 
                     data["variables"].update(ir["variables"])
                     data["d"]["solvers"][ir["id"]] = ir["data"]
+
+            if verbose:
+                print()
 
         for robot in g.subjects(rdflib.RDF.type, ROBOTS.Robot):
 
@@ -210,7 +223,7 @@ def main(motion_spec_name: str = None, ir_out_file_name: str = "ir.json"):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Generate motion specification IR",
-        usage="python -m motion_spec_gen.runner -m <motion_spec_name> -o <output_file_name>",
+        usage="python -m motion_spec_gen.runner -m <motion_spec_name> -o <output_file_name> [-v] [-g]",
     )
     # define arguments
     parser.add_argument(
@@ -219,7 +232,13 @@ if __name__ == "__main__":
     parser.add_argument(
         "-m", "--motion-spec", type=str, help="Motion specification name"
     )
+    parser.add_argument(
+        "-v", "--verbose", action="store_true", help="Print verbose output"
+    )
+    parser.add_argument(
+        "-g", "--graph", action="store_true", help="Print graph output"
+    )
 
     args = parser.parse_args()
 
-    main(args.motion_spec, args.output)
+    main(args.motion_spec, args.output, args.verbose, args.graph)
