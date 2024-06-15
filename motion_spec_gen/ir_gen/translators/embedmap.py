@@ -34,6 +34,9 @@ class EmbedMapTranslator:
             output = g.compute_qname(em_output_ae)[2]
             output_type = "acceleration-energy"
         elif em_output_ew:
+            asb = g.value(node, EMBED_MAP["asb"])
+            data["asb"] = g.compute_qname(asb)[2]
+
             output = g.compute_qname(em_output_ew)[2]
             output_type = "external-wrench"
 
@@ -46,6 +49,16 @@ class EmbedMapTranslator:
                     "value": ato,
                 }
                 data["output_wrench_applied_to"] = ato
+
+            ew_applied_by = g.value(node, EMBED_MAP["output-wrench-applied-by"])
+            if ew_applied_by:
+                aby = g.compute_qname(ew_applied_by)[2]
+                variables[aby] = {
+                    "type": None,
+                    "dtype": "string",
+                    "value": aby,
+                }
+                data["output_wrench_applied_by"] = aby
 
         # vector
         vector_id = None

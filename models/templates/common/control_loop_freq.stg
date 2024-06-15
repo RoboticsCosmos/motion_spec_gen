@@ -1,7 +1,9 @@
 initialize_control_loop_freq() ::= <<
-const double desired_frequency = 900.0;  // Hz
+const double desired_frequency = 1000.0;  // Hz
 const auto desired_period =
 std::chrono::duration\<double>(1.0 / desired_frequency);  // s
+
+double control_loop_dt = 1.0 / desired_frequency;
 >>
 
 control_loop_freq_starter() ::= <<
@@ -18,4 +20,6 @@ while (elapsed_time \< desired_period)
   end_time = std::chrono::high_resolution_clock::now();
   elapsed_time = std::chrono::duration\<double>(end_time - start_time);
 }
+
+control_loop_dt = elapsed_time.count();
 >>

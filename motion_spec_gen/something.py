@@ -14,6 +14,7 @@ from motion_spec_gen.namespaces import (
     BASE_FD_SOLVER,
     EMBED_MAP,
     NEWTONIAN_RBD_REL,
+    NEWTONIAN_RBD_COORD
 )
 
 
@@ -126,12 +127,33 @@ class PIDControllerStep:
 
         else:
             if g[solver : rdflib.RDF.type : ACHD_SOLVER.ACHDSolverFext]:
+                asb = g.value(coordinate, NEWTONIAN_RBD_COORD["as-seen-by"])
+                
                 output_data["output"] = {
                     "type": "output-external-wrench",
                     "var_name": rdflib.URIRef(
                         f"{prefix}{solver_name}_output_external_wrench"
                     ),
+                    "asb": asb,
                 }
+
+                g.add(
+                    (
+                        embed_map,
+                        EMBED_MAP["asb"],
+                        output_data["output"]["asb"],
+                    )
+                )
+
+                force = g.value(coordinate, NEWTONIAN_RBD_COORD.of)
+                
+                if g[force : rdflib.RDF.type : NEWTONIAN_RBD_REL.ContactForce]:
+                    force_applied_by = g.value(force, NEWTONIAN_RBD_REL["applied-by"])
+                    fab_qn = g.compute_qname(force_applied_by)[2]
+
+                    output_data["output"]["force_applied_by"] = rdflib.URIRef(
+                        f"{prefix}{fab_qn}"
+                    )
 
                 g.add(
                     (
@@ -168,6 +190,15 @@ class PIDControllerStep:
                 output_data["output"]["var_name"],
             )
         )
+        if "force_applied_by" in output_data["output"]:
+            g.add(
+                (
+                    embed_map,
+                    EMBED_MAP["output-wrench-applied-by"],
+                    output_data["output"]["force_applied_by"],
+                )
+            )
+        
 
 
 @for_type(IMPEDANCE_CONTROLLER.ImpedanceController)
@@ -248,6 +279,17 @@ class ImpedanceControllerStep:
             position_constraint = g.value(stiffness, CONTROLLER.constraint)
 
             coordinate = g.value(position_constraint, CONSTRAINT.quantity)
+            asb = g.value(coordinate, GEOM_COORD["as-seen-by"])
+
+            output_data["stiffness"]["asb"] = asb
+
+            g.add(
+                (
+                    embed_map,
+                    EMBED_MAP["asb"],
+                    output_data["stiffness"]["asb"],
+                )
+            )
 
             if g[coordinate : rdflib.RDF.type : GEOM_COORD.PositionCoordinate]:
                 types_of_coord = list(g.objects(coordinate, rdflib.RDF.type))
@@ -268,7 +310,7 @@ class ImpedanceControllerStep:
             # add additional type info and update
             if g[coordinate : rdflib.RDF.type : GEOM_COORD.VelocityTwistCoordinate]:
                 of_dist = g.value(coordinate, GEOM_COORD.of)
-                asb = g.value(coordinate, GEOM_COORD["as-seen-by"])
+                
                 asb_qn = g.compute_qname(asb)[2]
                 bw_ents = g.objects(of_dist, GEOM_REL["between-entities"])
                 bw_ents = [g.compute_qname(e)[2] for e in bw_ents]
@@ -340,3 +382,4 @@ class ImpedanceControllerStep:
                         output_data["output"]["force_applied_to"],
                     )
                 )
+            

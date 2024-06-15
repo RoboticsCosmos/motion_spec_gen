@@ -13,6 +13,7 @@ init_Manipulator(robot, robot_data) ::= <<
 <robot>.state = new <robot_data.type>State();
 bool <robot>_torque_control_mode_set = false;
 
+double <robot>_rne_init_taus[7]{};
 >>
 
 init_MobileBase(robot, robot_data) ::= <<
@@ -34,6 +35,20 @@ robile.kelo_base_config = &kelo_base_config;
 <robot>.mediator = &robile;
 <robot>.state = new <robot_data.type>State();
 
+>>
+
+compute_initial_robots_torques(robots_data) ::= <<
+<robots_data: {robot | <({compute_initial_<robots_data.(robot).type>_torques})(robot, robots_data.(robot))>}; separator="\n">
+>>
+
+compute_initial_Manipulator_torques(robot, robot_data) ::= <<
+double **<robot>_rne_ext_wrenches = new double*[7];
+init_2d_array(<robot>_rne_ext_wrenches, 7, 6);
+
+rne_solver(&robot, <robot>.base_frame, <robot>.tool_frame, <robot>_rne_solver_root_acc, <robot>_rne_ext_wrenches, <robot>_rne_init_taus);
+>>
+
+compute_initial_MobileBase_torques(robot, robot_data) ::= <<  
 >>
 
 init_robot_connections(robots_data) ::= <<
@@ -86,7 +101,7 @@ double <robot>_cmd_tau[7]{};
 KDL::JntArray <robot>_cmd_tau_kdl(7);
 cap_and_convert_torques(<robot>_cmd_tau, 7, <robot>_cmd_tau_kdl);
 if (!<robot>_torque_control_mode_set) {
-  robot.<robot>->mediator->set_control_mode(2);
+  robot.<robot>->mediator->set_control_mode(2, <robot>_rne_init_taus);
   <robot>_torque_control_mode_set = true;
 }
 

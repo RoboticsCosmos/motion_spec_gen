@@ -1153,7 +1153,7 @@
     "kr_achd_solver_nc": {
       "type": null,
       "dtype": "int",
-      "value": 6
+      "value": 5
     },
     "kr_achd_solver_nj": {
       "type": null,
@@ -1304,7 +1304,7 @@
     "kl_achd_solver_nc": {
       "type": null,
       "dtype": "int",
-      "value": 6
+      "value": 5
     },
     "kl_achd_solver_nj": {
       "type": null,
@@ -1927,6 +1927,8 @@
     "embed_maps": {
       "kl_achd_solver_fext": [
         {
+          "asb": "kinova_left_bracelet_link",
+          "output_wrench_applied_by": "kinova_left_bracelet_link",
           "name": "embed_map",
           "input": "kinova_left_bracelet_table_contact_force_pid_controller_signal",
           "output": "kinova_left_bracelet_table_contact_force_embed_map_kl_achd_solver_fext_output_external_wrench",
@@ -1936,6 +1938,7 @@
           "return": null
         },
         {
+          "asb": "base_link",
           "output_wrench_applied_to": "kinova_left_half_arm_2_link",
           "name": "embed_map",
           "input": "kl_elbow_base_base_distance_z_impedance_controller_signal",
@@ -1948,6 +1951,8 @@
       ],
       "kr_achd_solver_fext": [
         {
+          "asb": "kinova_right_bracelet_link",
+          "output_wrench_applied_by": "kinova_right_bracelet_link",
           "name": "embed_map",
           "input": "kinova_right_bracelet_table_contact_force_pid_controller_signal",
           "output": "kinova_right_bracelet_table_contact_force_embed_map_kr_achd_solver_fext_output_external_wrench",
@@ -1957,6 +1962,7 @@
           "return": null
         },
         {
+          "asb": "base_link",
           "output_wrench_applied_to": "kinova_right_half_arm_2_link",
           "name": "embed_map",
           "input": "kr_elbow_base_base_distance_z_impedance_controller_signal",
@@ -2091,12 +2097,14 @@
         "tip_link": "kinova_right_bracelet_link",
         "ext_wrench": [
           {
-            "link": null,
-            "wrench": "kinova_right_bracelet_table_contact_force_embed_map_kr_achd_solver_fext_output_external_wrench"
+            "link": "kinova_right_bracelet_link",
+            "wrench": "kinova_right_bracelet_table_contact_force_embed_map_kr_achd_solver_fext_output_external_wrench",
+            "asb": "kinova_right_bracelet_link"
           },
           {
             "link": "kinova_right_half_arm_2_link",
-            "wrench": "kr_elbow_base_base_distance_z_embed_map_kr_achd_solver_fext_output_external_wrench"
+            "wrench": "kr_elbow_base_base_distance_z_embed_map_kr_achd_solver_fext_output_external_wrench",
+            "asb": "base_link"
           }
         ],
         "nj": "kr_achd_solver_fext_nj",
@@ -2133,12 +2141,14 @@
         "tip_link": "kinova_left_bracelet_link",
         "ext_wrench": [
           {
-            "link": null,
-            "wrench": "kinova_left_bracelet_table_contact_force_embed_map_kl_achd_solver_fext_output_external_wrench"
+            "link": "kinova_left_bracelet_link",
+            "wrench": "kinova_left_bracelet_table_contact_force_embed_map_kl_achd_solver_fext_output_external_wrench",
+            "asb": "kinova_left_bracelet_link"
           },
           {
             "link": "kinova_left_half_arm_2_link",
-            "wrench": "kl_elbow_base_base_distance_z_embed_map_kl_achd_solver_fext_output_external_wrench"
+            "wrench": "kl_elbow_base_base_distance_z_embed_map_kl_achd_solver_fext_output_external_wrench",
+            "asb": "base_link"
           }
         ],
         "nj": "kl_achd_solver_fext_nj",

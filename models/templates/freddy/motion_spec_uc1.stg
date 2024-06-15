@@ -50,15 +50,19 @@ int main()
   <! variables !>
   <variables: {v | <variables_init(v, variables.(v))> }; separator="\n">
 
+  <initialize_control_loop_freq()>
+
   <! update robot state !>
-  get_robot_data(&robot);
+  get_robot_data(&robot, control_loop_dt);
+
+  // initial taus for manipulators during control mode switch
+  <compute_initial_robots_torques(d.robots)>
 
   // update compute variables
   <! cmpute variables !>
   <compute_variables: {v | <compute_variables_init(v, compute_variables.(v))> }; separator="\n">
 
   int count = 0;
-  <initialize_control_loop_freq()>
 
   while (true) {
     <control_loop_freq_starter()>
@@ -71,10 +75,10 @@ int main()
     }
 
     count++;
-    printf("count: %d\n", count);
+    // printf("count: %d\n", count);
 
     <! update robot state !>
-    get_robot_data(&robot);
+    get_robot_data(&robot, control_loop_dt);
 
     // controllers
     <! controllers !>

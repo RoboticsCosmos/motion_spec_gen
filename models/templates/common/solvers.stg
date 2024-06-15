@@ -27,7 +27,7 @@ achd_solver_fext(&robot, <data.root_link>, <data.tip_link>, <id>_ext_wrenches, <
 
 handle_external_wrench(id, ew, data) ::= <<
 double <ew.wrench>_transf[6]{};
-transform_wrench(&robot, <data.root_link>, <data.tip_link>, <ew.link>, <ew.wrench>, <ew.wrench>_transf);
+transform_wrench(&robot, <ew.asb>, <data.root_link>, <ew.wrench>, <ew.wrench>_transf);
 getLinkId(&robot, <data.root_link>, <data.tip_link>, <ew.link>, link_id);
 <id>_ext_wrenches[link_id] = <ew.wrench>_transf;
 >>

@@ -34,7 +34,7 @@ getLinkVelocity(<measured.of.entity>, <measured.asb>, <measured.wrt>, <measured.
 >>
 
 computeForce(measured, data) ::= <<
-computeForce(<measured.of.applied_by_entity>, <measured.of.applied_to_entity>, <measured.asb>, <measured.of.vector>, &robot, <measured.of.id>);
+getLinkForce(<measured.of.applied_by_entity>, <measured.of.applied_to_entity>, <measured.asb>, <measured.of.vector>, &robot, <measured.of.id>);
 >>
 
 computeDistance(measured, data) ::= <<

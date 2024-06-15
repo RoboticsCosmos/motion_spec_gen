@@ -114,7 +114,7 @@ class ACHDSolverTranslator:
             if embed_map["output_type"] == "external-wrench":
                 pass
 
-        nc = alpha.shape[1]
+        nc = alpha.shape[0]
 
         # num of joints TODO: get from the robot model
         nj = 7
@@ -251,14 +251,19 @@ class ACHDSolverFextTranslator:
                     "value": None,
                 }
 
+                link = None
+                if "output_wrench_applied_to" in embed_map:
+                    link = embed_map["output_wrench_applied_to"]
+                elif "output_wrench_applied_by" in embed_map:
+                    link = embed_map["output_wrench_applied_by"]
+
+                asb = embed_map["asb"]
+
                 ext_wrench.append(
                     {
-                        "link": (
-                            embed_map["output_wrench_applied_to"]
-                            if "output_wrench_applied_to" in embed_map
-                            else None
-                        ),
+                        "link": link,
                         "wrench": embed_map["output"],
+                        "asb": asb,
                     }
                 )
 
