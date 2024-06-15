@@ -14,7 +14,7 @@ from motion_spec_gen.namespaces import (
     BASE_FD_SOLVER,
     EMBED_MAP,
     NEWTONIAN_RBD_REL,
-    NEWTONIAN_RBD_COORD
+    NEWTONIAN_RBD_COORD,
 )
 
 
@@ -35,6 +35,8 @@ def get_vector_value(input_string):
         suffix_start = input_string.find("Vector") + len("Vector")
     elif "AngleAbout" in input_string:
         suffix_start = input_string.find("AngleAbout") + len("AngleAbout")
+    elif "OrientationAbout" in input_string:
+        suffix_start = input_string.find("OrientationAbout") + len("OrientationAbout")
     else:
         raise ValueError("Invalid input string")
 
@@ -128,7 +130,7 @@ class PIDControllerStep:
         else:
             if g[solver : rdflib.RDF.type : ACHD_SOLVER.ACHDSolverFext]:
                 asb = g.value(coordinate, NEWTONIAN_RBD_COORD["as-seen-by"])
-                
+
                 output_data["output"] = {
                     "type": "output-external-wrench",
                     "var_name": rdflib.URIRef(
@@ -146,7 +148,7 @@ class PIDControllerStep:
                 )
 
                 force = g.value(coordinate, NEWTONIAN_RBD_COORD.of)
-                
+
                 if g[force : rdflib.RDF.type : NEWTONIAN_RBD_REL.ContactForce]:
                     force_applied_by = g.value(force, NEWTONIAN_RBD_REL["applied-by"])
                     fab_qn = g.compute_qname(force_applied_by)[2]
@@ -165,7 +167,11 @@ class PIDControllerStep:
 
         types_of_coord = list(g.objects(coordinate, rdflib.RDF.type))
         # get the type with "vector" in it
-        vec_type = [t for t in types_of_coord if "vector" in str(t).lower()][0]
+        vec_type = [
+            t
+            for t in types_of_coord
+            if ("vector" in str(t).lower() or "about" in str(t).lower())
+        ][0]
         vec_comp, suffix = get_vector_value(str(vec_type))
 
         output_data["vector"] = vec_comp
@@ -198,7 +204,6 @@ class PIDControllerStep:
                     output_data["output"]["force_applied_by"],
                 )
             )
-        
 
 
 @for_type(IMPEDANCE_CONTROLLER.ImpedanceController)
@@ -310,7 +315,7 @@ class ImpedanceControllerStep:
             # add additional type info and update
             if g[coordinate : rdflib.RDF.type : GEOM_COORD.VelocityTwistCoordinate]:
                 of_dist = g.value(coordinate, GEOM_COORD.of)
-                
+
                 asb_qn = g.compute_qname(asb)[2]
                 bw_ents = g.objects(of_dist, GEOM_REL["between-entities"])
                 bw_ents = [g.compute_qname(e)[2] for e in bw_ents]
@@ -382,4 +387,3 @@ class ImpedanceControllerStep:
                         output_data["output"]["force_applied_to"],
                     )
                 )
-            

@@ -30,6 +30,8 @@ def get_vector_value(input_string):
         suffix_start = input_string.find("Vector") + len("Vector")
     elif "AngleAbout" in input_string:
         suffix_start = input_string.find("AngleAbout") + len("AngleAbout")
+    elif "OrientationAbout" in input_string:
+        suffix_start = input_string.find("OrientationAbout") + len("OrientationAbout")
     else:
         raise ValueError("Invalid input string")
 
@@ -173,9 +175,9 @@ class CoordinatesTranslator:
                 of_qname = g.compute_qname(of)[2]
                 wrt_qname = g.compute_qname(wrt)[2]
 
-                variables[of_pos_qname] = {
-                    "type": "array",
-                    "size": 3,
+                variables[node_qname] = {
+                    "type": None,
+                    "size": 1,
                     "dtype": "double",
                     "value": None,
                 }
@@ -198,16 +200,97 @@ class CoordinatesTranslator:
                     "value": asb_qname,
                 }
 
+                variables[f"{node_qname}_vector"] = {
+                    "type": "array",
+                    "size": 3,
+                    "dtype": "double",
+                    "value": None,
+                }
+
                 if g[node : rdflib.RDF.type : GEOM_COORD.VectorXYZ]:
                     x = g.value(of_pos, GEOM_COORD.x).toPython()
                     y = g.value(of_pos, GEOM_COORD.y).toPython()
                     z = g.value(of_pos, GEOM_COORD.z).toPython()
 
-                    variables[of_pos_qname]["value"] = [x, y, z]
+                    variables[node_qname]["value"] = [x, y, z]
 
                 data["of"] = {
-                    "id": of_pos_qname,
+                    "id": node_qname,
                     "entity": of_qname,
+                    "type": "position",
+                    "vector": f'{node_qname}_vector',
+                }
+                data["asb"] = asb_qname
+                data["wrt"] = wrt_qname
+
+            elif g[node : rdflib.RDF.type : GEOM_COORD.OrientationCoordinate]:
+                data["type"] = "Orientation"
+
+                of_ori = g.value(node, GEOM_COORD.of)
+                # TODO: do something with this
+                asb = g.value(node, GEOM_COORD["as-seen-by"])
+
+                # get Orientation
+                of = g.value(of_ori, GEOM_REL["of-entity"])
+                wrt = g.value(of_ori, GEOM_REL["with-respect-to"])
+
+                of_ori_qname = g.compute_qname(of_ori)[2]
+                asb_qname = g.compute_qname(asb)[2]
+                of_qname = g.compute_qname(of)[2]
+                wrt_qname = g.compute_qname(wrt)[2]
+
+                variables[node_qname] = {
+                    "type": None,
+                    "size": 1, # quaternion TODO: this is not correct
+                    "dtype": "double",
+                    "value": None,
+                }
+
+                variables[of_ori_qname] = {
+                    "type": None,
+                    "size": 1, # quaternion
+                    "dtype": "double",
+                    "value": None,
+                }
+
+                variables[of_qname] = {
+                    "type": None,
+                    "dtype": "string",
+                    "value": of_qname.replace("_origin_point", ""),
+                }
+
+                variables[wrt_qname] = {
+                    "type": None,
+                    "dtype": "string",
+                    "value": wrt_qname.replace("_origin_point", ""),
+                }
+
+                variables[asb_qname] = {
+                    "type": None,
+                    "dtype": "string",
+                    "value": asb_qname,
+                }
+
+                variables[f"{node_qname}_vector"] = {
+                    "type": "array",
+                    "size": 3,
+                    "dtype": "double",
+                    "value": None,
+                }
+
+                if g[node : rdflib.RDF.type : GEOM_COORD.QuaterniontXYZW]:
+                    x = g.value(of_pos, GEOM_COORD.x).toPython()
+                    y = g.value(of_pos, GEOM_COORD.y).toPython()
+                    z = g.value(of_pos, GEOM_COORD.z).toPython()
+                    w = g.value(of_pos, GEOM_COORD.w).toPython()
+
+                    variables[node_qname]["value"] = [x, y, z, w]
+
+                data["of"] = {
+                    "id": node_qname,
+                    "entity": of_qname,
+                    "type": "orientation",
+                    "vector": f'{node_qname}_vector',
                 }
                 data["asb"] = asb_qname
                 data["wrt"] = wrt_qname

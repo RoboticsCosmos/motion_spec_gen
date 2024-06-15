@@ -26,7 +26,14 @@ initialize_manipulator_state(<robot>_chain.getNrOfJoints(), <robot>_chain.getNrO
 >>
 
 computeForwardPoseKinematics(measured, data) ::= <<
+>>
+
+computePosition(measured, data) ::= <<
 getLinkPosition(<measured.of.entity>, <measured.asb>, <measured.wrt>, <measured.of.vector>, &robot, <measured.of.id>);
+>>
+
+computeOrientation(measured, data) ::= <<
+getLinkQuaternion(<measured.of.entity>, <measured.asb>, <measured.wrt>, <measured.of.vector>, &robot, <measured.of.id>);
 >>
 
 computeForwardVelocityKinematics(measured, data) ::= <<

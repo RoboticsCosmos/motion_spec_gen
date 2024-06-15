@@ -121,9 +121,9 @@ class GEOM_COORD(DefinedNamespace):
     PositionVectorY: URIRef
     PositionVectorZ: URIRef
 
-    OrientationVectorX: URIRef
-    OrientationVectorY: URIRef
-    OrientationVectorZ: URIRef
+    OrientationAboutX: URIRef
+    OrientationAboutY: URIRef
+    OrientationAboutZ: URIRef
 
     LinearVelocityVectorX: URIRef
     LinearVelocityVectorY: URIRef
@@ -146,6 +146,7 @@ class GEOM_COORD(DefinedNamespace):
     LinearAccelerationVector: URIRef
 
     VectorXYZ: URIRef
+    QuaterniontXYZW: URIRef
 
     AngleAboutZ: URIRef
 

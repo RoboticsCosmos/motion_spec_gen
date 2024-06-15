@@ -46,11 +46,11 @@ int main()
   <! kdl init !>
   <kdl_init()>
 
+  <initialize_control_loop_freq()>
+
   // initialize variables
   <! variables !>
   <variables: {v | <variables_init(v, variables.(v))> }; separator="\n">
-
-  <initialize_control_loop_freq()>
 
   <! update robot state !>
   get_robot_data(&robot, control_loop_dt);
