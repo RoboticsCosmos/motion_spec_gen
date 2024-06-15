@@ -9,5 +9,4 @@
   
 ## Changes made / Bugs fixed:
 
-- [x] control_loop_dt has to be used for all controllers, if no factor specified. Ref freddy_uc1_ref.
-- [x] handlers for position and orientation coordinates
+- [x] bug fix in vector computation for the position and orinetation coordinates

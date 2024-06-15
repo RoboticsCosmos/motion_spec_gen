@@ -162,6 +162,16 @@ class CoordinatesTranslator:
             elif g[node : rdflib.RDF.type : GEOM_COORD.PositionCoordinate]:
                 data["type"] = "Position"
 
+                # get the types of coordinates
+                coord_types = g.objects(node, rdflib.RDF.type)
+                # get the type with vector in it
+                vector_type = [
+                    t
+                    for t in coord_types
+                    if "vector" in str(t).lower()
+                ][0]
+                vec_comp, suffix = get_vector_value(str(vector_type))
+
                 of_pos = g.value(node, GEOM_COORD.of)
                 # TODO: do something with this
                 asb = g.value(node, GEOM_COORD["as-seen-by"])
@@ -202,9 +212,9 @@ class CoordinatesTranslator:
 
                 variables[f"{node_qname}_vector"] = {
                     "type": "array",
-                    "size": 3,
+                    "size": 6,
                     "dtype": "double",
-                    "value": None,
+                    "value": vec_comp,
                 }
 
                 if g[node : rdflib.RDF.type : GEOM_COORD.VectorXYZ]:
@@ -225,6 +235,16 @@ class CoordinatesTranslator:
 
             elif g[node : rdflib.RDF.type : GEOM_COORD.OrientationCoordinate]:
                 data["type"] = "Orientation"
+
+                # get the types of coordinates
+                coord_types = g.objects(node, rdflib.RDF.type)
+                # get the type with vector in it
+                vector_type = [
+                    t
+                    for t in coord_types
+                    if "vector" in str(t).lower() or "about" in str(t).lower()
+                ][0]
+                vec_comp, suffix = get_vector_value(str(vector_type))
 
                 of_ori = g.value(node, GEOM_COORD.of)
                 # TODO: do something with this
@@ -273,9 +293,9 @@ class CoordinatesTranslator:
 
                 variables[f"{node_qname}_vector"] = {
                     "type": "array",
-                    "size": 3,
+                    "size": 6,
                     "dtype": "double",
-                    "value": None,
+                    "value": vec_comp
                 }
 
                 if g[node : rdflib.RDF.type : GEOM_COORD.QuaterniontXYZW]:

@@ -173,9 +173,16 @@
     },
     "kr_bl_position_coord_lin_y_initial_vector": {
       "type": "array",
-      "size": 3,
+      "size": 6,
       "dtype": "double",
-      "value": null
+      "value": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
     },
     "kr_bl_position_coord_lin_y": {
       "type": null,
@@ -185,9 +192,16 @@
     },
     "kr_bl_position_coord_lin_y_vector": {
       "type": "array",
-      "size": 3,
+      "size": 6,
       "dtype": "double",
-      "value": null
+      "value": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
     },
     "kr_bl_position_lin_y_pid_controller_time_step": {
       "type": null,
@@ -244,9 +258,16 @@
     },
     "kr_bl_position_coord_lin_z_initial_vector": {
       "type": "array",
-      "size": 3,
+      "size": 6,
       "dtype": "double",
-      "value": null
+      "value": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
     },
     "kr_bl_position_coord_lin_z": {
       "type": null,
@@ -256,9 +277,16 @@
     },
     "kr_bl_position_coord_lin_z_vector": {
       "type": "array",
-      "size": 3,
+      "size": 6,
       "dtype": "double",
-      "value": null
+      "value": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
     },
     "kr_bl_position_lin_z_pid_controller_time_step": {
       "type": null,
@@ -321,9 +349,16 @@
     },
     "kr_bl_orientation_coord_ang_x_initial_vector": {
       "type": "array",
-      "size": 3,
+      "size": 6,
       "dtype": "double",
-      "value": null
+      "value": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        0
+      ]
     },
     "kr_bl_orientation_coord_ang_x": {
       "type": null,
@@ -333,9 +368,16 @@
     },
     "kr_bl_orientation_coord_ang_x_vector": {
       "type": "array",
-      "size": 3,
+      "size": 6,
       "dtype": "double",
-      "value": null
+      "value": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        0
+      ]
     },
     "kr_bl_orientation_ang_x_pid_controller_time_step": {
       "type": null,
@@ -392,9 +434,16 @@
     },
     "kr_bl_orientation_coord_ang_y_initial_vector": {
       "type": "array",
-      "size": 3,
+      "size": 6,
       "dtype": "double",
-      "value": null
+      "value": [
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+      ]
     },
     "kr_bl_orientation_coord_ang_y": {
       "type": null,
@@ -404,9 +453,16 @@
     },
     "kr_bl_orientation_coord_ang_y_vector": {
       "type": "array",
-      "size": 3,
+      "size": 6,
       "dtype": "double",
-      "value": null
+      "value": [
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+      ]
     },
     "kr_bl_orientation_ang_y_pid_controller_time_step": {
       "type": null,
@@ -463,9 +519,16 @@
     },
     "kr_bl_orientation_coord_ang_z_initial_vector": {
       "type": "array",
-      "size": 3,
+      "size": 6,
       "dtype": "double",
-      "value": null
+      "value": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ]
     },
     "kr_bl_orientation_coord_ang_z": {
       "type": null,
@@ -475,9 +538,16 @@
     },
     "kr_bl_orientation_coord_ang_z_vector": {
       "type": "array",
-      "size": 3,
+      "size": 6,
       "dtype": "double",
-      "value": null
+      "value": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ]
     },
     "kr_bl_orientation_ang_z_pid_controller_time_step": {
       "type": null,
@@ -592,9 +662,16 @@
     },
     "kl_bl_position_coord_lin_y_initial_vector": {
       "type": "array",
-      "size": 3,
+      "size": 6,
       "dtype": "double",
-      "value": null
+      "value": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
     },
     "kl_bl_position_coord_lin_y": {
       "type": null,
@@ -604,9 +681,16 @@
     },
     "kl_bl_position_coord_lin_y_vector": {
       "type": "array",
-      "size": 3,
+      "size": 6,
       "dtype": "double",
-      "value": null
+      "value": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
     },
     "kl_bl_position_lin_y_pid_controller_time_step": {
       "type": null,
@@ -663,9 +747,16 @@
     },
     "kl_bl_position_coord_lin_z_initial_vector": {
       "type": "array",
-      "size": 3,
+      "size": 6,
       "dtype": "double",
-      "value": null
+      "value": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
     },
     "kl_bl_position_coord_lin_z": {
       "type": null,
@@ -675,9 +766,16 @@
     },
     "kl_bl_position_coord_lin_z_vector": {
       "type": "array",
-      "size": 3,
+      "size": 6,
       "dtype": "double",
-      "value": null
+      "value": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
     },
     "kl_bl_position_lin_z_pid_controller_time_step": {
       "type": null,
@@ -740,9 +838,16 @@
     },
     "kl_bl_orientation_coord_ang_x_initial_vector": {
       "type": "array",
-      "size": 3,
+      "size": 6,
       "dtype": "double",
-      "value": null
+      "value": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        0
+      ]
     },
     "kl_bl_orientation_coord_ang_x": {
       "type": null,
@@ -752,9 +857,16 @@
     },
     "kl_bl_orientation_coord_ang_x_vector": {
       "type": "array",
-      "size": 3,
+      "size": 6,
       "dtype": "double",
-      "value": null
+      "value": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        0
+      ]
     },
     "kl_bl_orientation_ang_x_pid_controller_time_step": {
       "type": null,
@@ -811,9 +923,16 @@
     },
     "kl_bl_orientation_coord_ang_y_initial_vector": {
       "type": "array",
-      "size": 3,
+      "size": 6,
       "dtype": "double",
-      "value": null
+      "value": [
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+      ]
     },
     "kl_bl_orientation_coord_ang_y": {
       "type": null,
@@ -823,9 +942,16 @@
     },
     "kl_bl_orientation_coord_ang_y_vector": {
       "type": "array",
-      "size": 3,
+      "size": 6,
       "dtype": "double",
-      "value": null
+      "value": [
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+      ]
     },
     "kl_bl_orientation_ang_y_pid_controller_time_step": {
       "type": null,
@@ -882,9 +1008,16 @@
     },
     "kl_bl_orientation_coord_ang_z_initial_vector": {
       "type": "array",
-      "size": 3,
+      "size": 6,
       "dtype": "double",
-      "value": null
+      "value": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ]
     },
     "kl_bl_orientation_coord_ang_z": {
       "type": null,
@@ -894,9 +1027,16 @@
     },
     "kl_bl_orientation_coord_ang_z_vector": {
       "type": "array",
-      "size": 3,
+      "size": 6,
       "dtype": "double",
-      "value": null
+      "value": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ]
     },
     "kl_bl_orientation_ang_z_pid_controller_time_step": {
       "type": null,
