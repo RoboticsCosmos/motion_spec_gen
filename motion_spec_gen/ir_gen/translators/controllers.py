@@ -32,8 +32,9 @@ class PIDControllerTranslator:
                 f"{'-'*verbose_padding} Translating PID Controller: {g.compute_qname(node)[2]}"
             )
 
-        compute_variables = {}
+        initial_compute_variables = {}
         variables = {}
+        compute_variables = {}
         data = {
             "measured": {},
         }
@@ -138,8 +139,8 @@ class PIDControllerTranslator:
                         case _:
                             raise ValueError("Reference coordinate type not supported")
 
-                    # add it to compute_variables
-                    compute_variables[ref_coord_var_id] = {
+                    # add it to initial_compute_variables
+                    initial_compute_variables[ref_coord_var_id] = {
                         "measured": {
                             "of": ref_coord_ir["data"]["of"],
                             "asb": ref_coord_ir["data"]["asb"],
@@ -163,8 +164,7 @@ class PIDControllerTranslator:
 
         coord_type = measured_coord_ir["data"]["type"]
 
-        if coord_type != "Force":
-            data["measured"]["wrt"] = measured_coord_ir["data"]["wrt"]
+        
 
         match coord_type:
             case "Distance":
@@ -270,9 +270,19 @@ class PIDControllerTranslator:
             "value": embed_map_vector,
         }
 
+        compute_variables[measured_coord_ir["data"]["of"]["id"]] = {
+            "measured": {
+                "of": measured_coord_ir["data"]["of"],
+                "asb": measured_coord_ir["data"]["asb"],
+            },
+            "measure_variable": measure_variable,
+        }
+
+        if coord_type != "Force":
+            compute_variables[measured_coord_ir["data"]["of"]["id"]]["measured"]["wrt"] = measured_coord_ir["data"]["wrt"]
+
         data["name"] = "pid_controller"
         data["error"] = f"{id}_error"
-        data["measure_variable"] = measure_variable
         data["dt"] = f"{id}_time_step"
         data["gains"] = gains if len(gains) > 0 else None
         data["measured"]["of"] = measured_coord_ir["data"]["of"]
@@ -286,6 +296,7 @@ class PIDControllerTranslator:
             "id": id,
             "data": data,
             "variables": variables,
+            "initial_compute_variables": initial_compute_variables,
             "compute_variables": compute_variables,
         }
 
@@ -296,6 +307,7 @@ class ImpedanceControllerTranslator:
     def translate(self, g: rdflib.Graph, node, verbose=False, **kwargs) -> dict:
 
         variables = {}
+        compute_variables = {}
         data = {}
 
         id = g.compute_qname(node)[2]
@@ -405,6 +417,11 @@ class ImpedanceControllerTranslator:
                 "measured": measured,
             }
 
+            compute_variables[measured["of"]["id"]] = {
+                "measured": measured,
+                "measure_variable": measure_variable,
+            }
+
         force = g.value(node, IMPEDANCE_CONTROLLER.force)
 
         if g[force : rdflib.RDF.type : NEWTONIAN_RBD_REL.VirtualForce]:
@@ -431,4 +448,5 @@ class ImpedanceControllerTranslator:
             "id": id,
             "data": data,
             "variables": variables,
+            "compute_variables": compute_variables,
         }

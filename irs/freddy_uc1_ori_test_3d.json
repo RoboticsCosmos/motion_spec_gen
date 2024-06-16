@@ -1143,7 +1143,7 @@
       "value": null
     }
   },
-  "compute_variables": {
+  "initial_compute_variables": {
     "kr_bl_position_coord_lin_y_initial": {
       "measured": {
         "of": {
@@ -1228,6 +1228,140 @@
       "pre": {},
       "post": {}
     },
+    "compute_variables": {
+      "kl_bracelet_table_contact_force_lin_z": {
+        "measured": {
+          "of": {
+            "id": "kl_bracelet_table_contact_force_lin_z",
+            "applied_by_entity": "kl_bracelet_link",
+            "applied_to_entity": "table",
+            "type": "force",
+            "vector": "kl_bracelet_table_contact_force_lin_z_vector_lin_z"
+          },
+          "asb": "kl_bracelet_link"
+        },
+        "measure_variable": "computeForce"
+      },
+      "kr_bracelet_table_contact_force_lin_z": {
+        "measured": {
+          "of": {
+            "id": "kr_bracelet_table_contact_force_lin_z",
+            "applied_by_entity": "kr_bracelet_link",
+            "applied_to_entity": "table",
+            "type": "force",
+            "vector": "kr_bracelet_table_contact_force_lin_z_vector_lin_z"
+          },
+          "asb": "kr_bracelet_link"
+        },
+        "measure_variable": "computeForce"
+      },
+      "kr_bl_position_coord_lin_y": {
+        "measured": {
+          "of": {
+            "id": "kr_bl_position_coord_lin_y",
+            "entity": "kinova_right_bracelet_link_origin_point",
+            "type": "position",
+            "vector": "kr_bl_position_coord_lin_y_vector"
+          },
+          "asb": "base_link",
+          "wrt": "base_link_origin_point"
+        },
+        "measure_variable": "computePosition"
+      },
+      "kr_bl_position_coord_lin_z": {
+        "measured": {
+          "of": {
+            "id": "kr_bl_position_coord_lin_z",
+            "entity": "kinova_right_bracelet_link_origin_point",
+            "type": "position",
+            "vector": "kr_bl_position_coord_lin_z_vector"
+          },
+          "asb": "base_link",
+          "wrt": "base_link_origin_point"
+        },
+        "measure_variable": "computePosition"
+      },
+      "kr_bl_orientation_coord": {
+        "measured": {
+          "of": {
+            "id": "kr_bl_orientation_coord",
+            "entity": "kinova_right_bracelet_link_origin_point",
+            "type": "Quaternion",
+            "vector": "kr_bl_orientation_coord_vector"
+          },
+          "asb": "base_link",
+          "wrt": "base_link_origin_point"
+        },
+        "measure_variable": "computeQuaternion"
+      },
+      "kr_elbow_base_distance_coord_lin_z": {
+        "measured": {
+          "of": {
+            "id": "kr_elbow_base_distance_coord_lin_z",
+            "entities": [
+              "kinova_right_half_arm_2_link_origin_point",
+              "base_link_origin_point"
+            ],
+            "axis": "kr_elbow_base_distance_coord_lin_z_axis"
+          },
+          "asb": "base_link"
+        },
+        "measure_variable": "computeDistance1D"
+      },
+      "kl_bl_position_coord_lin_y": {
+        "measured": {
+          "of": {
+            "id": "kl_bl_position_coord_lin_y",
+            "entity": "kinova_left_bracelet_link_origin_point",
+            "type": "position",
+            "vector": "kl_bl_position_coord_lin_y_vector"
+          },
+          "asb": "base_link",
+          "wrt": "base_link_origin_point"
+        },
+        "measure_variable": "computePosition"
+      },
+      "kl_bl_position_coord_lin_z": {
+        "measured": {
+          "of": {
+            "id": "kl_bl_position_coord_lin_z",
+            "entity": "kinova_left_bracelet_link_origin_point",
+            "type": "position",
+            "vector": "kl_bl_position_coord_lin_z_vector"
+          },
+          "asb": "base_link",
+          "wrt": "base_link_origin_point"
+        },
+        "measure_variable": "computePosition"
+      },
+      "kl_bl_orientation_coord": {
+        "measured": {
+          "of": {
+            "id": "kl_bl_orientation_coord",
+            "entity": "kinova_left_bracelet_link_origin_point",
+            "type": "Quaternion",
+            "vector": "kl_bl_orientation_coord_vector"
+          },
+          "asb": "base_link",
+          "wrt": "base_link_origin_point"
+        },
+        "measure_variable": "computeQuaternion"
+      },
+      "kl_elbow_base_distance_coord_lin_z": {
+        "measured": {
+          "of": {
+            "id": "kl_elbow_base_distance_coord_lin_z",
+            "entities": [
+              "kinova_left_half_arm_2_link_origin_point",
+              "base_link_origin_point"
+            ],
+            "axis": "kl_elbow_base_distance_coord_lin_z_axis"
+          },
+          "asb": "base_link"
+        },
+        "measure_variable": "computeDistance1D"
+      }
+    },
     "controllers": {
       "kl_bracelet_table_contact_force_pid_controller": {
         "measured": {
@@ -1245,7 +1379,6 @@
         "size": null,
         "name": "pid_controller",
         "error": "kl_bracelet_table_contact_force_pid_controller_error",
-        "measure_variable": "computeForce",
         "dt": "kl_bracelet_table_contact_force_pid_controller_time_step",
         "gains": {
           "kp": "kl_bracelet_table_contact_force_pid_controller_kp",
@@ -1273,7 +1406,6 @@
         "size": null,
         "name": "pid_controller",
         "error": "kr_bracelet_table_contact_force_pid_controller_error",
-        "measure_variable": "computeForce",
         "dt": "kr_bracelet_table_contact_force_pid_controller_time_step",
         "gains": {
           "kp": "kr_bracelet_table_contact_force_pid_controller_kp",
@@ -1287,7 +1419,6 @@
       },
       "kr_bl_position_lin_y_pid_controller": {
         "measured": {
-          "wrt": "base_link_origin_point",
           "of": {
             "id": "kr_bl_position_coord_lin_y",
             "entity": "kinova_right_bracelet_link_origin_point",
@@ -1301,7 +1432,6 @@
         "size": null,
         "name": "pid_controller",
         "error": "kr_bl_position_lin_y_pid_controller_error",
-        "measure_variable": "computePosition",
         "dt": "kr_bl_position_lin_y_pid_controller_time_step",
         "gains": {
           "kp": "kr_bl_position_lin_y_pid_controller_kp",
@@ -1315,7 +1445,6 @@
       },
       "kr_bl_position_lin_z_pid_controller": {
         "measured": {
-          "wrt": "base_link_origin_point",
           "of": {
             "id": "kr_bl_position_coord_lin_z",
             "entity": "kinova_right_bracelet_link_origin_point",
@@ -1329,7 +1458,6 @@
         "size": null,
         "name": "pid_controller",
         "error": "kr_bl_position_lin_z_pid_controller_error",
-        "measure_variable": "computePosition",
         "dt": "kr_bl_position_lin_z_pid_controller_time_step",
         "gains": {
           "kp": "kr_bl_position_lin_z_pid_controller_kp",
@@ -1343,7 +1471,6 @@
       },
       "kr_bl_orientation_pid_controller": {
         "measured": {
-          "wrt": "base_link_origin_point",
           "of": {
             "id": "kr_bl_orientation_coord",
             "entity": "kinova_right_bracelet_link_origin_point",
@@ -1357,7 +1484,6 @@
         "size": 3,
         "name": "pid_controller",
         "error": "kr_bl_orientation_pid_controller_error",
-        "measure_variable": "computeQuaternion",
         "dt": "kr_bl_orientation_pid_controller_time_step",
         "gains": {
           "kp": "kr_bl_orientation_pid_controller_kp",
@@ -1399,7 +1525,6 @@
       },
       "kl_bl_position_lin_y_pid_controller": {
         "measured": {
-          "wrt": "base_link_origin_point",
           "of": {
             "id": "kl_bl_position_coord_lin_y",
             "entity": "kinova_left_bracelet_link_origin_point",
@@ -1413,7 +1538,6 @@
         "size": null,
         "name": "pid_controller",
         "error": "kl_bl_position_lin_y_pid_controller_error",
-        "measure_variable": "computePosition",
         "dt": "kl_bl_position_lin_y_pid_controller_time_step",
         "gains": {
           "kp": "kl_bl_position_lin_y_pid_controller_kp",
@@ -1427,7 +1551,6 @@
       },
       "kl_bl_position_lin_z_pid_controller": {
         "measured": {
-          "wrt": "base_link_origin_point",
           "of": {
             "id": "kl_bl_position_coord_lin_z",
             "entity": "kinova_left_bracelet_link_origin_point",
@@ -1441,7 +1564,6 @@
         "size": null,
         "name": "pid_controller",
         "error": "kl_bl_position_lin_z_pid_controller_error",
-        "measure_variable": "computePosition",
         "dt": "kl_bl_position_lin_z_pid_controller_time_step",
         "gains": {
           "kp": "kl_bl_position_lin_z_pid_controller_kp",
@@ -1455,7 +1577,6 @@
       },
       "kl_bl_orientation_pid_controller": {
         "measured": {
-          "wrt": "base_link_origin_point",
           "of": {
             "id": "kl_bl_orientation_coord",
             "entity": "kinova_left_bracelet_link_origin_point",
@@ -1469,7 +1590,6 @@
         "size": 3,
         "name": "pid_controller",
         "error": "kl_bl_orientation_pid_controller_error",
-        "measure_variable": "computeQuaternion",
         "dt": "kl_bl_orientation_pid_controller_time_step",
         "gains": {
           "kp": "kl_bl_orientation_pid_controller_kp",

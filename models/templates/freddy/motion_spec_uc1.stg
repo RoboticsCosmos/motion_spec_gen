@@ -8,7 +8,7 @@ import "../common/embed_maps.stg"
 import "../common/solvers.stg"
 import "../common/control_loop_freq.stg"
 
-application(variables, compute_variables, d) ::= <<
+application(variables, initial_compute_variables, d) ::= <<
 <kelo_motion_control_include()>
 <cpp_include()>
 <controller_include()>
@@ -60,7 +60,7 @@ int main()
 
   // update compute variables
   <! cmpute variables !>
-  <compute_variables: {v | <compute_variables_init(v, compute_variables.(v))> }; separator="\n">
+  <initial_compute_variables: {v | <compute_variables_init(v, initial_compute_variables.(v))> }; separator="\n">
 
   int count = 0;
 
@@ -79,6 +79,9 @@ int main()
 
     <! update robot state !>
     get_robot_data(&robot, control_loop_timestep);
+
+    // update compute variables
+    <d.compute_variables: {v | <compute_variables_init(v, d.compute_variables.(v))> }; separator="\n">
 
     // controllers
     <! controllers !>
