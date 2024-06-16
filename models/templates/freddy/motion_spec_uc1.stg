@@ -53,7 +53,7 @@ int main()
   <variables: {v | <variables_init(v, variables.(v))> }; separator="\n">
 
   <! update robot state !>
-  get_robot_data(&robot, control_loop_dt);
+  get_robot_data(&robot, control_loop_timestep);
 
   // initial taus for manipulators during control mode switch
   <compute_initial_robots_torques(d.robots)>
@@ -78,11 +78,11 @@ int main()
     // printf("count: %d\n", count);
 
     <! update robot state !>
-    get_robot_data(&robot, control_loop_dt);
+    get_robot_data(&robot, control_loop_timestep);
 
     // controllers
     <! controllers !>
-    <d.controllers: {v | <({<d.controllers.(v).name>})(v, d.controllers.(v))>}; separator="\n">
+    <d.controllers: {v | <({<d.controllers.(v).name>})(v, d.controllers.(v), variables)>}; separator="\n">
 
     // embed maps
     <! embed maps !>

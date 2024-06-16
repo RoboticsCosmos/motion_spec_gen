@@ -1,9 +1,12 @@
-pid_controller(id, data) ::= <<
+pid_controller(id, data, variables) ::= <<
 // pid controller
 <({<data.measure_variable>})(data.measured, data)>
-double <data.error> = 0;
+<variables_init(data.error, variables.(data.error))>
 <({compute<data.operator>Error})(data.measured, data.reference_value, data.error)>
-pidController(<data.error>, <data.gains.kp>, <data.gains.ki>, <data.gains.kd>, <data.dt>, <data.error_sum>, <data.last_error>, <data.signal>);
+<if(!data.size)>pidController(<data.error>, <data.gains.kp>, <data.gains.ki>, <data.gains.kd>, <data.dt>, <data.error_sum>, <data.last_error>, <data.signal>);
+<else>
+pidController(<data.error>, <data.gains.kp>, <data.gains.ki>, <data.gains.kd>, <data.dt>, <data.error_sum>, <data.last_error>, <data.signal>, <data.size>);
+<endif>
 
 >>
 
@@ -11,7 +14,11 @@ computeEqualError(measured, reference_value, error) ::= <<
 computeEqualityError(<measured.of.id>, <reference_value>, <error>);
 >>
 
-impedance_controller(id, data) ::= <<
+computeQuaternionEqualError(measured, reference_value, error) ::= <<
+computeQuaternionEqualityError(<measured.of.id>, <reference_value>, <error>);
+>>
+
+impedance_controller(id, data, variables) ::= <<
 // impedance controller
 <if(data.stiffness)><stiffness(data)><endif>
 <if(data.damping)><damping(data)><endif>
@@ -20,6 +27,7 @@ impedanceController(<if(data.stiffness)><data.stiffness.error><else>0.0<endif>, 
 >>
 
 stiffness(data) ::= <<
+<! TODO: handle stiffness error similar to pid_controller error !>
 double <data.stiffness.error> = 0;
 <({<data.stiffness.measure_variable>})(data.stiffness.measured, data)>
 <({compute<data.operator>Error})(data.stiffness.measured, data.stiffness.reference_value, data.stiffness.error)>

@@ -44,7 +44,11 @@ def get_vector_value(input_string):
     if vec_comp is None:
         raise ValueError("Invalid suffix")
 
-    if "linear" in input_string or "position" in input_string:
+    if (
+        "linear" in input_string
+        or "position" in input_string
+        or "force" in input_string
+    ):
         return vec_comp + (0, 0, 0), f"lin_{suffix.lower()}"
     elif (
         "angular" in input_string
@@ -165,11 +169,7 @@ class CoordinatesTranslator:
                 # get the types of coordinates
                 coord_types = g.objects(node, rdflib.RDF.type)
                 # get the type with vector in it
-                vector_type = [
-                    t
-                    for t in coord_types
-                    if "vector" in str(t).lower()
-                ][0]
+                vector_type = [t for t in coord_types if "vector" in str(t).lower()][0]
                 vec_comp, suffix = get_vector_value(str(vector_type))
 
                 of_pos = g.value(node, GEOM_COORD.of)
@@ -228,13 +228,12 @@ class CoordinatesTranslator:
                     "id": node_qname,
                     "entity": of_qname,
                     "type": "position",
-                    "vector": f'{node_qname}_vector',
+                    "vector": f"{node_qname}_vector",
                 }
                 data["asb"] = asb_qname
                 data["wrt"] = wrt_qname
 
             elif g[node : rdflib.RDF.type : GEOM_COORD.OrientationCoordinate]:
-                data["type"] = "Orientation"
 
                 # get the types of coordinates
                 coord_types = g.objects(node, rdflib.RDF.type)
@@ -259,16 +258,28 @@ class CoordinatesTranslator:
                 of_qname = g.compute_qname(of)[2]
                 wrt_qname = g.compute_qname(wrt)[2]
 
-                variables[node_qname] = {
-                    "type": None,
-                    "size": 1, # quaternion TODO: this is not correct
-                    "dtype": "double",
-                    "value": None,
-                }
+                if sum(vec_comp) == 1:
+                    data["type"] = "Orientation1D"
+                    variables[node_qname] = {
+                        "type": None,
+                        "size": 1,  # TODO: this is not correct
+                        "dtype": "double",
+                        "value": None,
+                    }
+                elif sum(vec_comp) == 3:
+                    data["type"] = "Quaternion"
+                    variables[node_qname] = {
+                        "type": "array",
+                        "size": 4,  # quaternion
+                        "dtype": "double",
+                        "value": None,
+                    }
+                else:
+                    raise ValueError("Invalid orientation vector")
 
                 variables[of_ori_qname] = {
                     "type": None,
-                    "size": 1, # quaternion
+                    "size": 1,  # quaternion
                     "dtype": "double",
                     "value": None,
                 }
@@ -295,7 +306,7 @@ class CoordinatesTranslator:
                     "type": "array",
                     "size": 6,
                     "dtype": "double",
-                    "value": vec_comp
+                    "value": vec_comp,
                 }
 
                 if g[node : rdflib.RDF.type : GEOM_COORD.QuaterniontXYZW]:
@@ -309,8 +320,8 @@ class CoordinatesTranslator:
                 data["of"] = {
                     "id": node_qname,
                     "entity": of_qname,
-                    "type": "orientation",
-                    "vector": f'{node_qname}_vector',
+                    "type": data["type"],
+                    "vector": f"{node_qname}_vector",
                 }
                 data["asb"] = asb_qname
                 data["wrt"] = wrt_qname

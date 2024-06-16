@@ -91,6 +91,9 @@ def main(motion_spec_name: str = None, ir_out_file_name: str = "ir.json", verbos
 
     for motion_spec in g.subjects(rdflib.RDF.type, MOTION_SPEC.MotionSpec):
 
+        if verbose:
+            print(f"Translating motion spec: {g.compute_qname(motion_spec)[2]}\n")
+
         pre_conditions = g.objects(motion_spec, MOTION_SPEC["pre-conditions"])
         per_conditions = g.objects(motion_spec, MOTION_SPEC["per-conditions"])
         post_conditions = g.objects(motion_spec, MOTION_SPEC["post-conditions"])
@@ -138,7 +141,7 @@ def main(motion_spec_name: str = None, ir_out_file_name: str = "ir.json", verbos
 
                     if "compute_variables" in ir:
                         data["compute_variables"].update(ir["compute_variables"])
-
+            
             embed_map = g.value(predicate=EMBED_MAP.controller, object=controller)
             embed_map_ir = EmbedMapTranslator().translate(g, embed_map)
 

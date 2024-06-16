@@ -54,12 +54,16 @@ class PIDControllerTranslator:
         embed_map_vector = list(Collection(g, embed_map_vector_collec))
         embed_map_vector = [float(q) for q in embed_map_vector]
 
-        # append signal to variables
-        variables[g.compute_qname(signal)[2]] = {
-            "type": None,
-            "dtype": "double",
-            "value": None,
-        }
+        # temp hack for handling 3d control
+        # get number of non-zero elements in the vector
+        non_zero_elements = len([i for i in embed_map_vector if i != 0])
+
+        var_type = None
+        var_size = None
+
+        if non_zero_elements > 1:
+            var_type = "array"
+            var_size = non_zero_elements
 
         constraint = g.value(node, CONTROLLER.constraint)
         quantity = g.value(constraint, CONSTRAINT.quantity)
@@ -98,29 +102,41 @@ class PIDControllerTranslator:
                     g, reference_value, prefix="", verbose=verbose, verbose_padding=4
                 )
 
-                # print(f'ref {reference_value} coord vars: {ref_coord_ir["variables"]}')
                 ref_coord_var_id = ref_coord_ir["data"]["of"]["id"]
                 if ref_coord_ir["variables"][ref_coord_var_id]["value"] is None:
 
                     # pop the value from variables
-                    ref_coord_var = ref_coord_ir["variables"].pop(ref_coord_var_id)
+                    # ref_coord_var = ref_coord_ir["variables"].pop(ref_coord_var_id)
 
-                    ref_coord_var = {
-                        "type": None,
-                        "dtype": "double",
-                        "value": None,
-                    }
+                    # ref_coord_var = {
+                    #     "type": None,
+                    #     "dtype": "double",
+                    #     "value": None,
+                    # }
 
-                    variables[ref_coord_var_id] = ref_coord_var
+                    # variables[ref_coord_var_id] = ref_coord_var
 
-                    if ref_coord_ir["data"]["type"] == "Pose":
-                        measure_variable = "computeForwardPoseKinematics"
-                    elif ref_coord_ir["data"]["type"] == "Position":
-                        measure_variable = "computePosition"
-                    elif ref_coord_ir["data"]["type"] == "Orientation":
-                        measure_variable = "computeOrientation"
-                    else:
-                        raise ValueError("Reference coordinate type not supported")
+                    coord_type = ref_coord_ir["data"]["type"]
+
+                    match coord_type:
+                        case "Distance":
+                            measure_variable = "computeDistance"
+                        case "Distance1D":
+                            measure_variable = "computeDistance1D"
+                        case "Pose":
+                            measure_variable = "computeForwardPoseKinematics"
+                        case "Position":
+                            measure_variable = "computePosition"
+                        case "Orientation1D":
+                            measure_variable = "computeOrientation1D"
+                        case "Quaternion":
+                            measure_variable = "computeQuaternion"
+                        case "VelocityTwist":
+                            measure_variable = "computeForwardVelocityKinematics"
+                        case "Force":
+                            measure_variable = "computeForce"
+                        case _:
+                            raise ValueError("Reference coordinate type not supported")
 
                     # add it to compute_variables
                     compute_variables[ref_coord_var_id] = {
@@ -159,20 +175,26 @@ class PIDControllerTranslator:
                 measure_variable = "computeForwardPoseKinematics"
             case "Position":
                 measure_variable = "computePosition"
-            case "Orientation":
-                measure_variable = "computeOrientation"
+            case "Orientation1D":
+                measure_variable = "computeOrientation1D"
+            case "Quaternion":
+                measure_variable = "computeQuaternion"
             case "VelocityTwist":
                 measure_variable = "computeForwardVelocityKinematics"
             case "Force":
                 measure_variable = "computeForce"
             case _:
                 raise ValueError("Reference coordinate type not supported")
-        
+
+        # temp hack for handling 3d control
+        if operator_type == "Equal" and measure_variable == "computeQuaternion":
+            data["operator"] = "QuaternionEqual"
+
         # time-step
         variables[f"{id}_time_step"] = {
             "type": None,
             "dtype": "double",
-            "value": time_step or "control_loop_dt",
+            "value": time_step or "*control_loop_dt",
         }
 
         # skip any of p, i and d gains if they are not present
@@ -193,16 +215,38 @@ class PIDControllerTranslator:
         }
 
         variables[f"{id}_error_sum"] = {
-            "type": None,
+            "type": var_type,
             "dtype": "double",
             "value": None,
         }
 
         variables[f"{id}_prev_error"] = {
-            "type": None,
+            "type": var_type,
             "dtype": "double",
             "value": None,
         }
+
+        # append signal to variables
+        variables[g.compute_qname(signal)[2]] = {
+            "type": var_type,
+            "dtype": "double",
+            "value": None,
+        }
+
+        variables[f"{id}_error"] = {
+            "type": var_type,
+            "dtype": "double",
+            "value": None,
+        }
+
+        data["size"] = None
+
+        if var_size:
+            variables[g.compute_qname(signal)[2]]["size"] = var_size
+            variables[f"{id}_prev_error"]["size"] = var_size
+            variables[f"{id}_error_sum"]["size"] = var_size
+            variables[f"{id}_error"]["size"] = var_size
+            data["size"] = var_size
 
         gains = {
             "kp": f"{id}_kp",

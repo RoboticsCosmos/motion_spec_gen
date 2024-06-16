@@ -32,8 +32,12 @@ computePosition(measured, data) ::= <<
 getLinkPosition(<measured.of.entity>, <measured.asb>, <measured.wrt>, <measured.of.vector>, &robot, <measured.of.id>);
 >>
 
-computeOrientation(measured, data) ::= <<
-getLinkQuaternion(<measured.of.entity>, <measured.asb>, <measured.wrt>, <measured.of.vector>, &robot, <measured.of.id>);
+computeOrientation1D(measured, data) ::= <<
+<measured.of.id>: Not_implemented
+>>
+
+computeQuaternion(measured, data) ::= <<
+getLinkQuaternion(<measured.of.entity>, <measured.asb>, <measured.wrt>, &robot, <measured.of.id>);
 >>
 
 computeForwardVelocityKinematics(measured, data) ::= <<

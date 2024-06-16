@@ -1,10 +1,5 @@
 {
   "variables": {
-    "kl_bracelet_table_contact_force_pid_controller_signal": {
-      "type": null,
-      "dtype": "double",
-      "value": null
-    },
     "arm_table_contact_force_reference_value": {
       "type": null,
       "dtype": "double",
@@ -24,7 +19,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0, 0, 1, 0, 0, 0]
+      "value": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
     },
     "kl_bracelet_table_contact_force_lin_z": {
       "type": null,
@@ -61,16 +63,28 @@
       "dtype": "double",
       "value": null
     },
+    "kl_bracelet_table_contact_force_pid_controller_signal": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kl_bracelet_table_contact_force_pid_controller_error": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
     "kl_bracelet_table_contact_force_embed_map_vector": {
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0.0, 0.0, 1.0, 0.0, 0.0, 0.0]
-    },
-    "kr_bracelet_table_contact_force_pid_controller_signal": {
-      "type": null,
-      "dtype": "double",
-      "value": null
+      "value": [
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
     },
     "kr_bracelet_link": {
       "type": null,
@@ -81,7 +95,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0, 0, 1, 0, 0, 0]
+      "value": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
     },
     "kr_bracelet_table_contact_force_lin_z": {
       "type": null,
@@ -118,16 +139,28 @@
       "dtype": "double",
       "value": null
     },
+    "kr_bracelet_table_contact_force_pid_controller_signal": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bracelet_table_contact_force_pid_controller_error": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
     "kr_bracelet_table_contact_force_embed_map_vector": {
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0.0, 0.0, 1.0, 0.0, 0.0, 0.0]
-    },
-    "kr_bl_position_lin_y_pid_controller_signal": {
-      "type": null,
-      "dtype": "double",
-      "value": null
+      "value": [
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
     },
     "kr_bl_position_coord_lin_y_initial": {
       "type": null,
@@ -154,7 +187,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0, 1, 0, 0, 0, 0]
+      "value": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
     },
     "kr_bl_position_coord_lin_y": {
       "type": null,
@@ -166,7 +206,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0, 1, 0, 0, 0, 0]
+      "value": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
     },
     "kr_bl_position_lin_y_pid_controller_time_step": {
       "type": null,
@@ -198,16 +245,28 @@
       "dtype": "double",
       "value": null
     },
+    "kr_bl_position_lin_y_pid_controller_signal": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_position_lin_y_pid_controller_error": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
     "kr_bl_position_lin_y_embed_map_vector": {
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
-    },
-    "kr_bl_position_lin_z_pid_controller_signal": {
-      "type": null,
-      "dtype": "double",
-      "value": null
+      "value": [
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
     },
     "kr_bl_position_coord_lin_z_initial": {
       "type": null,
@@ -219,7 +278,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0, 0, 1, 0, 0, 0]
+      "value": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
     },
     "kr_bl_position_coord_lin_z": {
       "type": null,
@@ -231,7 +297,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0, 0, 1, 0, 0, 0]
+      "value": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
     },
     "kr_bl_position_lin_z_pid_controller_time_step": {
       "type": null,
@@ -263,20 +336,32 @@
       "dtype": "double",
       "value": null
     },
-    "kr_bl_position_lin_z_embed_map_vector": {
-      "type": "array",
-      "size": 6,
-      "dtype": "double",
-      "value": [0.0, 0.0, 1.0, 0.0, 0.0, 0.0]
-    },
-    "kr_bl_orientation_ang_x_pid_controller_signal": {
+    "kr_bl_position_lin_z_pid_controller_signal": {
       "type": null,
       "dtype": "double",
       "value": null
     },
-    "kr_bl_orientation_coord_ang_x_initial": {
+    "kr_bl_position_lin_z_pid_controller_error": {
       "type": null,
-      "size": 1,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_position_lin_z_embed_map_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "kr_bl_orientation_coord_initial": {
+      "type": "array",
+      "size": 4,
       "dtype": "double",
       "value": null
     },
@@ -286,189 +371,94 @@
       "dtype": "double",
       "value": null
     },
-    "kr_bl_orientation_coord_ang_x_initial_vector": {
+    "kr_bl_orientation_coord_initial_vector": {
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0, 0, 0, 1, 0, 0]
+      "value": [
+        0,
+        0,
+        0,
+        1,
+        1,
+        1
+      ]
     },
-    "kr_bl_orientation_coord_ang_x": {
-      "type": null,
-      "size": 1,
+    "kr_bl_orientation_coord": {
+      "type": "array",
+      "size": 4,
       "dtype": "double",
       "value": null
     },
-    "kr_bl_orientation_coord_ang_x_vector": {
+    "kr_bl_orientation_coord_vector": {
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0, 0, 0, 1, 0, 0]
+      "value": [
+        0,
+        0,
+        0,
+        1,
+        1,
+        1
+      ]
     },
-    "kr_bl_orientation_ang_x_pid_controller_time_step": {
+    "kr_bl_orientation_pid_controller_time_step": {
       "type": null,
       "dtype": "double",
       "value": "*control_loop_dt"
     },
-    "kr_bl_orientation_ang_x_pid_controller_kp": {
+    "kr_bl_orientation_pid_controller_kp": {
       "type": null,
       "dtype": "double",
       "value": "20.0"
     },
-    "kr_bl_orientation_ang_x_pid_controller_ki": {
+    "kr_bl_orientation_pid_controller_ki": {
       "type": null,
       "dtype": "double",
       "value": "0.9"
     },
-    "kr_bl_orientation_ang_x_pid_controller_kd": {
+    "kr_bl_orientation_pid_controller_kd": {
       "type": null,
       "dtype": "double",
       "value": "2.5"
     },
-    "kr_bl_orientation_ang_x_pid_controller_error_sum": {
-      "type": null,
+    "kr_bl_orientation_pid_controller_error_sum": {
+      "type": "array",
       "dtype": "double",
-      "value": null
+      "value": null,
+      "size": 3
     },
-    "kr_bl_orientation_ang_x_pid_controller_prev_error": {
-      "type": null,
+    "kr_bl_orientation_pid_controller_prev_error": {
+      "type": "array",
       "dtype": "double",
-      "value": null
+      "value": null,
+      "size": 3
     },
-    "kr_bl_orientation_ang_x_embed_map_vector": {
+    "kr_bl_orientation_pid_controller_signal": {
+      "type": "array",
+      "dtype": "double",
+      "value": null,
+      "size": 3
+    },
+    "kr_bl_orientation_pid_controller_error": {
+      "type": "array",
+      "dtype": "double",
+      "value": null,
+      "size": 3
+    },
+    "kr_bl_orientation_embed_map_vector": {
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0.0, 0.0, 0.0, 1.0, 0.0, 0.0]
-    },
-    "kr_bl_orientation_ang_y_pid_controller_signal": {
-      "type": null,
-      "dtype": "double",
-      "value": null
-    },
-    "kr_bl_orientation_coord_ang_y_initial": {
-      "type": null,
-      "size": 1,
-      "dtype": "double",
-      "value": null
-    },
-    "kr_bl_orientation_coord_ang_y_initial_vector": {
-      "type": "array",
-      "size": 6,
-      "dtype": "double",
-      "value": [0, 0, 0, 0, 1, 0]
-    },
-    "kr_bl_orientation_coord_ang_y": {
-      "type": null,
-      "size": 1,
-      "dtype": "double",
-      "value": null
-    },
-    "kr_bl_orientation_coord_ang_y_vector": {
-      "type": "array",
-      "size": 6,
-      "dtype": "double",
-      "value": [0, 0, 0, 0, 1, 0]
-    },
-    "kr_bl_orientation_ang_y_pid_controller_time_step": {
-      "type": null,
-      "dtype": "double",
-      "value": "*control_loop_dt"
-    },
-    "kr_bl_orientation_ang_y_pid_controller_kp": {
-      "type": null,
-      "dtype": "double",
-      "value": "20.0"
-    },
-    "kr_bl_orientation_ang_y_pid_controller_ki": {
-      "type": null,
-      "dtype": "double",
-      "value": "0.9"
-    },
-    "kr_bl_orientation_ang_y_pid_controller_kd": {
-      "type": null,
-      "dtype": "double",
-      "value": "2.5"
-    },
-    "kr_bl_orientation_ang_y_pid_controller_error_sum": {
-      "type": null,
-      "dtype": "double",
-      "value": null
-    },
-    "kr_bl_orientation_ang_y_pid_controller_prev_error": {
-      "type": null,
-      "dtype": "double",
-      "value": null
-    },
-    "kr_bl_orientation_ang_y_embed_map_vector": {
-      "type": "array",
-      "size": 6,
-      "dtype": "double",
-      "value": [0.0, 0.0, 0.0, 0.0, 1.0, 0.0]
-    },
-    "kr_bl_orientation_ang_z_pid_controller_signal": {
-      "type": null,
-      "dtype": "double",
-      "value": null
-    },
-    "kr_bl_orientation_coord_ang_z_initial": {
-      "type": null,
-      "size": 1,
-      "dtype": "double",
-      "value": null
-    },
-    "kr_bl_orientation_coord_ang_z_initial_vector": {
-      "type": "array",
-      "size": 6,
-      "dtype": "double",
-      "value": [0, 0, 0, 0, 0, 1]
-    },
-    "kr_bl_orientation_coord_ang_z": {
-      "type": null,
-      "size": 1,
-      "dtype": "double",
-      "value": null
-    },
-    "kr_bl_orientation_coord_ang_z_vector": {
-      "type": "array",
-      "size": 6,
-      "dtype": "double",
-      "value": [0, 0, 0, 0, 0, 1]
-    },
-    "kr_bl_orientation_ang_z_pid_controller_time_step": {
-      "type": null,
-      "dtype": "double",
-      "value": "*control_loop_dt"
-    },
-    "kr_bl_orientation_ang_z_pid_controller_kp": {
-      "type": null,
-      "dtype": "double",
-      "value": "20.0"
-    },
-    "kr_bl_orientation_ang_z_pid_controller_ki": {
-      "type": null,
-      "dtype": "double",
-      "value": "0.9"
-    },
-    "kr_bl_orientation_ang_z_pid_controller_kd": {
-      "type": null,
-      "dtype": "double",
-      "value": "2.5"
-    },
-    "kr_bl_orientation_ang_z_pid_controller_error_sum": {
-      "type": null,
-      "dtype": "double",
-      "value": null
-    },
-    "kr_bl_orientation_ang_z_pid_controller_prev_error": {
-      "type": null,
-      "dtype": "double",
-      "value": null
-    },
-    "kr_bl_orientation_ang_z_embed_map_vector": {
-      "type": "array",
-      "size": 6,
-      "dtype": "double",
-      "value": [0.0, 0.0, 0.0, 0.0, 0.0, 1.0]
+      "value": [
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0
+      ]
     },
     "kr_elbow_base_base_distance_z_impedance_controller_signal": {
       "type": null,
@@ -479,7 +469,9 @@
       "type": "array",
       "size": 1,
       "dtype": "double",
-      "value": [100.0]
+      "value": [
+        100.0
+      ]
     },
     "kr_elbow_base_z_distance_reference_value": {
       "type": null,
@@ -490,7 +482,11 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0, 0, 1]
+      "value": [
+        0,
+        0,
+        1
+      ]
     },
     "kr_elbow_base_distance_coord_lin_z": {
       "type": null,
@@ -506,17 +502,16 @@
       "type": "array",
       "size": 3,
       "dtype": "double",
-      "value": [0.0, 0.0, 1.0]
+      "value": [
+        0.0,
+        0.0,
+        1.0
+      ]
     },
     "kr_half_arm_2_link": {
       "type": null,
       "dtype": "string",
       "value": "kr_half_arm_2_link"
-    },
-    "kl_bl_position_lin_y_pid_controller_signal": {
-      "type": null,
-      "dtype": "double",
-      "value": null
     },
     "kl_bl_position_coord_lin_y_initial": {
       "type": null,
@@ -533,7 +528,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0, 1, 0, 0, 0, 0]
+      "value": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
     },
     "kl_bl_position_coord_lin_y": {
       "type": null,
@@ -545,7 +547,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0, 1, 0, 0, 0, 0]
+      "value": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
     },
     "kl_bl_position_lin_y_pid_controller_time_step": {
       "type": null,
@@ -577,16 +586,28 @@
       "dtype": "double",
       "value": null
     },
+    "kl_bl_position_lin_y_pid_controller_signal": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kl_bl_position_lin_y_pid_controller_error": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
     "kl_bl_position_lin_y_embed_map_vector": {
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
-    },
-    "kl_bl_position_lin_z_pid_controller_signal": {
-      "type": null,
-      "dtype": "double",
-      "value": null
+      "value": [
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
     },
     "kl_bl_position_coord_lin_z_initial": {
       "type": null,
@@ -598,7 +619,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0, 0, 1, 0, 0, 0]
+      "value": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
     },
     "kl_bl_position_coord_lin_z": {
       "type": null,
@@ -610,7 +638,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0, 0, 1, 0, 0, 0]
+      "value": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
     },
     "kl_bl_position_lin_z_pid_controller_time_step": {
       "type": null,
@@ -642,20 +677,32 @@
       "dtype": "double",
       "value": null
     },
-    "kl_bl_position_lin_z_embed_map_vector": {
-      "type": "array",
-      "size": 6,
-      "dtype": "double",
-      "value": [0.0, 0.0, 1.0, 0.0, 0.0, 0.0]
-    },
-    "kl_bl_orientation_ang_x_pid_controller_signal": {
+    "kl_bl_position_lin_z_pid_controller_signal": {
       "type": null,
       "dtype": "double",
       "value": null
     },
-    "kl_bl_orientation_coord_ang_x_initial": {
+    "kl_bl_position_lin_z_pid_controller_error": {
       "type": null,
-      "size": 1,
+      "dtype": "double",
+      "value": null
+    },
+    "kl_bl_position_lin_z_embed_map_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "kl_bl_orientation_coord_initial": {
+      "type": "array",
+      "size": 4,
       "dtype": "double",
       "value": null
     },
@@ -665,189 +712,94 @@
       "dtype": "double",
       "value": null
     },
-    "kl_bl_orientation_coord_ang_x_initial_vector": {
+    "kl_bl_orientation_coord_initial_vector": {
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0, 0, 0, 1, 0, 0]
+      "value": [
+        0,
+        0,
+        0,
+        1,
+        1,
+        1
+      ]
     },
-    "kl_bl_orientation_coord_ang_x": {
-      "type": null,
-      "size": 1,
+    "kl_bl_orientation_coord": {
+      "type": "array",
+      "size": 4,
       "dtype": "double",
       "value": null
     },
-    "kl_bl_orientation_coord_ang_x_vector": {
+    "kl_bl_orientation_coord_vector": {
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0, 0, 0, 1, 0, 0]
+      "value": [
+        0,
+        0,
+        0,
+        1,
+        1,
+        1
+      ]
     },
-    "kl_bl_orientation_ang_x_pid_controller_time_step": {
+    "kl_bl_orientation_pid_controller_time_step": {
       "type": null,
       "dtype": "double",
       "value": "*control_loop_dt"
     },
-    "kl_bl_orientation_ang_x_pid_controller_kp": {
+    "kl_bl_orientation_pid_controller_kp": {
       "type": null,
       "dtype": "double",
       "value": "20.0"
     },
-    "kl_bl_orientation_ang_x_pid_controller_ki": {
+    "kl_bl_orientation_pid_controller_ki": {
       "type": null,
       "dtype": "double",
       "value": "0.9"
     },
-    "kl_bl_orientation_ang_x_pid_controller_kd": {
+    "kl_bl_orientation_pid_controller_kd": {
       "type": null,
       "dtype": "double",
       "value": "2.5"
     },
-    "kl_bl_orientation_ang_x_pid_controller_error_sum": {
-      "type": null,
+    "kl_bl_orientation_pid_controller_error_sum": {
+      "type": "array",
       "dtype": "double",
-      "value": null
+      "value": null,
+      "size": 3
     },
-    "kl_bl_orientation_ang_x_pid_controller_prev_error": {
-      "type": null,
+    "kl_bl_orientation_pid_controller_prev_error": {
+      "type": "array",
       "dtype": "double",
-      "value": null
+      "value": null,
+      "size": 3
     },
-    "kl_bl_orientation_ang_x_embed_map_vector": {
+    "kl_bl_orientation_pid_controller_signal": {
+      "type": "array",
+      "dtype": "double",
+      "value": null,
+      "size": 3
+    },
+    "kl_bl_orientation_pid_controller_error": {
+      "type": "array",
+      "dtype": "double",
+      "value": null,
+      "size": 3
+    },
+    "kl_bl_orientation_embed_map_vector": {
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0.0, 0.0, 0.0, 1.0, 0.0, 0.0]
-    },
-    "kl_bl_orientation_ang_y_pid_controller_signal": {
-      "type": null,
-      "dtype": "double",
-      "value": null
-    },
-    "kl_bl_orientation_coord_ang_y_initial": {
-      "type": null,
-      "size": 1,
-      "dtype": "double",
-      "value": null
-    },
-    "kl_bl_orientation_coord_ang_y_initial_vector": {
-      "type": "array",
-      "size": 6,
-      "dtype": "double",
-      "value": [0, 0, 0, 0, 1, 0]
-    },
-    "kl_bl_orientation_coord_ang_y": {
-      "type": null,
-      "size": 1,
-      "dtype": "double",
-      "value": null
-    },
-    "kl_bl_orientation_coord_ang_y_vector": {
-      "type": "array",
-      "size": 6,
-      "dtype": "double",
-      "value": [0, 0, 0, 0, 1, 0]
-    },
-    "kl_bl_orientation_ang_y_pid_controller_time_step": {
-      "type": null,
-      "dtype": "double",
-      "value": "*control_loop_dt"
-    },
-    "kl_bl_orientation_ang_y_pid_controller_kp": {
-      "type": null,
-      "dtype": "double",
-      "value": "20.0"
-    },
-    "kl_bl_orientation_ang_y_pid_controller_ki": {
-      "type": null,
-      "dtype": "double",
-      "value": "0.9"
-    },
-    "kl_bl_orientation_ang_y_pid_controller_kd": {
-      "type": null,
-      "dtype": "double",
-      "value": "2.5"
-    },
-    "kl_bl_orientation_ang_y_pid_controller_error_sum": {
-      "type": null,
-      "dtype": "double",
-      "value": null
-    },
-    "kl_bl_orientation_ang_y_pid_controller_prev_error": {
-      "type": null,
-      "dtype": "double",
-      "value": null
-    },
-    "kl_bl_orientation_ang_y_embed_map_vector": {
-      "type": "array",
-      "size": 6,
-      "dtype": "double",
-      "value": [0.0, 0.0, 0.0, 0.0, 1.0, 0.0]
-    },
-    "kl_bl_orientation_ang_z_pid_controller_signal": {
-      "type": null,
-      "dtype": "double",
-      "value": null
-    },
-    "kl_bl_orientation_coord_ang_z_initial": {
-      "type": null,
-      "size": 1,
-      "dtype": "double",
-      "value": null
-    },
-    "kl_bl_orientation_coord_ang_z_initial_vector": {
-      "type": "array",
-      "size": 6,
-      "dtype": "double",
-      "value": [0, 0, 0, 0, 0, 1]
-    },
-    "kl_bl_orientation_coord_ang_z": {
-      "type": null,
-      "size": 1,
-      "dtype": "double",
-      "value": null
-    },
-    "kl_bl_orientation_coord_ang_z_vector": {
-      "type": "array",
-      "size": 6,
-      "dtype": "double",
-      "value": [0, 0, 0, 0, 0, 1]
-    },
-    "kl_bl_orientation_ang_z_pid_controller_time_step": {
-      "type": null,
-      "dtype": "double",
-      "value": "*control_loop_dt"
-    },
-    "kl_bl_orientation_ang_z_pid_controller_kp": {
-      "type": null,
-      "dtype": "double",
-      "value": "20.0"
-    },
-    "kl_bl_orientation_ang_z_pid_controller_ki": {
-      "type": null,
-      "dtype": "double",
-      "value": "0.9"
-    },
-    "kl_bl_orientation_ang_z_pid_controller_kd": {
-      "type": null,
-      "dtype": "double",
-      "value": "2.5"
-    },
-    "kl_bl_orientation_ang_z_pid_controller_error_sum": {
-      "type": null,
-      "dtype": "double",
-      "value": null
-    },
-    "kl_bl_orientation_ang_z_pid_controller_prev_error": {
-      "type": null,
-      "dtype": "double",
-      "value": null
-    },
-    "kl_bl_orientation_ang_z_embed_map_vector": {
-      "type": "array",
-      "size": 6,
-      "dtype": "double",
-      "value": [0.0, 0.0, 0.0, 0.0, 0.0, 1.0]
+      "value": [
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0
+      ]
     },
     "kl_elbow_base_base_distance_z_impedance_controller_signal": {
       "type": null,
@@ -858,7 +810,9 @@
       "type": "array",
       "size": 1,
       "dtype": "double",
-      "value": [100.0]
+      "value": [
+        100.0
+      ]
     },
     "kl_elbow_base_z_distance_reference_value": {
       "type": null,
@@ -869,7 +823,11 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [0, 0, 1]
+      "value": [
+        0,
+        0,
+        1
+      ]
     },
     "kl_elbow_base_distance_coord_lin_z": {
       "type": null,
@@ -885,7 +843,11 @@
       "type": "array",
       "size": 3,
       "dtype": "double",
-      "value": [0.0, 0.0, 1.0]
+      "value": [
+        0.0,
+        0.0,
+        1.0
+      ]
     },
     "kl_half_arm_2_link": {
       "type": null,
@@ -896,7 +858,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [-9.685, -1.033, 1.324, 0.0, 0.0, 0.0]
+      "value": [
+        -9.685,
+        -1.033,
+        1.324,
+        0.0,
+        0.0,
+        0.0
+      ]
     },
     "kinova_right_base_link": {
       "type": null,
@@ -920,19 +889,7 @@
       "dtype": "double",
       "value": null
     },
-    "kr_bl_orientation_ang_x_embed_map_kr_achd_solver_output_acceleration_energy": {
-      "type": "array",
-      "size": 6,
-      "dtype": "double",
-      "value": null
-    },
-    "kr_bl_orientation_ang_y_embed_map_kr_achd_solver_output_acceleration_energy": {
-      "type": "array",
-      "size": 6,
-      "dtype": "double",
-      "value": null
-    },
-    "kr_bl_orientation_ang_z_embed_map_kr_achd_solver_output_acceleration_energy": {
+    "kr_bl_orientation_embed_map_kr_achd_solver_output_acceleration_energy": {
       "type": "array",
       "size": 6,
       "dtype": "double",
@@ -954,11 +911,46 @@
       "cols": 5,
       "dtype": "double",
       "value": [
-        [0.0, 1.0, 0.0, 0.0, 0.0, 0.0],
-        [0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
-        [0.0, 0.0, 0.0, 1.0, 0.0, 0.0],
-        [0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
-        [0.0, 0.0, 0.0, 0.0, 0.0, 1.0]
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
       ]
     },
     "kr_achd_solver_feed_forward_torques": {
@@ -1010,7 +1002,14 @@
       "type": "array",
       "size": 6,
       "dtype": "double",
-      "value": [-9.6, 0.99, 1.4, 0.0, 0.0, 0.0]
+      "value": [
+        -9.6,
+        0.99,
+        1.4,
+        0.0,
+        0.0,
+        0.0
+      ]
     },
     "kinova_left_base_link": {
       "type": null,
@@ -1034,19 +1033,7 @@
       "dtype": "double",
       "value": null
     },
-    "kl_bl_orientation_ang_x_embed_map_kl_achd_solver_output_acceleration_energy": {
-      "type": "array",
-      "size": 6,
-      "dtype": "double",
-      "value": null
-    },
-    "kl_bl_orientation_ang_y_embed_map_kl_achd_solver_output_acceleration_energy": {
-      "type": "array",
-      "size": 6,
-      "dtype": "double",
-      "value": null
-    },
-    "kl_bl_orientation_ang_z_embed_map_kl_achd_solver_output_acceleration_energy": {
+    "kl_bl_orientation_embed_map_kl_achd_solver_output_acceleration_energy": {
       "type": "array",
       "size": 6,
       "dtype": "double",
@@ -1068,11 +1055,46 @@
       "cols": 5,
       "dtype": "double",
       "value": [
-        [0.0, 1.0, 0.0, 0.0, 0.0, 0.0],
-        [0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
-        [0.0, 0.0, 0.0, 1.0, 0.0, 0.0],
-        [0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
-        [0.0, 0.0, 0.0, 0.0, 0.0, 1.0]
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
       ]
     },
     "kl_achd_solver_feed_forward_torques": {
@@ -1148,44 +1170,18 @@
       },
       "measure_variable": "computePosition"
     },
-    "kr_bl_orientation_coord_ang_x_initial": {
+    "kr_bl_orientation_coord_initial": {
       "measured": {
         "of": {
-          "id": "kr_bl_orientation_coord_ang_x_initial",
+          "id": "kr_bl_orientation_coord_initial",
           "entity": "kinova_right_bracelet_link_origin_point",
-          "type": "Orientation1D",
-          "vector": "kr_bl_orientation_coord_ang_x_initial_vector"
+          "type": "Quaternion",
+          "vector": "kr_bl_orientation_coord_initial_vector"
         },
         "asb": "base_link",
         "wrt": "base_link_origin_point"
       },
-      "measure_variable": "computeOrientation1D"
-    },
-    "kr_bl_orientation_coord_ang_y_initial": {
-      "measured": {
-        "of": {
-          "id": "kr_bl_orientation_coord_ang_y_initial",
-          "entity": "kinova_right_bracelet_link_origin_point",
-          "type": "Orientation1D",
-          "vector": "kr_bl_orientation_coord_ang_y_initial_vector"
-        },
-        "asb": "base_link",
-        "wrt": "base_link_origin_point"
-      },
-      "measure_variable": "computeOrientation1D"
-    },
-    "kr_bl_orientation_coord_ang_z_initial": {
-      "measured": {
-        "of": {
-          "id": "kr_bl_orientation_coord_ang_z_initial",
-          "entity": "kinova_right_bracelet_link_origin_point",
-          "type": "Orientation1D",
-          "vector": "kr_bl_orientation_coord_ang_z_initial_vector"
-        },
-        "asb": "base_link",
-        "wrt": "base_link_origin_point"
-      },
-      "measure_variable": "computeOrientation1D"
+      "measure_variable": "computeQuaternion"
     },
     "kl_bl_position_coord_lin_y_initial": {
       "measured": {
@@ -1213,44 +1209,18 @@
       },
       "measure_variable": "computePosition"
     },
-    "kl_bl_orientation_coord_ang_x_initial": {
+    "kl_bl_orientation_coord_initial": {
       "measured": {
         "of": {
-          "id": "kl_bl_orientation_coord_ang_x_initial",
+          "id": "kl_bl_orientation_coord_initial",
           "entity": "kinova_left_bracelet_link_origin_point",
-          "type": "Orientation1D",
-          "vector": "kl_bl_orientation_coord_ang_x_initial_vector"
+          "type": "Quaternion",
+          "vector": "kl_bl_orientation_coord_initial_vector"
         },
         "asb": "base_link",
         "wrt": "base_link_origin_point"
       },
-      "measure_variable": "computeOrientation1D"
-    },
-    "kl_bl_orientation_coord_ang_y_initial": {
-      "measured": {
-        "of": {
-          "id": "kl_bl_orientation_coord_ang_y_initial",
-          "entity": "kinova_left_bracelet_link_origin_point",
-          "type": "Orientation1D",
-          "vector": "kl_bl_orientation_coord_ang_y_initial_vector"
-        },
-        "asb": "base_link",
-        "wrt": "base_link_origin_point"
-      },
-      "measure_variable": "computeOrientation1D"
-    },
-    "kl_bl_orientation_coord_ang_z_initial": {
-      "measured": {
-        "of": {
-          "id": "kl_bl_orientation_coord_ang_z_initial",
-          "entity": "kinova_left_bracelet_link_origin_point",
-          "type": "Orientation1D",
-          "vector": "kl_bl_orientation_coord_ang_z_initial_vector"
-        },
-        "asb": "base_link",
-        "wrt": "base_link_origin_point"
-      },
-      "measure_variable": "computeOrientation1D"
+      "measure_variable": "computeQuaternion"
     }
   },
   "d": {
@@ -1272,6 +1242,7 @@
         },
         "operator": "Equal",
         "reference_value": "arm_table_contact_force_reference_value",
+        "size": null,
         "name": "pid_controller",
         "error": "kl_bracelet_table_contact_force_pid_controller_error",
         "measure_variable": "computeForce",
@@ -1299,6 +1270,7 @@
         },
         "operator": "Equal",
         "reference_value": "arm_table_contact_force_reference_value",
+        "size": null,
         "name": "pid_controller",
         "error": "kr_bracelet_table_contact_force_pid_controller_error",
         "measure_variable": "computeForce",
@@ -1326,6 +1298,7 @@
         },
         "operator": "Equal",
         "reference_value": "kr_bl_position_coord_lin_y_initial",
+        "size": null,
         "name": "pid_controller",
         "error": "kr_bl_position_lin_y_pid_controller_error",
         "measure_variable": "computePosition",
@@ -1353,6 +1326,7 @@
         },
         "operator": "Equal",
         "reference_value": "kr_bl_position_coord_lin_z_initial",
+        "size": null,
         "name": "pid_controller",
         "error": "kr_bl_position_lin_z_pid_controller_error",
         "measure_variable": "computePosition",
@@ -1367,86 +1341,33 @@
         "error_sum": "kr_bl_position_lin_z_pid_controller_error_sum",
         "last_error": "kr_bl_position_lin_z_pid_controller_prev_error"
       },
-      "kr_bl_orientation_ang_x_pid_controller": {
+      "kr_bl_orientation_pid_controller": {
         "measured": {
           "wrt": "base_link_origin_point",
           "of": {
-            "id": "kr_bl_orientation_coord_ang_x",
+            "id": "kr_bl_orientation_coord",
             "entity": "kinova_right_bracelet_link_origin_point",
-            "type": "Orientation1D",
-            "vector": "kr_bl_orientation_coord_ang_x_vector"
+            "type": "Quaternion",
+            "vector": "kr_bl_orientation_coord_vector"
           },
           "asb": "base_link"
         },
-        "operator": "Equal",
-        "reference_value": "kr_bl_orientation_coord_ang_x_initial",
+        "operator": "QuaternionEqual",
+        "reference_value": "kr_bl_orientation_coord_initial",
+        "size": 3,
         "name": "pid_controller",
-        "error": "kr_bl_orientation_ang_x_pid_controller_error",
-        "measure_variable": "computeOrientation1D",
-        "dt": "kr_bl_orientation_ang_x_pid_controller_time_step",
+        "error": "kr_bl_orientation_pid_controller_error",
+        "measure_variable": "computeQuaternion",
+        "dt": "kr_bl_orientation_pid_controller_time_step",
         "gains": {
-          "kp": "kr_bl_orientation_ang_x_pid_controller_kp",
-          "ki": "kr_bl_orientation_ang_x_pid_controller_ki",
-          "kd": "kr_bl_orientation_ang_x_pid_controller_kd"
+          "kp": "kr_bl_orientation_pid_controller_kp",
+          "ki": "kr_bl_orientation_pid_controller_ki",
+          "kd": "kr_bl_orientation_pid_controller_kd"
         },
-        "signal": "kr_bl_orientation_ang_x_pid_controller_signal",
-        "vector": "kr_bl_orientation_ang_x_embed_map_vector",
-        "error_sum": "kr_bl_orientation_ang_x_pid_controller_error_sum",
-        "last_error": "kr_bl_orientation_ang_x_pid_controller_prev_error"
-      },
-      "kr_bl_orientation_ang_y_pid_controller": {
-        "measured": {
-          "wrt": "base_link_origin_point",
-          "of": {
-            "id": "kr_bl_orientation_coord_ang_y",
-            "entity": "kinova_right_bracelet_link_origin_point",
-            "type": "Orientation1D",
-            "vector": "kr_bl_orientation_coord_ang_y_vector"
-          },
-          "asb": "base_link"
-        },
-        "operator": "Equal",
-        "reference_value": "kr_bl_orientation_coord_ang_y_initial",
-        "name": "pid_controller",
-        "error": "kr_bl_orientation_ang_y_pid_controller_error",
-        "measure_variable": "computeOrientation1D",
-        "dt": "kr_bl_orientation_ang_y_pid_controller_time_step",
-        "gains": {
-          "kp": "kr_bl_orientation_ang_y_pid_controller_kp",
-          "ki": "kr_bl_orientation_ang_y_pid_controller_ki",
-          "kd": "kr_bl_orientation_ang_y_pid_controller_kd"
-        },
-        "signal": "kr_bl_orientation_ang_y_pid_controller_signal",
-        "vector": "kr_bl_orientation_ang_y_embed_map_vector",
-        "error_sum": "kr_bl_orientation_ang_y_pid_controller_error_sum",
-        "last_error": "kr_bl_orientation_ang_y_pid_controller_prev_error"
-      },
-      "kr_bl_orientation_ang_z_pid_controller": {
-        "measured": {
-          "wrt": "base_link_origin_point",
-          "of": {
-            "id": "kr_bl_orientation_coord_ang_z",
-            "entity": "kinova_right_bracelet_link_origin_point",
-            "type": "Orientation1D",
-            "vector": "kr_bl_orientation_coord_ang_z_vector"
-          },
-          "asb": "base_link"
-        },
-        "operator": "Equal",
-        "reference_value": "kr_bl_orientation_coord_ang_z_initial",
-        "name": "pid_controller",
-        "error": "kr_bl_orientation_ang_z_pid_controller_error",
-        "measure_variable": "computeOrientation1D",
-        "dt": "kr_bl_orientation_ang_z_pid_controller_time_step",
-        "gains": {
-          "kp": "kr_bl_orientation_ang_z_pid_controller_kp",
-          "ki": "kr_bl_orientation_ang_z_pid_controller_ki",
-          "kd": "kr_bl_orientation_ang_z_pid_controller_kd"
-        },
-        "signal": "kr_bl_orientation_ang_z_pid_controller_signal",
-        "vector": "kr_bl_orientation_ang_z_embed_map_vector",
-        "error_sum": "kr_bl_orientation_ang_z_pid_controller_error_sum",
-        "last_error": "kr_bl_orientation_ang_z_pid_controller_prev_error"
+        "signal": "kr_bl_orientation_pid_controller_signal",
+        "vector": "kr_bl_orientation_embed_map_vector",
+        "error_sum": "kr_bl_orientation_pid_controller_error_sum",
+        "last_error": "kr_bl_orientation_pid_controller_prev_error"
       },
       "kr_elbow_base_base_distance_z_impedance_controller": {
         "operator": "Equal",
@@ -1489,6 +1410,7 @@
         },
         "operator": "Equal",
         "reference_value": "kl_bl_position_coord_lin_y_initial",
+        "size": null,
         "name": "pid_controller",
         "error": "kl_bl_position_lin_y_pid_controller_error",
         "measure_variable": "computePosition",
@@ -1516,6 +1438,7 @@
         },
         "operator": "Equal",
         "reference_value": "kl_bl_position_coord_lin_z_initial",
+        "size": null,
         "name": "pid_controller",
         "error": "kl_bl_position_lin_z_pid_controller_error",
         "measure_variable": "computePosition",
@@ -1530,86 +1453,33 @@
         "error_sum": "kl_bl_position_lin_z_pid_controller_error_sum",
         "last_error": "kl_bl_position_lin_z_pid_controller_prev_error"
       },
-      "kl_bl_orientation_ang_x_pid_controller": {
+      "kl_bl_orientation_pid_controller": {
         "measured": {
           "wrt": "base_link_origin_point",
           "of": {
-            "id": "kl_bl_orientation_coord_ang_x",
+            "id": "kl_bl_orientation_coord",
             "entity": "kinova_left_bracelet_link_origin_point",
-            "type": "Orientation1D",
-            "vector": "kl_bl_orientation_coord_ang_x_vector"
+            "type": "Quaternion",
+            "vector": "kl_bl_orientation_coord_vector"
           },
           "asb": "base_link"
         },
-        "operator": "Equal",
-        "reference_value": "kl_bl_orientation_coord_ang_x_initial",
+        "operator": "QuaternionEqual",
+        "reference_value": "kl_bl_orientation_coord_initial",
+        "size": 3,
         "name": "pid_controller",
-        "error": "kl_bl_orientation_ang_x_pid_controller_error",
-        "measure_variable": "computeOrientation1D",
-        "dt": "kl_bl_orientation_ang_x_pid_controller_time_step",
+        "error": "kl_bl_orientation_pid_controller_error",
+        "measure_variable": "computeQuaternion",
+        "dt": "kl_bl_orientation_pid_controller_time_step",
         "gains": {
-          "kp": "kl_bl_orientation_ang_x_pid_controller_kp",
-          "ki": "kl_bl_orientation_ang_x_pid_controller_ki",
-          "kd": "kl_bl_orientation_ang_x_pid_controller_kd"
+          "kp": "kl_bl_orientation_pid_controller_kp",
+          "ki": "kl_bl_orientation_pid_controller_ki",
+          "kd": "kl_bl_orientation_pid_controller_kd"
         },
-        "signal": "kl_bl_orientation_ang_x_pid_controller_signal",
-        "vector": "kl_bl_orientation_ang_x_embed_map_vector",
-        "error_sum": "kl_bl_orientation_ang_x_pid_controller_error_sum",
-        "last_error": "kl_bl_orientation_ang_x_pid_controller_prev_error"
-      },
-      "kl_bl_orientation_ang_y_pid_controller": {
-        "measured": {
-          "wrt": "base_link_origin_point",
-          "of": {
-            "id": "kl_bl_orientation_coord_ang_y",
-            "entity": "kinova_left_bracelet_link_origin_point",
-            "type": "Orientation1D",
-            "vector": "kl_bl_orientation_coord_ang_y_vector"
-          },
-          "asb": "base_link"
-        },
-        "operator": "Equal",
-        "reference_value": "kl_bl_orientation_coord_ang_y_initial",
-        "name": "pid_controller",
-        "error": "kl_bl_orientation_ang_y_pid_controller_error",
-        "measure_variable": "computeOrientation1D",
-        "dt": "kl_bl_orientation_ang_y_pid_controller_time_step",
-        "gains": {
-          "kp": "kl_bl_orientation_ang_y_pid_controller_kp",
-          "ki": "kl_bl_orientation_ang_y_pid_controller_ki",
-          "kd": "kl_bl_orientation_ang_y_pid_controller_kd"
-        },
-        "signal": "kl_bl_orientation_ang_y_pid_controller_signal",
-        "vector": "kl_bl_orientation_ang_y_embed_map_vector",
-        "error_sum": "kl_bl_orientation_ang_y_pid_controller_error_sum",
-        "last_error": "kl_bl_orientation_ang_y_pid_controller_prev_error"
-      },
-      "kl_bl_orientation_ang_z_pid_controller": {
-        "measured": {
-          "wrt": "base_link_origin_point",
-          "of": {
-            "id": "kl_bl_orientation_coord_ang_z",
-            "entity": "kinova_left_bracelet_link_origin_point",
-            "type": "Orientation1D",
-            "vector": "kl_bl_orientation_coord_ang_z_vector"
-          },
-          "asb": "base_link"
-        },
-        "operator": "Equal",
-        "reference_value": "kl_bl_orientation_coord_ang_z_initial",
-        "name": "pid_controller",
-        "error": "kl_bl_orientation_ang_z_pid_controller_error",
-        "measure_variable": "computeOrientation1D",
-        "dt": "kl_bl_orientation_ang_z_pid_controller_time_step",
-        "gains": {
-          "kp": "kl_bl_orientation_ang_z_pid_controller_kp",
-          "ki": "kl_bl_orientation_ang_z_pid_controller_ki",
-          "kd": "kl_bl_orientation_ang_z_pid_controller_kd"
-        },
-        "signal": "kl_bl_orientation_ang_z_pid_controller_signal",
-        "vector": "kl_bl_orientation_ang_z_embed_map_vector",
-        "error_sum": "kl_bl_orientation_ang_z_pid_controller_error_sum",
-        "last_error": "kl_bl_orientation_ang_z_pid_controller_prev_error"
+        "signal": "kl_bl_orientation_pid_controller_signal",
+        "vector": "kl_bl_orientation_embed_map_vector",
+        "error_sum": "kl_bl_orientation_pid_controller_error_sum",
+        "last_error": "kl_bl_orientation_pid_controller_prev_error"
       },
       "kl_elbow_base_base_distance_z_impedance_controller": {
         "operator": "Equal",
@@ -1710,28 +1580,10 @@
         },
         {
           "name": "embed_map",
-          "input": "kr_bl_orientation_ang_x_pid_controller_signal",
-          "output": "kr_bl_orientation_ang_x_embed_map_kr_achd_solver_output_acceleration_energy",
+          "input": "kr_bl_orientation_pid_controller_signal",
+          "output": "kr_bl_orientation_embed_map_kr_achd_solver_output_acceleration_energy",
           "output_type": "acceleration-energy",
-          "vector": "kr_bl_orientation_ang_x_embed_map_vector",
-          "vector_info": null,
-          "return": null
-        },
-        {
-          "name": "embed_map",
-          "input": "kr_bl_orientation_ang_y_pid_controller_signal",
-          "output": "kr_bl_orientation_ang_y_embed_map_kr_achd_solver_output_acceleration_energy",
-          "output_type": "acceleration-energy",
-          "vector": "kr_bl_orientation_ang_y_embed_map_vector",
-          "vector_info": null,
-          "return": null
-        },
-        {
-          "name": "embed_map",
-          "input": "kr_bl_orientation_ang_z_pid_controller_signal",
-          "output": "kr_bl_orientation_ang_z_embed_map_kr_achd_solver_output_acceleration_energy",
-          "output_type": "acceleration-energy",
-          "vector": "kr_bl_orientation_ang_z_embed_map_vector",
+          "vector": "kr_bl_orientation_embed_map_vector",
           "vector_info": null,
           "return": null
         }
@@ -1757,28 +1609,10 @@
         },
         {
           "name": "embed_map",
-          "input": "kl_bl_orientation_ang_x_pid_controller_signal",
-          "output": "kl_bl_orientation_ang_x_embed_map_kl_achd_solver_output_acceleration_energy",
+          "input": "kl_bl_orientation_pid_controller_signal",
+          "output": "kl_bl_orientation_embed_map_kl_achd_solver_output_acceleration_energy",
           "output_type": "acceleration-energy",
-          "vector": "kl_bl_orientation_ang_x_embed_map_vector",
-          "vector_info": null,
-          "return": null
-        },
-        {
-          "name": "embed_map",
-          "input": "kl_bl_orientation_ang_y_pid_controller_signal",
-          "output": "kl_bl_orientation_ang_y_embed_map_kl_achd_solver_output_acceleration_energy",
-          "output_type": "acceleration-energy",
-          "vector": "kl_bl_orientation_ang_y_embed_map_vector",
-          "vector_info": null,
-          "return": null
-        },
-        {
-          "name": "embed_map",
-          "input": "kl_bl_orientation_ang_z_pid_controller_signal",
-          "output": "kl_bl_orientation_ang_z_embed_map_kl_achd_solver_output_acceleration_energy",
-          "output_type": "acceleration-energy",
-          "vector": "kl_bl_orientation_ang_z_embed_map_vector",
+          "vector": "kl_bl_orientation_embed_map_vector",
           "vector_info": null,
           "return": null
         }
@@ -1792,9 +1626,7 @@
         "beta": [
           "kr_bl_position_lin_y_embed_map_kr_achd_solver_output_acceleration_energy",
           "kr_bl_position_lin_z_embed_map_kr_achd_solver_output_acceleration_energy",
-          "kr_bl_orientation_ang_x_embed_map_kr_achd_solver_output_acceleration_energy",
-          "kr_bl_orientation_ang_y_embed_map_kr_achd_solver_output_acceleration_energy",
-          "kr_bl_orientation_ang_z_embed_map_kr_achd_solver_output_acceleration_energy"
+          "kr_bl_orientation_embed_map_kr_achd_solver_output_acceleration_energy"
         ],
         "ext_wrench": [],
         "nc": "kr_achd_solver_nc",
@@ -1836,9 +1668,7 @@
         "beta": [
           "kl_bl_position_lin_y_embed_map_kl_achd_solver_output_acceleration_energy",
           "kl_bl_position_lin_z_embed_map_kl_achd_solver_output_acceleration_energy",
-          "kl_bl_orientation_ang_x_embed_map_kl_achd_solver_output_acceleration_energy",
-          "kl_bl_orientation_ang_y_embed_map_kl_achd_solver_output_acceleration_energy",
-          "kl_bl_orientation_ang_z_embed_map_kl_achd_solver_output_acceleration_energy"
+          "kl_bl_orientation_embed_map_kl_achd_solver_output_acceleration_energy"
         ],
         "ext_wrench": [],
         "nc": "kl_achd_solver_nc",
