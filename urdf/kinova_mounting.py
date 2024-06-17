@@ -46,20 +46,21 @@ for i in range(6):
     column = right_identity_mat[:, i]
     
     # Apply the transformation
-    transformed_column = tf_r.apply(column[:3])
+    transformed_column1 = tf_r.apply(column[:3])
+    transformed_column2 = tf_r.apply(column[3:])
     
     # Store the transformed column
-    transformed_mat[:3, i] = transformed_column
-    transformed_mat[3:, i] = column[3:]  # assuming the last 3 elements don't need transformation
+    transformed_mat[:3, i] = transformed_column1
+    transformed_mat[3:, i] = transformed_column2
 
 print("Transformed matrix:")
-print(transformed_mat)
+print(np.round(transformed_mat.T, decimals=5))
 
 
 print()
 
-print("Left arm:")
-print(tf_l.as_euler("xyz", degrees=True))
-print(tf_l.as_matrix())
-print(tf_l_rpy.as_matrix())
-print(tf_l.inv().apply(g))
+# print("Left arm:")
+# print(tf_l.as_euler("xyz", degrees=True))
+# print(tf_l.as_matrix())
+# print(tf_l_rpy.as_matrix())
+# print(tf_l.inv().apply(g))

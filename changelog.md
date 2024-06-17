@@ -7,7 +7,9 @@
 - [ ] handle embed map for multi-degree controllers
 - [ ] update "measured" object for the controllers to not be redundtant with compute_variables
 - [ ] compute setpoints (variable) at the beginning of the control loop
+- [ ] bug in the achd solver beta population based on the active constraints !!!
   
 ## Changes made / Bugs fixed:
 
-- [x] Compute all the current values at the beginning of the control loop.
+- [x] Jacobian computation for the platform velocity. 
+- [x] timestep update for the odom computation.
