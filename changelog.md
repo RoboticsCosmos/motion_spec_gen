@@ -11,5 +11,4 @@
   
 ## Changes made / Bugs fixed:
 
-- [x] Jacobian computation for the platform velocity. 
-- [x] timestep update for the odom computation.
+- [x] usecase 1 with stiffness controller for the base
