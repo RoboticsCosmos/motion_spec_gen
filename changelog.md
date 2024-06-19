@@ -11,4 +11,4 @@
   
 ## Changes made / Bugs fixed:
 
-- [x] usecase 1 with stiffness controller for the base
+- [x] added pid controller for the base force control
