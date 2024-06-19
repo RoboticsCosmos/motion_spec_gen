@@ -58,10 +58,7 @@ int main()
   kelo_base_config.castor_offset = 0.01;
   kelo_base_config.half_wheel_distance = 0.0775 / 2;
   kelo_base_config.wheel_coordinates =
-      new double[8]{0.188, 0.2075,
-                   -0.188, 0.2075, 
-                   -0.188, -0.2075, 
-                    0.188, -0.2075};
+      new double[8]{0.188, 0.2075, -0.188, 0.2075, -0.188, -0.2075, 0.188, -0.2075};
   kelo_base_config.pivot_angles_deviation = new double[4]{5.310, 5.533, 1.563, 1.625};
 
   MobileBase<Robile> freddy_base;
@@ -244,10 +241,7 @@ int main()
   robot.mobile_base->state->x_platform = new double[3] {0.0, 0.0, 0.0};
   robot.mobile_base->state->xd_platform = new double[3] {0.0, 0.0, 0.0};
 
-  std::cout << "odom: " << robot.mobile_base->state->x_platform[0] << " " << robot.mobile_base->state->x_platform[1] << " "
-              << RAD2DEG(robot.mobile_base->state->x_platform[2]) << std::endl;
-
-  while (true)
+  while (count < 3000)
   {
     auto start_time = std::chrono::high_resolution_clock::now();
 
@@ -585,6 +579,13 @@ int main()
 
     KDL::JntArray kinova_right_cmd_tau_kdl(7);
     cap_and_convert_torques(kinova_right_cmd_tau, 7, kinova_right_cmd_tau_kdl);
+
+    double fd_solver_robile_output_torques[8]{};
+    double fd_solver_robile_platform_wrench[6] = {50.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    base_fd_solver(&robot, fd_solver_robile_platform_wrench,
+                   fd_solver_robile_output_torques);
+
+    set_mobile_base_torques(&robot, fd_solver_robile_output_torques);
 
     // if (!kinova_right_torque_control_mode_set)
     // {
