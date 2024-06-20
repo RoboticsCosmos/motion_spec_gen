@@ -163,7 +163,7 @@ int main()
   double kl_bl_orientation_ang_x_twist_embed_map_kl_achd_solver_output_acceleration_energy[6]{};
   double kr_bl_orientation_ang_y_pid_controller_prev_error = 0.0;
   double kl_elbow_base_distance_coord_lin_z = 0.0;
-  double kr_arm_table_contact_force_reference_value = -10.0;
+  double kr_arm_table_contact_force_reference_value = -20.0;
   double kl_arm_table_contact_force_reference_value = -20.0;
   double kl_bl_position_lin_y_pid_controller_signal = 0.0;
   double kl_bl_orientation_ang_y_pid_controller_prev_error = 0.0;
@@ -174,7 +174,7 @@ int main()
   double kr_bl_orientation_ang_z_pid_controller_signal = 0.0;
   double kr_bl_orientation_coord_ang_x_initial_vector[6] = {0, 0, 0, 1, 0, 0};
   double kr_bl_orientation_ang_z_twist_embed_map_kr_achd_solver_output_acceleration_energy[6]{};
-  double kl_bl_orientation_ang_x_pid_controller_kd = 10.5;
+  double kl_bl_orientation_ang_x_pid_controller_kd = 30.5;
   double kl_bl_position_lin_z_pid_controller_ki = 2.9;
   double kr_elbow_base_distance_coord_lin_z_axis[6] = {0, 0, 1, 0, 0, 0};
   double kl_bl_orientation_ang_x_twist_embed_map_vector[6] = {0.0, 0.0, 0.0, 1.0, 0.0, 0.0};
@@ -191,7 +191,7 @@ int main()
   double kl_bl_orientation_ang_z_pid_controller_prev_error = 0.0;
   double kl_bl_orientation_ang_y_pid_controller_kp = 80.0;
   double kl_bl_orientation_ang_z_pid_controller_ki = 2.9;
-  double kl_bl_orientation_ang_z_pid_controller_kd = 10.5;
+  double kl_bl_orientation_ang_z_pid_controller_kd = 30.5;
   double kl_bl_orientation_ang_x_pid_controller_kp = 80.0;
   int kr_achd_solver_fext_nj = 7;
   double kr_bl_orientation_coord_ang_z_initial = 0.0;
@@ -230,7 +230,7 @@ int main()
   double kl_bl_position_coord_lin_y_vector[6] = {0, 1, 0, 0, 0, 0};
   double kl_bl_orientation_coord_ang_y_initial_vector[6] = {0, 0, 0, 0, 1, 0};
   std::string kinova_left_bracelet_link = "kinova_left_bracelet_link";
-  double kl_bl_orientation_ang_y_pid_controller_kd = 10.5;
+  double kl_bl_orientation_ang_y_pid_controller_kd = 30.5;
   double kl_achd_solver_output_torques[7]{};
   double kl_bl_position_coord_lin_y_initial = 0.0;
   double kl_bl_orientation_ang_y_pid_controller_ki = 2.9;
@@ -289,18 +289,18 @@ int main()
   double kr_bl_orientation_coord_ang_z_initial_vector[6] = {0, 0, 0, 0, 0, 1};
 
   // uc1 vars
-  double arms_bl_base_distance_reference_value = 0.82;
+  double arms_bl_base_distance_reference_value = 0.75;
   double kr_bl_base_distance = 0.0;
   double kr_bl_base_distance_pid_controller_kp = 300.0;
-  double kr_bl_base_distance_pid_controller_ki = 3.5;
+  double kr_bl_base_distance_pid_controller_ki = 2.5;
   double kr_bl_base_distance_pid_controller_kd = 0.0;
   double kr_bl_base_distance_pid_error_sum = 0.0;
   double kr_bl_base_distance_pid_prev_error = 0.0;
   double kr_bl_base_distance_pid_controller_signal = 0.0;
 
   double kl_bl_base_distance = 0.0;
-  double kl_bl_base_distance_pid_controller_kp = 100.0;
-  double kl_bl_base_distance_pid_controller_ki = 3.5;
+  double kl_bl_base_distance_pid_controller_kp = 300.0;
+  double kl_bl_base_distance_pid_controller_ki = 2.5;
   double kl_bl_base_distance_pid_controller_kd = 0.0;
   double kl_bl_base_distance_pid_error_sum = 0.0;
   double kl_bl_base_distance_pid_prev_error = 0.0;
@@ -308,6 +308,8 @@ int main()
 
   double fd_solver_robile_output_torques[8]{};
 
+  update_base_state(robot.mobile_base->mediator->kelo_base_config,
+                    robot.mobile_base->mediator->ethercat_config);
   get_robot_data(&robot, *control_loop_dt);
 
   // init torques
@@ -408,6 +410,8 @@ int main()
     // printf("\n");
     // printf("count: %d\n", count);
 
+    // update_base_state(robot.mobile_base->mediator->kelo_base_config,
+    //                 robot.mobile_base->mediator->ethercat_config);
     get_robot_data(&robot, *control_loop_dt);
 
     KDL::Frame base_to_world;
@@ -469,7 +473,7 @@ int main()
     pidController(
         kl_bl_orientation_ang_x_pid_controller_error, kl_bl_orientation_ang_x_pid_controller_kp,
         kl_bl_orientation_ang_x_pid_controller_ki, kl_bl_orientation_ang_x_pid_controller_kd,
-        *control_loop_dt, kl_bl_orientation_ang_x_pid_controller_error_sum,
+        *control_loop_dt, kl_bl_orientation_ang_x_pid_controller_error_sum, 1.0,
         kl_bl_orientation_ang_x_pid_controller_prev_error,
         kl_bl_orientation_ang_x_pid_controller_signal);
 
@@ -479,7 +483,7 @@ int main()
     pidController(
         kl_bl_orientation_ang_y_pid_controller_error, kl_bl_orientation_ang_y_pid_controller_kp,
         kl_bl_orientation_ang_y_pid_controller_ki, kl_bl_orientation_ang_y_pid_controller_kd,
-        *control_loop_dt, kl_bl_orientation_ang_y_pid_controller_error_sum,
+        *control_loop_dt, kl_bl_orientation_ang_y_pid_controller_error_sum, 1.0,
         kl_bl_orientation_ang_y_pid_controller_prev_error,
         kl_bl_orientation_ang_y_pid_controller_signal);
 
@@ -489,7 +493,7 @@ int main()
     pidController(
         kl_bl_orientation_ang_z_pid_controller_error, kl_bl_orientation_ang_z_pid_controller_kp,
         kl_bl_orientation_ang_z_pid_controller_ki, kl_bl_orientation_ang_z_pid_controller_kd,
-        *control_loop_dt, kl_bl_orientation_ang_z_pid_controller_error_sum,
+        *control_loop_dt, kl_bl_orientation_ang_z_pid_controller_error_sum, 1.0,
         kl_bl_orientation_ang_z_pid_controller_prev_error,
         kl_bl_orientation_ang_z_pid_controller_signal);
 
@@ -499,7 +503,7 @@ int main()
     pidController(
         kr_bl_orientation_ang_x_pid_controller_error, kr_bl_orientation_ang_x_pid_controller_kp,
         kr_bl_orientation_ang_x_pid_controller_ki, kr_bl_orientation_ang_x_pid_controller_kd,
-        *control_loop_dt, kr_bl_orientation_ang_x_pid_controller_error_sum,
+        *control_loop_dt, kr_bl_orientation_ang_x_pid_controller_error_sum, 1.0,
         kr_bl_orientation_ang_x_pid_controller_prev_error,
         kr_bl_orientation_ang_x_pid_controller_signal);
 
@@ -509,7 +513,7 @@ int main()
     pidController(
         kr_bl_orientation_ang_y_pid_controller_error, kr_bl_orientation_ang_y_pid_controller_kp,
         kr_bl_orientation_ang_y_pid_controller_ki, kr_bl_orientation_ang_y_pid_controller_kd,
-        *control_loop_dt, kr_bl_orientation_ang_y_pid_controller_error_sum,
+        *control_loop_dt, kr_bl_orientation_ang_y_pid_controller_error_sum, 1.0,
         kr_bl_orientation_ang_y_pid_controller_prev_error,
         kr_bl_orientation_ang_y_pid_controller_signal);
 
@@ -519,7 +523,7 @@ int main()
     pidController(
         kr_bl_orientation_ang_z_pid_controller_error, kr_bl_orientation_ang_z_pid_controller_kp,
         kr_bl_orientation_ang_z_pid_controller_ki, kr_bl_orientation_ang_z_pid_controller_kd,
-        *control_loop_dt, kr_bl_orientation_ang_z_pid_controller_error_sum,
+        *control_loop_dt, kr_bl_orientation_ang_z_pid_controller_error_sum, 1.0,
         kr_bl_orientation_ang_z_pid_controller_prev_error,
         kr_bl_orientation_ang_z_pid_controller_signal);
 
@@ -535,7 +539,7 @@ int main()
                   kinova_left_bracelet_table_contact_force_pid_controller_kp,
                   kinova_left_bracelet_table_contact_force_pid_controller_ki,
                   kinova_left_bracelet_table_contact_force_pid_controller_kd, *control_loop_dt,
-                  kinova_left_bracelet_table_contact_force_pid_controller_error_sum,
+                  kinova_left_bracelet_table_contact_force_pid_controller_error_sum, 1.0,
                   kinova_left_bracelet_table_contact_force_pid_controller_prev_error,
                   kinova_left_bracelet_table_contact_force_pid_controller_signal);
 
@@ -557,9 +561,9 @@ int main()
                     kr_bl_position_coord_lin_y_vector, &robot, kr_bl_position_coord_lin_y);
 
     // transform from base to world
-    KDL::Vector kr_bl_position_coord_lin_y_world =
-        base_to_world.Inverse() * KDL::Vector(0.0, kr_bl_position_coord_lin_y, 0.0);
-    kr_bl_position_coord_lin_y = kr_bl_position_coord_lin_y_world.y();
+    // KDL::Vector kr_bl_position_coord_lin_y_world =
+    //     base_to_world.Inverse() * KDL::Vector(0.0, kr_bl_position_coord_lin_y, 0.0);
+    // kr_bl_position_coord_lin_y = kr_bl_position_coord_lin_y_world.y();
 
     double kr_bl_position_lin_y_pid_controller_error = 0;
     computeEqualityError(kr_bl_position_coord_lin_y, kr_bl_position_coord_lin_y_initial,
@@ -567,7 +571,7 @@ int main()
     pidController(kr_bl_position_lin_y_pid_controller_error,
                   kr_bl_position_lin_y_pid_controller_kp, kr_bl_position_lin_y_pid_controller_ki,
                   kr_bl_position_lin_y_pid_controller_kd, *control_loop_dt,
-                  kr_bl_position_lin_y_pid_controller_error_sum,
+                  kr_bl_position_lin_y_pid_controller_error_sum, 1.0,
                   kr_bl_position_lin_y_pid_controller_prev_error,
                   kr_bl_position_lin_y_pid_controller_signal);
 
@@ -580,7 +584,7 @@ int main()
     pidController(kl_bl_position_lin_z_pid_controller_error,
                   kl_bl_position_lin_z_pid_controller_kp, kl_bl_position_lin_z_pid_controller_ki,
                   kl_bl_position_lin_z_pid_controller_kd, *control_loop_dt,
-                  kl_bl_position_lin_z_pid_controller_error_sum,
+                  kl_bl_position_lin_z_pid_controller_error_sum, 1.0,
                   kl_bl_position_lin_z_pid_controller_prev_error,
                   kl_bl_position_lin_z_pid_controller_signal);
 
@@ -596,7 +600,7 @@ int main()
                   kinova_right_bracelet_table_contact_force_pid_controller_kp,
                   kinova_right_bracelet_table_contact_force_pid_controller_ki,
                   kinova_right_bracelet_table_contact_force_pid_controller_kd, *control_loop_dt,
-                  kinova_right_bracelet_table_contact_force_pid_controller_error_sum,
+                  kinova_right_bracelet_table_contact_force_pid_controller_error_sum, 1.0,
                   kinova_right_bracelet_table_contact_force_pid_controller_prev_error,
                   kinova_right_bracelet_table_contact_force_pid_controller_signal);
 
@@ -622,7 +626,7 @@ int main()
     pidController(kr_bl_position_lin_z_pid_controller_error,
                   kr_bl_position_lin_z_pid_controller_kp, kr_bl_position_lin_z_pid_controller_ki,
                   kr_bl_position_lin_z_pid_controller_kd, *control_loop_dt,
-                  kr_bl_position_lin_z_pid_controller_error_sum,
+                  kr_bl_position_lin_z_pid_controller_error_sum, 1.0,
                   kr_bl_position_lin_z_pid_controller_prev_error,
                   kr_bl_position_lin_z_pid_controller_signal);
 
@@ -631,9 +635,9 @@ int main()
                     kl_bl_position_coord_lin_y_vector, &robot, kl_bl_position_coord_lin_y);
 
     // transform from base to world
-    KDL::Vector kl_bl_position_coord_lin_y_world =
-        base_to_world.Inverse() * KDL::Vector(0.0, kl_bl_position_coord_lin_y, 0.0);
-    kl_bl_position_coord_lin_y = kl_bl_position_coord_lin_y_world.y();
+    // KDL::Vector kl_bl_position_coord_lin_y_world =
+    //     base_to_world.Inverse() * KDL::Vector(0.0, kl_bl_position_coord_lin_y, 0.0);
+    // kl_bl_position_coord_lin_y = kl_bl_position_coord_lin_y_world.y();
 
     double kl_bl_position_lin_y_pid_controller_error = 0;
     computeEqualityError(kl_bl_position_coord_lin_y, kl_bl_position_coord_lin_y_initial,
@@ -641,7 +645,7 @@ int main()
     pidController(kl_bl_position_lin_y_pid_controller_error,
                   kl_bl_position_lin_y_pid_controller_kp, kl_bl_position_lin_y_pid_controller_ki,
                   kl_bl_position_lin_y_pid_controller_kd, *control_loop_dt,
-                  kl_bl_position_lin_y_pid_controller_error_sum,
+                  kl_bl_position_lin_y_pid_controller_error_sum, 1.0,
                   kl_bl_position_lin_y_pid_controller_prev_error,
                   kl_bl_position_lin_y_pid_controller_signal);
 
@@ -655,7 +659,7 @@ int main()
                          kr_bl_base_distance_controller_error);
     pidController(kr_bl_base_distance_controller_error, kr_bl_base_distance_pid_controller_kp,
                   kr_bl_base_distance_pid_controller_ki, kr_bl_base_distance_pid_controller_kd,
-                  *control_loop_dt, kr_bl_base_distance_pid_error_sum,
+                  *control_loop_dt, kr_bl_base_distance_pid_error_sum, 3.0,
                   kr_bl_base_distance_pid_prev_error, kr_bl_base_distance_pid_controller_signal);
     // impedanceController(
     //     kr_bl_base_distance_impedance_controller_stiffness_error, 0.0,
@@ -672,13 +676,19 @@ int main()
                          kl_bl_base_distance_controller_error);
     pidController(kl_bl_base_distance_controller_error, kl_bl_base_distance_pid_controller_kp,
                   kl_bl_base_distance_pid_controller_ki, kl_bl_base_distance_pid_controller_kd,
-                  *control_loop_dt, kl_bl_base_distance_pid_error_sum,
+                  *control_loop_dt, kl_bl_base_distance_pid_error_sum, 3.0,
                   kl_bl_base_distance_pid_prev_error, kl_bl_base_distance_pid_controller_signal);
     // impedanceController(
     //     kl_bl_base_distance_impedance_controller_stiffness_error, 0.0,
     //     kl_bl_base_distance_impedance_controller_stiffness_diag_mat,
     //     new double[1]{0.0},
     //     kl_bl_base_distance_impedance_controller_signal);
+
+    // std::cout << "dists  : " << kl_bl_base_distance << " " << kr_bl_base_distance << std::endl;
+    // std::cout << "errors : " << kl_bl_base_distance_controller_error << " "
+    //           << kr_bl_base_distance_controller_error << std::endl;
+    // std::cout << "signals: " << kl_bl_base_distance_pid_controller_signal << " "
+    //           << kr_bl_base_distance_pid_controller_signal << std::endl;
 
     // embed maps
     double
@@ -849,19 +859,35 @@ int main()
     // uc1 embed maps
     double fd_solver_robile_output_external_wrench_kl[6]{};
     decomposeSignal(&robot, kinova_left_base_link, kinova_left_bracelet_link,
-                    kinova_left_bracelet_link, kl_bl_base_distance_pid_controller_signal,
+                    kinova_left_base_link, kl_bl_base_distance_pid_controller_signal,
                     fd_solver_robile_output_external_wrench_kl);
-    transform_wrench2(&robot, kinova_left_bracelet_link, base_link,
+
+    // std::cout << "kl_wrench: ";
+    // print_array(fd_solver_robile_output_external_wrench_kl, 6);
+
+    transform_wrench2(&robot, kinova_left_base_link, base_link,
                       fd_solver_robile_output_external_wrench_kl,
                       fd_solver_robile_output_external_wrench_kl);
 
+    // std::cout << "kl_wrench_transf: ";
+    // print_array(fd_solver_robile_output_external_wrench_kl, 6);
+
     double fd_solver_robile_output_external_wrench_kr[6]{};
     decomposeSignal(&robot, kinova_right_base_link, kinova_right_bracelet_link,
-                    kinova_right_bracelet_link, kr_bl_base_distance_pid_controller_signal,
+                    kinova_right_base_link, kr_bl_base_distance_pid_controller_signal,
                     fd_solver_robile_output_external_wrench_kr);
-    transform_wrench2(&robot, kinova_right_bracelet_link, base_link,
+
+    // std::cout << "kr_wrench: ";
+    // print_array(fd_solver_robile_output_external_wrench_kr, 6);
+
+    transform_wrench2(&robot, kinova_right_base_link, base_link,
                       fd_solver_robile_output_external_wrench_kr,
                       fd_solver_robile_output_external_wrench_kr);
+
+    // std::cout << "kr_wrench_transf: ";
+    // print_array(fd_solver_robile_output_external_wrench_kr, 6);
+
+    std::cout << std::endl;
 
     // solvers
     // fd solver
@@ -871,6 +897,7 @@ int main()
         fd_solver_robile_platform_wrench, 6);
     add(fd_solver_robile_output_external_wrench_kr, fd_solver_robile_platform_wrench,
         fd_solver_robile_platform_wrench, 6);
+    // fd_solver_robile_platform_wrench[5] = 0.0;
     base_fd_solver(&robot, fd_solver_robile_platform_wrench, fd_solver_robile_output_torques);
 
     // achd_solver_fext
@@ -1022,19 +1049,19 @@ int main()
     KDL::JntArray kinova_left_cmd_tau_kdl(7);
     cap_and_convert_torques(kinova_left_cmd_tau, 7, kinova_left_cmd_tau_kdl);
 
-    // if (!kinova_left_torque_control_mode_set)
-    // {
-    //   robot.kinova_left->mediator->set_control_mode(2, kl_rne_output_torques);
-    //   kinova_left_torque_control_mode_set = true;
-    // }
-    // set_manipulator_torques(&robot, kinova_left_base_link, &kinova_left_cmd_tau_kdl);
+    if (!kinova_left_torque_control_mode_set)
+    {
+      robot.kinova_left->mediator->set_control_mode(2, kl_rne_output_torques);
+      kinova_left_torque_control_mode_set = true;
+    }
+    set_manipulator_torques(&robot, kinova_left_base_link, &kinova_left_cmd_tau_kdl);
 
-    // if (!kinova_right_torque_control_mode_set)
-    // {
-    //   robot.kinova_right->mediator->set_control_mode(2, kr_rne_output_torques);
-    //   kinova_right_torque_control_mode_set = true;
-    // }
-    // set_manipulator_torques(&robot, kinova_right_base_link, &kinova_right_cmd_tau_kdl);
+    if (!kinova_right_torque_control_mode_set)
+    {
+      robot.kinova_right->mediator->set_control_mode(2, kr_rne_output_torques);
+      kinova_right_torque_control_mode_set = true;
+    }
+    set_manipulator_torques(&robot, kinova_right_base_link, &kinova_right_cmd_tau_kdl);
 
     set_mobile_base_torques(&robot, fd_solver_robile_output_torques);
 
