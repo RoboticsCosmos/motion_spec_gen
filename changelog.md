@@ -8,6 +8,7 @@
 - [ ] update "measured" object for the controllers to not be redundtant with compute_variables
 - [ ] compute setpoints (variable) at the beginning of the control loop
 - [ ] bug in the achd solver beta population based on the active constraints !!!
+- [ ] !! transform utils are wrong. only wrench and alpha are corrected. 
   
 ## Changes made / Bugs fixed:
 

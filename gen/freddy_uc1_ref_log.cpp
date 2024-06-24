@@ -14,6 +14,7 @@ extern "C"
 #include <motion_spec_utils/math_utils.hpp>
 #include <motion_spec_utils/solver_utils.hpp>
 #include <kinova_mediator/mediator.hpp>
+#include "motion_spec_utils/log_structs.hpp"
 #include <csignal>
 
 volatile sig_atomic_t flag = 0;
@@ -106,6 +107,7 @@ int main()
   double kinova_right_bracelet_table_contact_force_pid_controller_error_sum = 0.0;
   double kl_bl_position_coord_lin_z_vector[6] = {0, 0, 1, 0, 0, 0};
   double kinova_left_bracelet_table_contact_force_pid_controller_kp = 1.0;
+  double kl_elbow_base_z_distance_reference_value = 0.75;
   double kinova_left_bracelet_table_contact_force_pid_controller_ki = 0.0;
   double kinova_left_bracelet_table_contact_force_pid_controller_kd = 0.0;
   double kl_bl_position_lin_z_twist_embed_map_vector[6] = {0.0, 0.0, 1.0, 0.0, 0.0, 0.0};
@@ -142,6 +144,7 @@ int main()
           [6]{};
   double kl_achd_solver_predicted_accelerations[7]{};
   double kl_achd_solver_fext_output_torques[7]{};
+  double kr_elbow_base_z_distance_reference_value = 0.75;
   int kl_achd_solver_nc = 5;
   double kl_bl_orientation_ang_z_pid_controller_signal = 0.0;
   double
@@ -164,6 +167,8 @@ int main()
   double kl_bl_orientation_ang_x_twist_embed_map_kl_achd_solver_output_acceleration_energy[6]{};
   double kr_bl_orientation_ang_y_pid_controller_prev_error = 0.0;
   double kl_elbow_base_distance_coord_lin_z = 0.0;
+  double kr_arm_table_contact_force_reference_value = -10.0;
+  double kl_arm_table_contact_force_reference_value = -20.0;
   double kl_bl_position_lin_y_pid_controller_signal = 0.0;
   double kl_bl_orientation_ang_y_pid_controller_prev_error = 0.0;
   double kr_bl_orientation_ang_x_pid_controller_prev_error = 0.0;
@@ -180,18 +185,9 @@ int main()
   double kl_bl_position_lin_z_pid_controller_kd = 30.5;
   double kl_bl_position_lin_z_pid_controller_error_sum = 0.0;
   double kr_bl_orientation_ang_z_pid_controller_prev_error = 0.0;
-  double kl_bl_orientation_ang_z_pid_controller_prev_error = 0.0;
-  
-  std::string kinova_right_half_arm_2_link = "kinova_right_forearm_link";
-  std::string kinova_left_half_arm_2_link = "kinova_left_forearm_link";
-
-  double kr_elbow_base_z_distance_reference_value = 0.7;
-  double kl_elbow_base_z_distance_reference_value = 0.7;
-  double kr_elbow_base_base_distance_z_impedance_controller_stiffness_diag_mat[1] = {1000.0};
   double kl_elbow_base_base_distance_z_impedance_controller_stiffness_diag_mat[1] = {1000.0};
-
-  double kr_arm_table_contact_force_reference_value = -20.0;
-  double kl_arm_table_contact_force_reference_value = -20.0;
+  std::string kinova_left_half_arm_2_link = "kinova_left_half_arm_2_link";
+  double kl_bl_orientation_ang_z_pid_controller_prev_error = 0.0;
 
   double kl_bl_orientation_ang_x_pid_controller_kp = 80.0;
   double kl_bl_orientation_ang_x_pid_controller_ki = 2.9;
@@ -212,7 +208,7 @@ int main()
   double kr_bl_orientation_ang_z_pid_controller_kp = 200.0;
   double kr_bl_orientation_ang_z_pid_controller_ki = 2.9;
   double kr_bl_orientation_ang_z_pid_controller_kd = 80.5;
-  
+
   double kl_bl_orientation_ang_y_pid_controller_error_sum = 0.0;
   double kl_bl_orientation_ang_y_pid_controller_signal = 0.0;
   int kr_achd_solver_fext_nj = 7;
@@ -245,6 +241,7 @@ int main()
   double kr_bl_position_lin_z_pid_controller_prev_error = 0.0;
   double kr_bl_orientation_ang_z_twist_embed_map_vector[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 1.0};
   double kr_bl_position_lin_y_pid_controller_kd = 20.5;
+  std::string kinova_right_half_arm_2_link = "kinova_right_half_arm_2_link";
   double kr_bl_position_lin_z_twist_embed_map_kr_achd_solver_output_acceleration_energy[6]{};
   double kl_bl_orientation_coord_ang_z_vector[6] = {0, 0, 0, 0, 0, 1};
   double kr_bl_orientation_ang_y_pid_controller_signal = 0.0;
@@ -286,6 +283,7 @@ int main()
   double kl_bl_orientation_ang_y_twist_embed_map_vector[6] = {0.0, 0.0, 0.0, 0.0, 1.0, 0.0};
   double kr_achd_solver_root_acceleration[6] = {-9.685, -1.033, 1.324, 0.0, 0.0, 0.0};
   double kr_bl_position_lin_z_pid_controller_kp = 50.0;
+  double kr_elbow_base_base_distance_z_impedance_controller_stiffness_diag_mat[1] = {1000.0};
   double kl_bl_orientation_coord_ang_x_initial = 0.0;
   double kr_bl_orientation_ang_x_twist_embed_map_kr_achd_solver_output_acceleration_energy[6]{};
   double kl_bl_position_coord_lin_y = 0.0;
@@ -404,6 +402,22 @@ int main()
                                 base_world_orientation_coord_ang_quat_initial[2],
                                 base_world_orientation_coord_ang_quat_initial[3]);
 
+  std::string log_dir = "../../logs/data/freddy_uc1";
+  char log_dir_name[100];
+  get_new_folder_name(log_dir.c_str(), log_dir_name);
+  std::filesystem::create_directories(log_dir_name);
+  std::filesystem::permissions(log_dir_name, std::filesystem::perms::all);
+
+  LogManipulatorDataVector kr_log_data_vector("kinova_right", log_dir_name);
+  LogManipulatorDataVector kl_log_data_vector("kinova_left", log_dir_name);
+  LogMobileBaseDataVector base_log_data_vector(log_dir_name);
+
+  double kinova_right_cmd_tau[7]{};
+  double kinova_left_cmd_tau[7]{};
+
+  double kr_achd_solver_beta[6]{};
+  double kl_achd_solver_beta[6]{};
+
   int count = 0;
 
   while (true)
@@ -412,6 +426,13 @@ int main()
 
     if (flag)
     {
+      kr_log_data_vector.addManipulatorData(robot.kinova_right, kr_achd_solver_beta,
+                                          kinova_right_cmd_tau, nullptr);
+      kl_log_data_vector.addManipulatorData(robot.kinova_left, kl_achd_solver_beta,
+                                            kinova_left_cmd_tau, nullptr);
+      base_log_data_vector.addMobileBaseData(robot.mobile_base, robot.mobile_base->state->x_platform,
+                                            robot.mobile_base->state->xd_platform);
+
       free_robot_data(&robot);
       printf("Exiting somewhat cleanly...\n");
       exit(0);
@@ -485,7 +506,8 @@ int main()
     // kr_theta_world.GetRPY(r, p, y);
     // std::cout << "kr_theta_world : " << RAD2DEG(r) << " " << RAD2DEG(p) << " " << RAD2DEG(y)
     //           << std::endl;
-    // std::cout << "kr_theta_diff  : " << RAD2DEG(kr_theta_diff.x()) << " " << RAD2DEG(kr_theta_diff.y())
+    // std::cout << "kr_theta_diff  : " << RAD2DEG(kr_theta_diff.x()) << " " <<
+    // RAD2DEG(kr_theta_diff.y())
     //           << " " << RAD2DEG(kr_theta_diff.z()) << std::endl;
 
     // controllers
@@ -887,18 +909,32 @@ int main()
     // uc1 embed maps
     double fd_solver_robile_output_external_wrench_kl[6]{};
     decomposeSignal(&robot, kinova_left_base_link, kinova_left_bracelet_link,
-                    base_link, kl_bl_base_distance_pid_controller_signal,
+                    kinova_left_base_link, kl_bl_base_distance_pid_controller_signal,
                     fd_solver_robile_output_external_wrench_kl);
 
     // std::cout << "kl_wrench: ";
     // print_array(fd_solver_robile_output_external_wrench_kl, 6);
 
+    transform_wrench2(&robot, kinova_left_base_link, base_link,
+                      fd_solver_robile_output_external_wrench_kl,
+                      fd_solver_robile_output_external_wrench_kl);
+
+    // std::cout << "kl_wrench_transf: ";
+    // print_array(fd_solver_robile_output_external_wrench_kl, 6);
+
     double fd_solver_robile_output_external_wrench_kr[6]{};
     decomposeSignal(&robot, kinova_right_base_link, kinova_right_bracelet_link,
-                    base_link, kr_bl_base_distance_pid_controller_signal,
+                    kinova_right_base_link, kr_bl_base_distance_pid_controller_signal,
                     fd_solver_robile_output_external_wrench_kr);
 
     // std::cout << "kr_wrench: ";
+    // print_array(fd_solver_robile_output_external_wrench_kr, 6);
+
+    transform_wrench2(&robot, kinova_right_base_link, base_link,
+                      fd_solver_robile_output_external_wrench_kr,
+                      fd_solver_robile_output_external_wrench_kr);
+
+    // std::cout << "kr_wrench_transf: ";
     // print_array(fd_solver_robile_output_external_wrench_kr, 6);
 
     std::cout << std::endl;
@@ -911,13 +947,12 @@ int main()
         fd_solver_robile_platform_wrench, 6);
     add(fd_solver_robile_output_external_wrench_kr, fd_solver_robile_platform_wrench,
         fd_solver_robile_platform_wrench, 6);
-    // std::cout << "pf: ";
-    // for (size_t i = 0; i < 6; i++)
-    // {
-    //   std::cout << fd_solver_robile_platform_wrench[i] << " ";
-    // }
-    // std::cout << std::endl;
-    // usleep(2000);
+    std::cout << "pf: ";
+    for (size_t i = 0; i < 6; i++)
+    {
+      std::cout << fd_solver_robile_platform_wrench[i] << " ";
+    }
+    std::cout << std::endl;
     base_fd_solver(&robot, fd_solver_robile_platform_wrench, fd_solver_robile_output_torques);
 
     // achd_solver_fext
@@ -1051,7 +1086,7 @@ int main()
     for (size_t i = 0; i < 6; i++)
     {
       kr_achd_solver_fext_ext_wrenches[link_id][i] =
-          kr_elbow_base_base_distance_z_embed_map_kr_achd_solver_fext_output_external_wrench_transf[i];
+          kr_elbow_base_base_distance_z_embed_map_kr_achd_solver_fext_output_external_wrench[i];
     }
     achd_solver_fext(&robot, kinova_right_base_link, kinova_right_bracelet_link,
                      kr_achd_solver_fext_ext_wrenches, kr_achd_solver_fext_output_torques);
@@ -1071,11 +1106,17 @@ int main()
     KDL::JntArray kinova_left_cmd_tau_kdl(7);
     cap_and_convert_manipulator_torques(kinova_left_cmd_tau, 7, kinova_left_cmd_tau_kdl);
 
-    // set torques
-    // set_mobile_base_torques(&robot, fd_solver_robile_output_torques);
-    // set_manipulator_torques(&robot, kinova_left_base_link, &kinova_left_cmd_tau_kdl);
-    set_manipulator_torques(&robot, kinova_right_base_link, &kinova_right_cmd_tau_kdl);
+    kr_log_data_vector.addManipulatorData(robot.kinova_right, kr_achd_solver_beta,
+                                          kinova_right_cmd_tau, nullptr);
+    kl_log_data_vector.addManipulatorData(robot.kinova_left, kl_achd_solver_beta,
+                                          kinova_left_cmd_tau, nullptr);
+    base_log_data_vector.addMobileBaseData(robot.mobile_base, robot.mobile_base->state->x_platform,
+                                           robot.mobile_base->state->xd_platform);
 
+    // set torques
+    set_mobile_base_torques(&robot, fd_solver_robile_output_torques);
+    set_manipulator_torques(&robot, kinova_left_base_link, &kinova_left_cmd_tau_kdl);
+    set_manipulator_torques(&robot, kinova_right_base_link, &kinova_right_cmd_tau_kdl);
 
     auto end_time = std::chrono::high_resolution_clock::now();
     auto elapsed_time = std::chrono::duration<double>(end_time - start_time);

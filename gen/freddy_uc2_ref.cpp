@@ -400,7 +400,7 @@ int main()
 
   int count = 0;
 
-  while (true)
+  while (count < 1)
   {
     auto start_time = std::chrono::high_resolution_clock::now();
 
@@ -870,34 +870,20 @@ int main()
 
     // uc1 embed maps
     double fd_solver_robile_output_external_wrench_kl[6]{};
-    decomposeSignal(&robot, kinova_left_base_link, kinova_left_bracelet_link,
-                    kinova_left_base_link, kl_bl_base_distance_pid_controller_signal,
+    decomposeSignal(&robot, kinova_left_bracelet_link, kinova_left_base_link,
+                   kinova_left_bracelet_link, kl_bl_base_distance_pid_controller_signal,
                     fd_solver_robile_output_external_wrench_kl);
 
     std::cout << "kl_wrench: ";
     print_array(fd_solver_robile_output_external_wrench_kl, 6);
 
-    transform_wrench2(&robot, kinova_left_base_link, base_link,
-                      fd_solver_robile_output_external_wrench_kl,
-                      fd_solver_robile_output_external_wrench_kl);
-
-    // std::cout << "kl_wrench_transf: ";
-    // print_array(fd_solver_robile_output_external_wrench_kl, 6);
-
     double fd_solver_robile_output_external_wrench_kr[6]{};
-    decomposeSignal(&robot, kinova_right_base_link, kinova_right_bracelet_link,
-                    kinova_right_base_link, kr_bl_base_distance_pid_controller_signal,
+    decomposeSignal(&robot, kinova_right_bracelet_link, kinova_right_base_link,
+                    kinova_right_bracelet_link, kr_bl_base_distance_pid_controller_signal,
                     fd_solver_robile_output_external_wrench_kr);
 
     std::cout << "kr_wrench: ";
     print_array(fd_solver_robile_output_external_wrench_kr, 6);
-
-    transform_wrench2(&robot, kinova_right_base_link, base_link,
-                      fd_solver_robile_output_external_wrench_kr,
-                      fd_solver_robile_output_external_wrench_kr);
-
-    // std::cout << "kr_wrench_transf: ";
-    // print_array(fd_solver_robile_output_external_wrench_kr, 6);
 
     std::cout << std::endl;
 
