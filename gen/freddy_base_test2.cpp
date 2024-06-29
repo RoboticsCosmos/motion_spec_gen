@@ -161,13 +161,6 @@ int main()
       0.0,    0.0,    0.01   // mx, my, mm
   };
 
-  double w_platform2[3 * 3] = {
-      // [1/N^2], [1/(N Nm)], [1/(Nm)^2]
-      1.0, 0.0, 0.0,  // xx, xy, xm
-      0.0, 1.0, 0.0,  // yx, yy, ym
-      0.0, 0.0, 1.0   // mx, my, mm
-  };
-
   double w_drive[4 * 4] = {
       // [1/N^2]
       1.0, 0.0, 0.0, 1.0,  // fl-xx, fl-xy, fl-yx, fl-yy
@@ -197,13 +190,13 @@ int main()
     printf("\n");
     // printf("count: %d\n", count);
 
-    update_base_state(robot.mobile_base->mediator->kelo_base_config,
-                      robot.mobile_base->mediator->ethercat_config);
+    // update_base_state(robot.mobile_base->mediator->kelo_base_config,
+    //                   robot.mobile_base->mediator->ethercat_config);
     get_robot_data(&robot, *control_loop_dt);
     std::cout << std::endl;
 
     // solver
-    double platform_force[3] = { 200.0, 0.0, 0.0};  // [N], [N], [Nm]
+    double platform_force[3] = { 150.0, 0.0, 0.0};  // [N], [N], [Nm]
 
     std::cout << "platform force: ";
     print_array(platform_force, 3);
@@ -215,131 +208,6 @@ int main()
     }
     std::cout << std::endl;
 
-    // compute the fk of pivot links
-    KDL::TreeFkSolverPos_recursive fk_solver = KDL::TreeFkSolverPos_recursive(tree);
-
-    KDL::JntArray q = KDL::JntArray(tree.getNrOfJoints());
-    // set the pivot angles based on the pivot joint ids
-    for (size_t i = 0; i < 4; i++)
-    {
-      q(pivot_joint_ids[i] - 1) = robot.mobile_base->state->pivot_angles[i];
-    }
-
-    KDL::Frame frame1;
-    fk_solver.JntToCart(q, frame1, "left_front_wheel_pivot_link");
-    // frame.M.GetRPY(r, p, y);
-    // std::cout << "left_front_wheel_pivot_link: " << frame.p.x() << ", " << frame.p.y() << ","
-    //           << frame.p.z() << ", " << RAD2DEG(r) << ", " << RAD2DEG(p) << ", " << RAD2DEG(y)
-    //           << std::endl;
-
-    KDL::Frame frame2;
-    fk_solver.JntToCart(q, frame2, "left_back_wheel_pivot_link");
-    // frame.M.GetRPY(r, p, y);
-    // std::cout << "left_back_wheel_pivot_link: " << frame.p.x() << ", " << frame.p.y() << ", "
-    //           << frame.p.z() << ", " << RAD2DEG(r) << ", " << RAD2DEG(p) << ", " << RAD2DEG(y)
-    //           << std::endl;
-
-    KDL::Frame frame3;
-    fk_solver.JntToCart(q, frame3, "right_back_wheel_pivot_link");
-    // frame.M.GetRPY(r, p, y);
-    // std::cout << "right_back_wheel_pivot_link: " << frame.p.x() << ", " << frame.p.y() << ", "
-    //           << frame.p.z() << ", " << RAD2DEG(r) << ", " << RAD2DEG(p) << ", " << RAD2DEG(y)
-    //           << std::endl;
-
-    KDL::Frame frame4;
-    fk_solver.JntToCart(q, frame4, "right_front_wheel_pivot_link");
-    // frame.M.GetRPY(r, p, y);
-    // std::cout << "right_front_wheel_pivot_link: " << frame.p.x() << ", " << frame.p.y() << ", "
-    //           << frame.p.z() << ", " << RAD2DEG(r) << ", " << RAD2DEG(p) << ", " << RAD2DEG(y)
-    //           << std::endl;
-
-    KDL::Wrench Fplt = KDL::Wrench(KDL::Vector(platform_force[0], platform_force[1], 0.0),
-                                   KDL::Vector(0.0, 0.0, platform_force[2]));
-
-    // normalize
-    Fplt.force.Normalize();
-    Fplt.torque.Normalize();
-
-    KDL::Wrench Fpiv_rb = KDL::Wrench(KDL::Vector(1.0, 0.0, 0.0), KDL::Vector::Zero());
-
-    KDL::Wrench f1 = ((frame1.M * Fpiv_rb) - Fplt);
-    KDL::Wrench f2 = ((frame2.M * Fpiv_rb) - Fplt);
-    KDL::Wrench f3 = ((frame3.M * Fpiv_rb) - Fplt);
-    KDL::Wrench f4 = ((frame4.M * Fpiv_rb) - Fplt);
-
-    // std::cout << "Fplt    : " << Fplt << std::endl;
-    // std::cout << "Fpiv_rb : " << Fpiv_rb << std::endl;
-    // std::cout << "Fpiv_rb1: " << frame.M * Fpiv_rb << std::endl;
-    // std::cout << "f       : " << f << std::endl;
-
-    // define eigen matrix
-    Eigen::Matrix<double, 3, 1> f1_eigen;
-    f1_eigen << f1.force.x(), f1.force.y(), f1.torque.z();
-
-    Eigen::Matrix<double, 3, 1> f2_eigen;
-    f2_eigen << f2.force.x(), f2.force.y(), f2.torque.z();
-
-    Eigen::Matrix<double, 3, 1> f3_eigen;
-    f3_eigen << f3.force.x(), f3.force.y(), f3.torque.z();
-
-    Eigen::Matrix<double, 3, 1> f4_eigen;
-    f4_eigen << f4.force.x(), f4.force.y(), f4.torque.z();
-
-    Eigen::Matrix<double, 3, 3> w_platform_eigen;
-    w_platform_eigen << w_platform1[0], w_platform1[1], w_platform1[2], w_platform1[3],
-        w_platform1[4], w_platform1[5], w_platform1[6], w_platform1[7], w_platform1[8];
-
-    // E = (X* Fpiv - Fplt)^T Wp^{-1} (X* Fpiv - Fplt)
-    double E1 = f1_eigen.transpose() * w_platform_eigen.inverse() * f1_eigen;
-    double E2 = f2_eigen.transpose() * w_platform_eigen.inverse() * f2_eigen;
-    double E3 = f3_eigen.transpose() * w_platform_eigen.inverse() * f3_eigen;
-    double E4 = f4_eigen.transpose() * w_platform_eigen.inverse() * f4_eigen;
-
-    double E_limit = 5.0;
-    double E_limit_low = 0.01;
-
-    if (E1 > E_limit)
-    {
-      E1 = E_limit;
-    }
-
-    if (E2 > E_limit)
-    {
-      E2 = E_limit;
-    }
-
-    if (E3 > E_limit)
-    {
-      E3 = E_limit;
-    }
-
-    if (E4 > E_limit)
-    {
-      E4 = E_limit;
-    }
-
-    if (E1 < E_limit_low)
-    {
-      E1 = 0.0;
-    }
-
-    if (E2 < E_limit_low)
-    {
-      E2 = 0.0;
-    }
-
-    if (E3 < E_limit_low)
-    {
-      E3 = 0.0;
-    }
-
-    if (E4 < E_limit_low)
-    {
-      E4 = 0.0;
-    }
-
-    std::cout << "E: " << E1 << ", " << E2 << ", " << E3 << ", " << E4 << std::endl;
-
     // change the platform force rotation
     KDL::Rotation R = KDL::Rotation::RotZ(DEG2RAD(90.0));
     KDL::Vector pf_vec = KDL::Vector(platform_force[0], platform_force[1], 0.0);
@@ -350,38 +218,12 @@ int main()
     std::cout << "platform force_R: ";
     print_array(platform_force, 3);
 
-    // approach 1
-    // double f_drive_ref[8] = {0.0, 0.0, 
-    //                          0.0, 0.0, 
-    //                           E3, 0.0, 
-    //                          0.0, 0.0};
-    // // double f_drive_ref[8]{};
-    // double f_drive_c[8]{};
-    // double f_wheel_c[8]{};
-    // double tau_wheel_c1[8]{};
-
-    // double force_dist_mat_pvt[3 * 2 * robot.mobile_base->mediator->kelo_base_config->nWheels]{};
-
-    // kelo_pltf_frc_comp_mat_pvt(robot.mobile_base->mediator->kelo_base_config->nWheels,
-    //                            robot.mobile_base->mediator->kelo_base_config->wheel_coordinates,
-    //                            robot.mobile_base->state->pivot_angles, force_dist_mat_pvt);
-
-    // kelo_pltf_slv_inv_frc_dist_cgls(robot.mobile_base->mediator->kelo_base_config->nWheels,
-    //                                 force_dist_mat_pvt, w_drive, platform_force, f_drive_ref,
-    //                                 f_drive_c);
-
-    // kelo_drive_solve_inv_force_dist(robot.mobile_base->mediator->kelo_base_config->nWheels,
-    //                                 wheel_distances, caster_offsets, f_drive_c, f_wheel_c);
-
-    // kelo_wheel_cart_force_to_act_torque(robot.mobile_base->mediator->kelo_base_config->nWheels,
-    //                                     wheel_diameters, f_wheel_c, tau_wheel_c1);
-
     // approach 2
-    double tau_wheel_ref[8] = {E1, -E1,
-                               E2, -E2,
-                               E3, -E3, 
-                               E4, -E4};
-    // double tau_wheel_ref[8]{};
+    // double tau_wheel_ref[8] = {E1, -E1,
+    //                            E2, -E2,
+    //                            E3, -E3, 
+    //                            E4, -E4};
+    double tau_wheel_ref[8]{};
     double tau_wheel_c2[8]{};
     double force_dist_mat_whl[3 * 2 * robot.mobile_base->mediator->kelo_base_config->nWheels]{};
 
