@@ -28,6 +28,35 @@ void handle_signal(int sig)
   printf("Caught signal %d\n", sig);
 }
 
+void method(double attachment_vector[2], double platform_force[3], double pivot_direction[2],
+            double &lin_diff, double &ang_diff)
+{
+  Eigen::Vector2d lin_platform_force;
+  lin_platform_force << platform_force[0], platform_force[1];
+  lin_platform_force.normalize();
+
+  Eigen::Vector2d attachment;
+  attachment << attachment_vector[0], attachment_vector[1];
+
+  Eigen::Vector2d pivot;
+  pivot << pivot_direction[0], pivot_direction[1];
+
+  // compute tangent vector of the attachment vector in cw or ccw based on platform force[2] -
+  // moment if the moment is positive, the tangents are in ccw, otherwise in cw
+  Eigen::Rotation2Dd rot_ccw(M_PI / 2);
+  Eigen::Rotation2Dd rot_cw(-M_PI / 2);
+
+  Eigen::Vector2d tangent = platform_force[2] > 0 ? rot_ccw * attachment : rot_cw * attachment;
+
+  // get the angular difference between the pivot direction and the tangent
+  ang_diff = atan2(pivot.x() * tangent.y() - pivot.y() * tangent.x(),
+                   pivot.x() * tangent.x() + pivot.y() * tangent.y());
+
+  // get the angular difference between the pivot direction and platform linear force
+  lin_diff = atan2(pivot.x() * lin_platform_force.y() - pivot.y() * lin_platform_force.x(),
+                   pivot.x() * lin_platform_force.x() + pivot.y() * lin_platform_force.y());
+}
+
 int main()
 {
   // handle signals
@@ -137,7 +166,39 @@ int main()
   double control_loop_timestep = desired_period.count();                               // s
   double *control_loop_dt = &control_loop_timestep;                                    // s
 
-  
+  // initialize variables
+  double caster_offsets[4]{};
+  for (size_t i = 0; i < 4; i++)
+  {
+    caster_offsets[i] = robot.mobile_base->mediator->kelo_base_config->castor_offset;
+  }
+
+  double wheel_distances[4]{};
+  for (size_t i = 0; i < 4; i++)
+  {
+    wheel_distances[i] = robot.mobile_base->mediator->kelo_base_config->half_wheel_distance * 2;
+  }
+
+  double wheel_diameters[8]{};
+  for (size_t i = 0; i < 8; i++)
+  {
+    wheel_diameters[i] = robot.mobile_base->mediator->kelo_base_config->radius * 2;
+  }
+
+  double w_platform[3 * 3] = {
+      // [1/N^2], [1/(N Nm)], [1/(Nm)^2]
+      1.0,    0.0,    0.0,  // xx, xy, xm
+      0.0,    1.0,    0.0,  // yx, yy, ym
+      0.0,    0.0,    1.0   // mx, my, mm
+  };
+
+  double w_drive[4 * 4] = {
+      // [1/N^2]
+      1.0, 0.0, 0.0, 1.0,  // fl-xx, fl-xy, fl-yx, fl-yy
+      1.0, 0.0, 0.0, 1.0,  // rl-xx, rl-xy, rl-yx, rl-yy
+      1.0, 0.0, 0.0, 1.0,  // rr-xx, rr-xy, rr-yx, rr-yy
+      1.0, 0.0, 0.0, 1.0   // fr-xx, fr-xy, fr-yx, fr-yy
+  };
 
   double fd_solver_robile_output_torques[8]{};
 
@@ -166,7 +227,7 @@ int main()
     std::cout << std::endl;
 
     // solver
-    double platform_force[3] = {0.0, 0.0, 10.0};  // [N], [N], [Nm]
+    double platform_force[3] = {0.0, 0.0, 150.0};  // [N], [N], [Nm]
 
     std::cout << "platform force: ";
     print_array(platform_force, 3);
@@ -200,110 +261,272 @@ int main()
     KDL::Frame frame4;
     fk_solver.JntToCart(q, frame4, "right_front_wheel_pivot_link");
 
-    // eigen vec of linear platform force
-    Eigen::Vector2d lin_platform_force;
-    lin_platform_force(0) = platform_force[0];
-    lin_platform_force(1) = platform_force[1];
+    // my approach
+    double attachment_vec_w1[2] = {frame1.p.x(), frame1.p.y()};
+    double attachment_vec_w2[2] = {frame2.p.x(), frame2.p.y()};
+    double attachment_vec_w3[2] = {frame3.p.x(), frame3.p.y()};
+    double attachment_vec_w4[2] = {frame4.p.x(), frame4.p.y()};
 
-    // normalize the linear platform force
-    lin_platform_force.normalize();
+    double pivot_direction_w1[2] = {frame1.M.UnitX().x(), frame1.M.UnitX().y()};
+    double pivot_direction_w2[2] = {frame2.M.UnitX().x(), frame2.M.UnitX().y()};
+    double pivot_direction_w3[2] = {frame3.M.UnitX().x(), frame3.M.UnitX().y()};
+    double pivot_direction_w4[2] = {frame4.M.UnitX().x(), frame4.M.UnitX().y()};
 
-    // 2x2 matrix
-    Eigen::Matrix2d lin_ctrl_matrix;
-    // x-axis into the direction of the platform force
-    // complement y-axis orthogonal to x-axis
-    lin_ctrl_matrix << lin_platform_force(0), -lin_platform_force(1),
-                      lin_platform_force(1), lin_platform_force(0);
+    double lin_diff_w1, ang_diff_w1;
+    double lin_diff_w2, ang_diff_w2;
+    double lin_diff_w3, ang_diff_w3;
+    double lin_diff_w4, ang_diff_w4;
 
-    // wheel 1
-    KDL::Vector attachment_vector_w1 = frame1.p;
-    attachment_vector_w1.Normalize();
+    method(attachment_vec_w1, platform_force, pivot_direction_w1, lin_diff_w1, ang_diff_w1);
+    method(attachment_vec_w2, platform_force, pivot_direction_w2, lin_diff_w2, ang_diff_w2);
+    method(attachment_vec_w3, platform_force, pivot_direction_w3, lin_diff_w3, ang_diff_w3);
+    method(attachment_vec_w4, platform_force, pivot_direction_w4, lin_diff_w4, ang_diff_w4);
 
-    Eigen::Matrix2d w1_ang_ctrl_matrix;
-    w1_ang_ctrl_matrix << attachment_vector_w1(1),  attachment_vector_w1(0),
-                          -attachment_vector_w1(0), attachment_vector_w1(1);
+    std::cout << "w1: " << lin_diff_w1 << " " << ang_diff_w1 << std::endl;
+    std::cout << "w2: " << lin_diff_w2 << " " << ang_diff_w2 << std::endl;
+    std::cout << "w3: " << lin_diff_w3 << " " << ang_diff_w3 << std::endl;
+    std::cout << "w4: " << lin_diff_w4 << " " << ang_diff_w4 << std::endl;
 
-    Eigen::Matrix2d w1_rb_cori_matrix;
-    w1_rb_cori_matrix << cos(robot.mobile_base->state->pivot_angles[0]), -sin(robot.mobile_base->state->pivot_angles[0]),
-                         sin(robot.mobile_base->state->pivot_angles[0]),  cos(robot.mobile_base->state->pivot_angles[0]);
+    Eigen::Vector2d lin_pf = Eigen::Vector2d(platform_force[0], platform_force[1]);
 
-    Eigen::Matrix2d w1_lin_diff_matrix = w1_rb_cori_matrix.transpose() * lin_ctrl_matrix;
-    Eigen::Matrix2d w1_ang_diff_matrix = w1_rb_cori_matrix.transpose() * w1_ang_ctrl_matrix;
+    double lin_force_norm = lin_pf.norm() == 0.0 ? 0.0 : 1.0;
+    double moment_norm = platform_force[2] == 0.0 ? 0.0 : 1.0;
 
-    double w1_lin_log_vee_omega = atan2(w1_lin_diff_matrix(1, 0), w1_lin_diff_matrix(0, 0));
-    double w1_ang_log_vee_omega = atan2(w1_ang_diff_matrix(1, 0), w1_ang_diff_matrix(0, 0));
+    double E1 = lin_force_norm * lin_diff_w1 + moment_norm * ang_diff_w1;
+    double E2 = lin_force_norm * lin_diff_w2 + moment_norm * ang_diff_w2;
+    double E3 = lin_force_norm * lin_diff_w3 + moment_norm * ang_diff_w3;
+    double E4 = lin_force_norm * lin_diff_w4 + moment_norm * ang_diff_w4;
 
-    // wheel 2
-    KDL::Vector attachment_vector_w2 = frame2.p;
-    attachment_vector_w2.Normalize();
+    // E1 = 0.0;
+    // E2 = 0.0;
+    // E3 = 0.0;
+    // E4 = 0.0;
 
-    Eigen::Matrix2d w2_ang_ctrl_matrix;
-    w2_ang_ctrl_matrix << attachment_vector_w2(1),  attachment_vector_w2(0),
-                          -attachment_vector_w2(0), attachment_vector_w2(1);
-    
-    Eigen::Matrix2d w2_rb_cori_matrix;
-    w2_rb_cori_matrix << cos(robot.mobile_base->state->pivot_angles[1]), -sin(robot.mobile_base->state->pivot_angles[1]),
-                         sin(robot.mobile_base->state->pivot_angles[1]),  cos(robot.mobile_base->state->pivot_angles[1]);
+    std::cout << "E: " << E1 << " " << E2 << " " << E3 << " " << E4 << std::endl;
 
-    Eigen::Matrix2d w2_lin_diff_matrix = w2_rb_cori_matrix.transpose() * lin_ctrl_matrix;
-    Eigen::Matrix2d w2_ang_diff_matrix = w2_rb_cori_matrix.transpose() * w2_ang_ctrl_matrix;
+    // change the platform force rotation
+    KDL::Rotation R = KDL::Rotation::RotZ(DEG2RAD(90.0));
+    KDL::Vector pf_vec = KDL::Vector(platform_force[0], platform_force[1], 0.0);
+    KDL::Vector pf_vec_rot = R * pf_vec;
+    platform_force[0] = pf_vec_rot.x();
+    platform_force[1] = pf_vec_rot.y();
 
-    double w2_lin_log_vee_omega = atan2(w2_lin_diff_matrix(0, 1), w2_lin_diff_matrix(0, 0));
-    double w2_ang_log_vee_omega = atan2(w2_ang_diff_matrix(0, 1), w2_ang_diff_matrix(0, 0));
+    std::cout << "platform force_R: ";
+    print_array(platform_force, 3);
 
-    // wheel 3
-    KDL::Vector attachment_vector_w3 = frame3.p;
-    attachment_vector_w3.Normalize();
+    // approach 2
+    double tau_wheel_ref[8] = { E1, -E1,
+                                E2, -E2,
+                                E3, -E3, 
+                                E4, -E4};
+    // double tau_wheel_ref[8]{};
+    double tau_wheel_c2[8]{};
+    double force_dist_mat_whl[3 * 2 * robot.mobile_base->mediator->kelo_base_config->nWheels]{};
 
-    Eigen::Matrix2d w3_ang_ctrl_matrix;
-    w3_ang_ctrl_matrix << attachment_vector_w3(1),  attachment_vector_w3(0),
-                          -attachment_vector_w3(0), attachment_vector_w3(1);
+    kelo_pltf_frc_comp_mat_whl(robot.mobile_base->mediator->kelo_base_config->nWheels,
+                               robot.mobile_base->mediator->kelo_base_config->wheel_coordinates,
+                               caster_offsets, wheel_distances, wheel_diameters,
+                               robot.mobile_base->state->pivot_angles, force_dist_mat_whl);
 
-    // 2x2 matrix
-    Eigen::Matrix2d w3_rb_cori_matrix;
-    w3_rb_cori_matrix << cos(robot.mobile_base->state->pivot_angles[2]), -sin(robot.mobile_base->state->pivot_angles[2]),
-                         sin(robot.mobile_base->state->pivot_angles[2]),  cos(robot.mobile_base->state->pivot_angles[2]);
+    kelo_pltf_slv_inv_frc_dist_ugls(robot.mobile_base->mediator->kelo_base_config->nWheels,
+                                    force_dist_mat_whl, w_platform, w_drive, platform_force,
+                                    tau_wheel_c2);
 
+    // kelo_pltf_slv_inv_frc_dist_cgls(robot.mobile_base->mediator->kelo_base_config->nWheels,
+    //                                 force_dist_mat_whl, w_drive, platform_force, tau_wheel_ref,
+    //                                 tau_wheel_c2);
 
-    // compute difference between matrices
-    Eigen::Matrix2d w3_lin_diff_matrix = w3_rb_cori_matrix.transpose() * lin_ctrl_matrix;
-    Eigen::Matrix2d w3_ang_diff_matrix = w3_rb_cori_matrix.transpose() * w3_ang_ctrl_matrix;
+    // usleep(9000);
 
-    double w3_lin_log_vee_omega = atan2(w3_lin_diff_matrix(1, 0), w3_lin_diff_matrix(0, 0));
-    double w3_ang_log_vee_omega = atan2(w3_ang_diff_matrix(1, 0), w3_ang_diff_matrix(0, 0));
+    // set torques
+    set_mobile_base_torques(&robot, tau_wheel_c2);
 
-    // wheel 4
-    KDL::Vector attachment_vector_w4 = frame4.p;
-    attachment_vector_w4.Normalize();
+    // KDL::Vector2 w1_attachment_vector = KDL::Vector2(frame1.p.x(), frame1.p.y());
+    // KDL::Vector2 w2_attachment_vector = KDL::Vector2(frame2.p.x(), frame2.p.y());
+    // KDL::Vector2 w3_attachment_vector = KDL::Vector2(frame3.p.x(), frame3.p.y());
+    // KDL::Vector2 w4_attachment_vector = KDL::Vector2(frame4.p.x(), frame4.p.y());
 
-    Eigen::Matrix2d w4_ang_ctrl_matrix;
-    w4_ang_ctrl_matrix << -attachment_vector_w4(1),  attachment_vector_w4(0),
-                          attachment_vector_w4(0), attachment_vector_w4(1);
+    // w1_attachment_vector = w1_attachment_vector / w1_attachment_vector.Norm();
+    // w2_attachment_vector = w2_attachment_vector / w2_attachment_vector.Norm();
+    // w3_attachment_vector = w3_attachment_vector / w3_attachment_vector.Norm();
+    // w4_attachment_vector = w4_attachment_vector / w4_attachment_vector.Norm();
 
-    Eigen::Matrix2d w4_rb_cori_matrix;
-    w4_rb_cori_matrix << cos(robot.mobile_base->state->pivot_angles[3]), -sin(robot.mobile_base->state->pivot_angles[3]),
-                         sin(robot.mobile_base->state->pivot_angles[3]),  cos(robot.mobile_base->state->pivot_angles[3]);
+    // // find the tangents of the attachment vectors in cw or ccw based on platform force [2] -
+    // // moment if the moment is positive, the tangents are in ccw, otherwise in cw
+    // KDL::Rotation2 rot_ccw = KDL::Rotation2::Rot(M_PI / 2);
+    // KDL::Rotation2 rot_cw = KDL::Rotation2::Rot(-M_PI / 2);
 
-    Eigen::Matrix2d w4_lin_diff_matrix = w4_rb_cori_matrix.transpose() * lin_ctrl_matrix;
-    Eigen::Matrix2d w4_ang_diff_matrix = w4_rb_cori_matrix.transpose() * w4_ang_ctrl_matrix;
+    // KDL::Vector2 w1_tangent =
+    //     platform_force[2] > 0 ? rot_ccw * w1_attachment_vector : rot_cw * w1_attachment_vector;
+    // KDL::Vector2 w2_tangent =
+    //     platform_force[2] > 0 ? rot_ccw * w2_attachment_vector : rot_cw * w2_attachment_vector;
+    // KDL::Vector2 w3_tangent =
+    //     platform_force[2] > 0 ? rot_ccw * w3_attachment_vector : rot_cw * w3_attachment_vector;
+    // KDL::Vector2 w4_tangent =
+    //     platform_force[2] > 0 ? rot_ccw * w4_attachment_vector : rot_cw * w4_attachment_vector;
 
-    double w4_lin_log_vee_omega = atan2(w4_lin_diff_matrix(1, 0), w4_lin_diff_matrix(0, 0));
-    double w4_ang_log_vee_omega = atan2(w4_ang_diff_matrix(1, 0), w4_ang_diff_matrix(0, 0));
+    // // get the current pivot directions from the fk around the z-axis
+    // KDL::Vector2 w1_pivot_direction = KDL::Vector2(frame1.M.UnitX().x(), frame1.M.UnitX().y());
+    // KDL::Vector2 w2_pivot_direction = KDL::Vector2(frame2.M.UnitX().x(), frame2.M.UnitX().y());
+    // KDL::Vector2 w3_pivot_direction = KDL::Vector2(frame3.M.UnitX().x(), frame3.M.UnitX().y());
+    // KDL::Vector2 w4_pivot_direction = KDL::Vector2(frame4.M.UnitX().x(), frame4.M.UnitX().y());
 
-    std::cout << "w1 omega: " << w1_lin_log_vee_omega << " " << w1_ang_log_vee_omega << std::endl;
-    std::cout << "w2 omega: " << w2_lin_log_vee_omega << " " << w2_ang_log_vee_omega << std::endl;
-    std::cout << "w3 omega: " << w3_lin_log_vee_omega << " " << w3_ang_log_vee_omega << std::endl;
-    std::cout << "w4 omega: " << w4_lin_log_vee_omega << " " << w4_ang_log_vee_omega << std::endl;
+    // // get the angular difference between the pivot direction and the tangent
+    // double w1_angular_diff =
+    //     atan2(w1_pivot_direction.x() * w1_tangent.y() - w1_pivot_direction.y() * w1_tangent.x(),
+    //           w1_pivot_direction.x() * w1_tangent.x() + w1_pivot_direction.y() * w1_tangent.y());
+    // double w2_angular_diff =
+    //     atan2(w2_pivot_direction.x() * w2_tangent.y() - w2_pivot_direction.y() * w2_tangent.x(),
+    //           w2_pivot_direction.x() * w2_tangent.x() + w2_pivot_direction.y() * w2_tangent.y());
+    // double w3_angular_diff =
+    //     atan2(w3_pivot_direction.x() * w3_tangent.y() - w3_pivot_direction.y() * w3_tangent.x(),
+    //           w3_pivot_direction.x() * w3_tangent.x() + w3_pivot_direction.y() * w3_tangent.y());
+    // double w4_angular_diff =
+    //     atan2(w4_pivot_direction.x() * w4_tangent.y() - w4_pivot_direction.y() * w4_tangent.x(),
+    //           w4_pivot_direction.x() * w4_tangent.x() + w4_pivot_direction.y() * w4_tangent.y());
 
-    usleep(90000);
+    // // get the angular difference between the pivot direction and platform linear force
+    // double w1_linear_diff = atan2(
+    //     w1_pivot_direction.x() * platform_force[1] - w1_pivot_direction.y() * platform_force[0],
+    //     w1_pivot_direction.x() * platform_force[0] + w1_pivot_direction.y() * platform_force[1]);
+    // double w2_linear_diff = atan2(
+    //     w2_pivot_direction.x() * platform_force[1] - w2_pivot_direction.y() * platform_force[0],
+    //     w2_pivot_direction.x() * platform_force[0] + w2_pivot_direction.y() * platform_force[1]);
+    // double w3_linear_diff = atan2(
+    //     w3_pivot_direction.x() * platform_force[1] - w3_pivot_direction.y() * platform_force[0],
+    //     w3_pivot_direction.x() * platform_force[0] + w3_pivot_direction.y() * platform_force[1]);
+    // double w4_linear_diff = atan2(
+    //     w4_pivot_direction.x() * platform_force[1] - w4_pivot_direction.y() * platform_force[0],
+    //     w4_pivot_direction.x() * platform_force[0] + w4_pivot_direction.y() * platform_force[1]);
+
+    // std::cout << "w lin: " << w1_linear_diff << " " << w2_linear_diff << " " << w3_linear_diff
+    //           << " " << w4_linear_diff << std::endl;
+    // std::cout << "w ang: " << w1_angular_diff << " " << w2_angular_diff << " " << w3_angular_diff
+    //           << " " << w4_angular_diff << std::endl;
+
+    // // eigen vec of linear platform force
+    // Eigen::Vector2d lin_platform_force;
+    // lin_platform_force(0) = platform_force[0];
+    // lin_platform_force(1) = platform_force[1];
+
+    // // normalize the linear platform force
+    // lin_platform_force.normalize();
+
+    // // 2x2 matrix
+    // Eigen::Matrix2d lin_ctrl_matrix;
+    // // x-axis into the direction of the platform force
+    // // complement y-axis orthogonal to x-axis
+    // lin_ctrl_matrix << lin_platform_force(0), -lin_platform_force(1), lin_platform_force(1),
+    //     lin_platform_force(0);
+
+    // // wheel 1
+    // KDL::Vector attachment_vector_w1 = frame1.p;
+    // attachment_vector_w1.Normalize();
+
+    // Eigen::Matrix2d w1_ang_ctrl_matrix;
+    // w1_ang_ctrl_matrix << attachment_vector_w1(1), attachment_vector_w1(0),
+    //     -attachment_vector_w1(0), attachment_vector_w1(1);
+
+    // Eigen::Matrix2d w1_rb_cori_matrix;
+    // w1_rb_cori_matrix << cos(robot.mobile_base->state->pivot_angles[0]),
+    //     -sin(robot.mobile_base->state->pivot_angles[0]),
+    //     sin(robot.mobile_base->state->pivot_angles[0]),
+    //     cos(robot.mobile_base->state->pivot_angles[0]);
+
+    // Eigen::Matrix2d w1_lin_diff_matrix = w1_rb_cori_matrix.transpose() * lin_ctrl_matrix;
+    // Eigen::Matrix2d w1_ang_diff_matrix = w1_rb_cori_matrix.transpose() * w1_ang_ctrl_matrix;
+
+    // double w1_lin_log_vee_omega = atan2(w1_lin_diff_matrix(1, 0), w1_lin_diff_matrix(0, 0));
+    // double w1_ang_log_vee_omega = atan2(w1_ang_diff_matrix(1, 0), w1_ang_diff_matrix(0, 0));
+
+    // // wheel 2
+    // KDL::Vector attachment_vector_w2 = frame2.p;
+    // attachment_vector_w2.Normalize();
+
+    // Eigen::Matrix2d w2_ang_ctrl_matrix;
+    // w2_ang_ctrl_matrix << attachment_vector_w2(1), attachment_vector_w2(0),
+    //     -attachment_vector_w2(0), attachment_vector_w2(1);
+
+    // Eigen::Matrix2d w2_rb_cori_matrix;
+    // w2_rb_cori_matrix << cos(robot.mobile_base->state->pivot_angles[1]),
+    //     -sin(robot.mobile_base->state->pivot_angles[1]),
+    //     sin(robot.mobile_base->state->pivot_angles[1]),
+    //     cos(robot.mobile_base->state->pivot_angles[1]);
+
+    // Eigen::Matrix2d w2_lin_diff_matrix = w2_rb_cori_matrix.transpose() * lin_ctrl_matrix;
+    // Eigen::Matrix2d w2_ang_diff_matrix = w2_rb_cori_matrix.transpose() * w2_ang_ctrl_matrix;
+
+    // double w2_lin_log_vee_omega = atan2(w2_lin_diff_matrix(0, 1), w2_lin_diff_matrix(0, 0));
+    // double w2_ang_log_vee_omega = atan2(w2_ang_diff_matrix(0, 1), w2_ang_diff_matrix(0, 0));
+
+    // // wheel 3
+    // KDL::Vector attachment_vector_w3 = frame3.p;
+    // attachment_vector_w3.Normalize();
+
+    // Eigen::Matrix2d w3_ang_ctrl_matrix;
+    // w3_ang_ctrl_matrix << attachment_vector_w3(1), attachment_vector_w3(0),
+    //     -attachment_vector_w3(0), attachment_vector_w3(1);
+
+    // // 2x2 matrix
+    // Eigen::Matrix2d w3_rb_cori_matrix;
+    // w3_rb_cori_matrix << cos(robot.mobile_base->state->pivot_angles[2]),
+    //     -sin(robot.mobile_base->state->pivot_angles[2]),
+    //     sin(robot.mobile_base->state->pivot_angles[2]),
+    //     cos(robot.mobile_base->state->pivot_angles[2]);
+
+    // // compute difference between matrices
+    // Eigen::Matrix2d w3_lin_diff_matrix = w3_rb_cori_matrix.transpose() * lin_ctrl_matrix;
+    // Eigen::Matrix2d w3_ang_diff_matrix = w3_rb_cori_matrix.transpose() * w3_ang_ctrl_matrix;
+
+    // double w3_lin_log_vee_omega = atan2(w3_lin_diff_matrix(1, 0), w3_lin_diff_matrix(0, 0));
+    // double w3_ang_log_vee_omega = atan2(w3_ang_diff_matrix(1, 0), w3_ang_diff_matrix(0, 0));
+
+    // // wheel 4
+    // KDL::Vector attachment_vector_w4 = frame4.p;
+    // attachment_vector_w4.Normalize();
+
+    // Eigen::Matrix2d w4_ang_ctrl_matrix;
+    // w4_ang_ctrl_matrix << attachment_vector_w4(1), attachment_vector_w4(0),
+    //     -attachment_vector_w4(0), attachment_vector_w4(1);
+
+    // Eigen::Matrix2d w4_rb_cori_matrix;
+    // w4_rb_cori_matrix << cos(robot.mobile_base->state->pivot_angles[3]),
+    //     -sin(robot.mobile_base->state->pivot_angles[3]),
+    //     sin(robot.mobile_base->state->pivot_angles[3]),
+    //     cos(robot.mobile_base->state->pivot_angles[3]);
+
+    // Eigen::Matrix2d w4_lin_diff_matrix = w4_rb_cori_matrix.transpose() * lin_ctrl_matrix;
+    // Eigen::Matrix2d w4_ang_diff_matrix = w4_rb_cori_matrix.transpose() * w4_ang_ctrl_matrix;
+
+    // double w4_lin_log_vee_omega = atan2(w4_lin_diff_matrix(1, 0), w4_lin_diff_matrix(0, 0));
+    // double w4_ang_log_vee_omega = atan2(w4_ang_diff_matrix(1, 0), w4_ang_diff_matrix(0, 0));
+
+    // std::cout << "w1 omega: " << w1_lin_log_vee_omega << " " << w1_ang_log_vee_omega << std::endl;
+    // std::cout << "w2 omega: " << w2_lin_log_vee_omega << " " << w2_ang_log_vee_omega << std::endl;
+    // std::cout << "w3 omega: " << w3_lin_log_vee_omega << " " << w3_ang_log_vee_omega << std::endl;
+    // std::cout << "w4 omega: " << w4_lin_log_vee_omega << " " << w4_ang_log_vee_omega << std::endl;
+
+    // usleep(90000);
 
     // std::cout << "wheels tau_c2: ";
     // print_array(tau_wheel_c2, 8);
 
-    std::cout << "w1 tau: " << lin_platform_force.norm()*w1_lin_log_vee_omega + platform_force[2]*w1_ang_log_vee_omega << std::endl;
-    std::cout << "w2 tau: " << lin_platform_force.norm()*w2_lin_log_vee_omega + platform_force[2]*w2_ang_log_vee_omega << std::endl;
-    std::cout << "w3 tau: " << lin_platform_force.norm()*w3_lin_log_vee_omega + platform_force[2]*w3_ang_log_vee_omega << std::endl;
-    std::cout << "w4 tau: " << lin_platform_force.norm()*w4_lin_log_vee_omega + platform_force[2]*w4_ang_log_vee_omega << std::endl;
+    // std::cout << "w1 tau: "
+    //           << lin_platform_force.norm() * w1_lin_log_vee_omega +
+    //                  platform_force[2] * w1_ang_log_vee_omega
+    //           << std::endl;
+    // std::cout << "w2 tau: "
+    //           << lin_platform_force.norm() * w2_lin_log_vee_omega +
+    //                  platform_force[2] * w2_ang_log_vee_omega
+    //           << std::endl;
+    // std::cout << "w3 tau: "
+    //           << lin_platform_force.norm() * w3_lin_log_vee_omega +
+    //                  platform_force[2] * w3_ang_log_vee_omega
+    //           << std::endl;
+    // std::cout << "w4 tau: "
+    //           << lin_platform_force.norm() * w4_lin_log_vee_omega +
+    //                  platform_force[2] * w4_ang_log_vee_omega
+    //           << std::endl;
 
     // set torques
     // set_mobile_base_torques(&robot, tau_wheel_c2);
