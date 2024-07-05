@@ -227,7 +227,7 @@ int main()
     std::cout << std::endl;
 
     // solver
-    double platform_force[3] = {0.0, 0.0, 150.0};  // [N], [N], [Nm]
+    double platform_force[3] = {400.0, 0.0, -50.0};  // [N], [N], [Nm]
 
     std::cout << "platform force: ";
     print_array(platform_force, 3);
@@ -292,10 +292,10 @@ int main()
     double lin_force_norm = lin_pf.norm() == 0.0 ? 0.0 : 1.0;
     double moment_norm = platform_force[2] == 0.0 ? 0.0 : 1.0;
 
-    double E1 = lin_force_norm * lin_diff_w1 + moment_norm * ang_diff_w1;
-    double E2 = lin_force_norm * lin_diff_w2 + moment_norm * ang_diff_w2;
-    double E3 = lin_force_norm * lin_diff_w3 + moment_norm * ang_diff_w3;
-    double E4 = lin_force_norm * lin_diff_w4 + moment_norm * ang_diff_w4;
+    double E1 = 2*lin_force_norm * lin_diff_w1 + moment_norm * ang_diff_w1;
+    double E2 = 2*lin_force_norm * lin_diff_w2 + moment_norm * ang_diff_w2;
+    double E3 = 2*lin_force_norm * lin_diff_w3 + moment_norm * ang_diff_w3;
+    double E4 = 2*lin_force_norm * lin_diff_w4 + moment_norm * ang_diff_w4;
 
     // E1 = 0.0;
     // E2 = 0.0;
@@ -328,15 +328,9 @@ int main()
                                caster_offsets, wheel_distances, wheel_diameters,
                                robot.mobile_base->state->pivot_angles, force_dist_mat_whl);
 
-    kelo_pltf_slv_inv_frc_dist_ugls(robot.mobile_base->mediator->kelo_base_config->nWheels,
-                                    force_dist_mat_whl, w_platform, w_drive, platform_force,
+    kelo_pltf_slv_inv_frc_dist_cgls(robot.mobile_base->mediator->kelo_base_config->nWheels,
+                                    force_dist_mat_whl, w_drive, platform_force, tau_wheel_ref,
                                     tau_wheel_c2);
-
-    // kelo_pltf_slv_inv_frc_dist_cgls(robot.mobile_base->mediator->kelo_base_config->nWheels,
-    //                                 force_dist_mat_whl, w_drive, platform_force, tau_wheel_ref,
-    //                                 tau_wheel_c2);
-
-    // usleep(9000);
 
     // set torques
     set_mobile_base_torques(&robot, tau_wheel_c2);
