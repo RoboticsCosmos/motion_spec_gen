@@ -302,7 +302,7 @@ int main()
     // E3 = 0.0;
     // E4 = 0.0;
 
-    std::cout << "E: " << E1 << " " << E2 << " " << E3 << " " << E4 << std::endl;
+    // std::cout << "E: " << E1 << " " << E2 << " " << E3 << " " << E4 << std::endl;
 
     // change the platform force rotation
     KDL::Rotation R = KDL::Rotation::RotZ(DEG2RAD(90.0));
@@ -327,6 +327,10 @@ int main()
                                robot.mobile_base->mediator->kelo_base_config->wheel_coordinates,
                                caster_offsets, wheel_distances, wheel_diameters,
                                robot.mobile_base->state->pivot_angles, force_dist_mat_whl);
+
+    // kelo_pltf_slv_inv_frc_dist_ugls(robot.mobile_base->mediator->kelo_base_config->nWheels,
+    //                                 force_dist_mat_whl, w_platform, w_drive, platform_force,
+    //                                 tau_wheel_c2);
 
     kelo_pltf_slv_inv_frc_dist_cgls(robot.mobile_base->mediator->kelo_base_config->nWheels,
                                     force_dist_mat_whl, w_drive, platform_force, tau_wheel_ref,
