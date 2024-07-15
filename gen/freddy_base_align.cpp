@@ -20,40 +20,29 @@ extern "C"
 
 #include "kdl/treefksolverpos_recursive.hpp"
 
+volatile sig_atomic_t flag = 0;
 
-
-void method(double attachment_vector[2], double platform_force[3], double pivot_direction[2],
-            double &lin_diff, double &ang_diff)
+void handle_signal(int sig)
 {
-  Eigen::Vector2d lin_platform_force;
-  lin_platform_force << platform_force[0], platform_force[1];
-  lin_platform_force.normalize();
-
-  Eigen::Vector2d attachment;
-  attachment << attachment_vector[0], attachment_vector[1];
-
-  Eigen::Vector2d pivot;
-  pivot << pivot_direction[0], pivot_direction[1];
-
-  // compute tangent vector of the attachment vector in cw or ccw based on platform force[2] -
-  // moment if the moment is positive, the tangents are in ccw, otherwise in cw
-  Eigen::Rotation2Dd rot_ccw(M_PI / 2);
-  Eigen::Rotation2Dd rot_cw(-M_PI / 2);
-
-  Eigen::Vector2d tangent = platform_force[2] > 0 ? rot_ccw * attachment : rot_cw * attachment;
-
-  // get the angular difference between the pivot direction and the tangent
-  ang_diff = atan2(pivot.x() * tangent.y() - pivot.y() * tangent.x(),
-                   pivot.x() * tangent.x() + pivot.y() * tangent.y());
-
-  // get the angular difference between the pivot direction and platform linear force
-  lin_diff = atan2(pivot.x() * lin_platform_force.y() - pivot.y() * lin_platform_force.x(),
-                   pivot.x() * lin_platform_force.x() + pivot.y() * lin_platform_force.y());
+  flag = 1;
+  printf("Caught signal %d\n", sig);
 }
 
 int main()
 {
-  
+  // handle signals
+  struct sigaction sa;
+  sa.sa_handler = handle_signal;
+  sigemptyset(&sa.sa_mask);
+  sa.sa_flags = 0;
+
+  for (int i = 1; i < NSIG; ++i)
+  {
+    if (sigaction(i, &sa, NULL) == -1)
+    {
+      perror("sigaction");
+    }
+  }
 
   // Initialize the robot structs
 
@@ -89,93 +78,25 @@ int main()
   char ethernet_interface[100] = "eno1";
   initialize_robot(robot_urdf, ethernet_interface, &robot);
 
-  KDL::Tree tree;
-  if (!kdl_parser::treeFromFile(robot_urdf, tree))
-  {
-    std::cerr << "Failed to construct KDL tree" << std::endl;
-    exit(1);
-  }
-
-  // pivot joints
-  // left_front_wheel_pivot_joint, right_front_wheel_pivot_joint, left_rear_wheel_pivot_joint,
-  // right_rear_wheel_pivot_joint
-
-  // get the ids of the pivot joints from the tree
-  std::string pivot_joint_names[4] = {
-      "left_front_wheel_pivot_joint",
-      "left_back_wheel_pivot_joint",
-      "right_back_wheel_pivot_joint",
-      "right_front_wheel_pivot_joint",
-  };
-
-  int pivot_joint_ids[4]{};
-
-  // print joint names
-  KDL::SegmentMap sm = robot.tree.getSegments();
-
-  // print segment name and joint name
-  int index = 0;
-  for (KDL::SegmentMap::const_iterator it = sm.begin(); it != sm.end(); it++)
-  {
-    // check joint type
-    if (it->second.segment.getJoint().getType() == KDL::Joint::None)
-    {
-      continue;
-    }
-    // print index and segment name
-    // printf("Index: %d, Segment: %s, Joint: %s\n", index, it->second.segment.getName().c_str(),
-    //        it->second.segment.getJoint().getName().c_str());
-    // update pivot joint ids
-    for (size_t i = 0; i < 4; i++)
-    {
-      if (it->second.segment.getJoint().getName() == pivot_joint_names[i])
-      {
-        pivot_joint_ids[i] = index;
-      }
-    }
-    index++;
-  }
-
-  printf("Pivot joint ids: ");
-  for (size_t i = 0; i < 4; i++)
-  {
-    printf("%d ", pivot_joint_ids[i]);
-  }
-  printf("\n");
-
   const double desired_frequency = 1000.0;                                             // Hz
   const auto desired_period = std::chrono::duration<double>(1.0 / desired_frequency);  // s
   double control_loop_timestep = desired_period.count();                               // s
   double *control_loop_dt = &control_loop_timestep;                                    // s
 
-  // initialize variables
-  double caster_offsets[4]{};
-  for (size_t i = 0; i < 4; i++)
-  {
-    caster_offsets[i] = robot.mobile_base->mediator->kelo_base_config->castor_offset;
-  }
+  // pid controller variables
+  double kp = 5.0;
+  double ki = 2.5;
+  double kd = 1.5;
 
-  double wheel_distances[4]{};
-  for (size_t i = 0; i < 4; i++)
-  {
-    wheel_distances[i] = robot.mobile_base->mediator->kelo_base_config->half_wheel_distance * 2;
-  }
+  // double wheel_lin_prev_error[4]{};
+  // double wheel_lin_error_sum[4]{};
+  // double wheel_ang_prev_error[4]{};
+  // double wheel_ang_error_sum[4]{};
 
-  double wheel_diameters[8]{};
-  for (size_t i = 0; i < 8; i++)
-  {
-    wheel_diameters[i] = robot.mobile_base->mediator->kelo_base_config->radius * 2;
-  }
-
-  double w_drive[4 * 4] = {
-      // [1/N^2]
-      1.0, 0.0, 0.0, 1.0,  // fl-xx, fl-xy, fl-yx, fl-yy
-      1.0, 0.0, 0.0, 1.0,  // rl-xx, rl-xy, rl-yx, rl-yy
-      1.0, 0.0, 0.0, 1.0,  // rr-xx, rr-xy, rr-yx, rr-yy
-      1.0, 0.0, 0.0, 1.0   // fr-xx, fr-xy, fr-yx, fr-yy
-  };
-
-  double fd_solver_robile_output_torques[8]{};
+  double w2_lin_prev_error = 0.0;
+  double w2_lin_error_sum = 0.0;
+  double w2_ang_prev_error = 0.0;
+  double w2_ang_error_sum = 0.0;
 
   get_robot_data(&robot, *control_loop_dt);
 
@@ -184,6 +105,13 @@ int main()
   while (true)
   {
     auto start_time = std::chrono::high_resolution_clock::now();
+
+    if (flag)
+    {
+      printf("Exiting somewhat cleanly...\n");
+      free_robot_data(&robot);
+      exit(0);
+    }
 
     count++;
     printf("\n");
@@ -195,102 +123,75 @@ int main()
     std::cout << std::endl;
 
     // solver
-    double platform_force[3] = {50.0, 0.0, 0.0};  // [N], [N], [Nm]
+    double platform_force[3] = {-50.0, -50.0, 0.0};  // [N], [N], [Nm]
 
     std::cout << "platform force: ";
     print_array(platform_force, 3);
 
-    std::cout << "pivolt angles: ";
-    for (size_t i = 0; i < 4; i++)
-    {
-      std::cout << RAD2DEG(robot.mobile_base->state->pivot_angles[i]) << " ";
-    }
-    std::cout << std::endl;
+    double platform_weights[2] = {1.0, 1.0};
 
-    // compute the fk of pivot links
-    KDL::TreeFkSolverPos_recursive fk_solver = KDL::TreeFkSolverPos_recursive(tree);
+    double lin_offsets[robot.mobile_base->mediator->kelo_base_config->nWheels];
+    double ang_offsets[robot.mobile_base->mediator->kelo_base_config->nWheels];
+    get_pivot_alignment_offsets(&robot, platform_force, lin_offsets, ang_offsets);
 
-    KDL::JntArray q = KDL::JntArray(tree.getNrOfJoints());
-    // set the pivot angles based on the pivot joint ids
-    for (size_t i = 0; i < 4; i++)
-    {
-      q(pivot_joint_ids[i] - 1) = robot.mobile_base->state->pivot_angles[i];
-    }
+    double lin_signals[4]{};
+    double ang_signals[4]{};
 
-    KDL::Frame frame1;
-    fk_solver.JntToCart(q, frame1, "left_front_wheel_pivot_link");
+    // pidController(lin_offsets[0], kp, ki, kd, control_loop_timestep, wheel_lin_error_sum[0],
+    //               2.0, wheel_lin_prev_error[0], lin_signals[0]);
+    // pidController(lin_offsets[1], kp, ki, kd, control_loop_timestep, wheel_lin_error_sum[1],
+    //               2.0, wheel_lin_prev_error[1], lin_signals[1]);
+    // pidController(lin_offsets[2], kp, ki, kd, control_loop_timestep, wheel_lin_error_sum[2],
+    //               2.0, wheel_lin_prev_error[2], lin_signals[2]);
+    // pidController(lin_offsets[3], kp, ki, kd, control_loop_timestep, wheel_lin_error_sum[3],
+    //               2.0, wheel_lin_prev_error[3], lin_signals[3]);
 
-    KDL::Frame frame2;
-    fk_solver.JntToCart(q, frame2, "left_back_wheel_pivot_link");
+    // pidController(ang_offsets[0], kp, ki, kd, control_loop_timestep, wheel_ang_error_sum[0],
+    //               2.0, wheel_ang_prev_error[0], ang_signals[0]);
+    // pidController(ang_offsets[1], kp, ki, kd, control_loop_timestep, wheel_ang_error_sum[1],
+    //               2.0, wheel_ang_prev_error[1], ang_signals[1]);  
+    // pidController(ang_offsets[2], kp, ki, kd, control_loop_timestep, wheel_ang_error_sum[2],
+    //               2.0, wheel_ang_prev_error[2], ang_signals[2]);
+    // pidController(ang_offsets[3], kp, ki, kd, control_loop_timestep, wheel_ang_error_sum[3],
+    //               2.0, wheel_ang_prev_error[3], ang_signals[3]);
 
-    KDL::Frame frame3;
-    fk_solver.JntToCart(q, frame3, "right_back_wheel_pivot_link");
+    pidController(lin_offsets[1], kp, ki, kd, control_loop_timestep, w2_lin_error_sum,
+                  5.0, w2_lin_prev_error, lin_signals[1]);
+    pidController(ang_offsets[1], kp, ki, kd, control_loop_timestep, w2_ang_error_sum,
+                  5.0, w2_ang_prev_error, ang_signals[1]);
 
-    KDL::Frame frame4;
-    fk_solver.JntToCart(q, frame4, "right_front_wheel_pivot_link");
+    std::cout << "lin signals: ";
+    print_array(lin_signals, 4);
+    std::cout << "ang signals: ";
+    print_array(ang_signals, 4);
 
-    // my approach
-    double attachment_vec_w1[2] = {frame1.p.x(), frame1.p.y()};
-    double attachment_vec_w2[2] = {frame2.p.x(), frame2.p.y()};
-    double attachment_vec_w3[2] = {frame3.p.x(), frame3.p.y()};
-    double attachment_vec_w4[2] = {frame4.p.x(), frame4.p.y()};
-
-    double pivot_direction_w1[2] = {frame1.M.UnitX().x(), frame1.M.UnitX().y()};
-    double pivot_direction_w2[2] = {frame2.M.UnitX().x(), frame2.M.UnitX().y()};
-    double pivot_direction_w3[2] = {frame3.M.UnitX().x(), frame3.M.UnitX().y()};
-    double pivot_direction_w4[2] = {frame4.M.UnitX().x(), frame4.M.UnitX().y()};
-
-    double lin_diff_w1, ang_diff_w1;
-    double lin_diff_w2, ang_diff_w2;
-    double lin_diff_w3, ang_diff_w3;
-    double lin_diff_w4, ang_diff_w4;
-
-    method(attachment_vec_w1, platform_force, pivot_direction_w1, lin_diff_w1, ang_diff_w1);
-    method(attachment_vec_w2, platform_force, pivot_direction_w2, lin_diff_w2, ang_diff_w2);
-    method(attachment_vec_w3, platform_force, pivot_direction_w3, lin_diff_w3, ang_diff_w3);
-    method(attachment_vec_w4, platform_force, pivot_direction_w4, lin_diff_w4, ang_diff_w4);
-
-    Eigen::Vector2d lin_pf = Eigen::Vector2d(platform_force[0], platform_force[1]);
-
-    double lin_force_norm = lin_pf.norm() == 0.0 ? 0.0 : 1.0;
-    double moment_norm = platform_force[2] == 0.0 ? 0.0 : 1.0;
-
-    double E1 = lin_force_norm * lin_diff_w1 + moment_norm * ang_diff_w1;
-    double E2 = lin_force_norm * lin_diff_w2 + moment_norm * ang_diff_w2;
-    double E3 = lin_force_norm * lin_diff_w3 + moment_norm * ang_diff_w3;
-    double E4 = lin_force_norm * lin_diff_w4 + moment_norm * ang_diff_w4;
-
-    std::cout << "E: " << E1 << " " << E2 << " " << E3 << " " << E4 << std::endl;
-
-    // change the platform force rotation
-    KDL::Rotation R = KDL::Rotation::RotZ(DEG2RAD(90.0));
-    KDL::Vector pf_vec = KDL::Vector(platform_force[0], platform_force[1], 0.0);
-    KDL::Vector pf_vec_rot = R * pf_vec;
-    platform_force[0] = pf_vec_rot.x();
-    platform_force[1] = pf_vec_rot.y();
-
-    std::cout << "platform force_R: ";
-    print_array(platform_force, 3);
-
-    // approach 2
-    double tau_wheel_ref[8] = { E1, -E1,
-                                E2, -E2,
-                                E3, -E3, 
-                                E4, -E4};
-    double tau_wheel_c2[8]{};
-    double force_dist_mat_whl[3 * 2 * robot.mobile_base->mediator->kelo_base_config->nWheels]{};
-
-    kelo_pltf_frc_comp_mat_whl(robot.mobile_base->mediator->kelo_base_config->nWheels,
-                               robot.mobile_base->mediator->kelo_base_config->wheel_coordinates,
-                               caster_offsets, wheel_distances, wheel_diameters,
-                               robot.mobile_base->state->pivot_angles, force_dist_mat_whl);
-
-    kelo_pltf_slv_inv_frc_dist_cgls(robot.mobile_base->mediator->kelo_base_config->nWheels,
-                                    force_dist_mat_whl, w_drive, platform_force, tau_wheel_ref,
-                                    tau_wheel_c2);
+    double tau_wheel_c[8]{};
+    // base_fd_solver_with_alignment(&robot, platform_force, lin_offsets, ang_offsets,
+    //                               platform_weights, tau_wheel_c);
+    base_fd_solver_with_alignment(&robot, platform_force, lin_signals, ang_signals,
+                                  platform_weights, tau_wheel_c);
 
     // set torques
-    set_mobile_base_torques(&robot, tau_wheel_c2);
+    double tau_wheel_c1[8]{};
+    tau_wheel_c1[2] = tau_wheel_c[2];
+    tau_wheel_c1[3] = tau_wheel_c[3];
+
+    std::cout << "torques: ";
+    print_array(tau_wheel_c1, 8);
+
+    for (size_t i = 0; i < 8; i++)
+    {
+      if (tau_wheel_c1[i] > 5.0)
+      {
+        tau_wheel_c1[i] = 5.0;
+      }
+      else if (tau_wheel_c1[i] < -5.0)
+      {
+        tau_wheel_c1[i] = -5.0;
+      }
+    }
+
+    set_mobile_base_torques(&robot, tau_wheel_c1);
 
     auto end_time = std::chrono::high_resolution_clock::now();
     auto elapsed_time = std::chrono::duration<double>(end_time - start_time);

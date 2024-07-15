@@ -227,7 +227,7 @@ int main()
     std::cout << std::endl;
 
     // solver
-    double platform_force[3] = {400.0, 0.0, -50.0};  // [N], [N], [Nm]
+    double platform_force[3] = {200.0, 0.0, -75.0};  // [N], [N], [Nm]
 
     std::cout << "platform force: ";
     print_array(platform_force, 3);
@@ -302,7 +302,7 @@ int main()
     // E3 = 0.0;
     // E4 = 0.0;
 
-    // std::cout << "E: " << E1 << " " << E2 << " " << E3 << " " << E4 << std::endl;
+    std::cout << "E: " << E1 << " " << E2 << " " << E3 << " " << E4 << std::endl;
 
     // change the platform force rotation
     KDL::Rotation R = KDL::Rotation::RotZ(DEG2RAD(90.0));
@@ -319,6 +319,10 @@ int main()
                                 E2, -E2,
                                 E3, -E3, 
                                 E4, -E4};
+    // double tau_wheel_ref[8] = {-E1, E1,
+    //                            -E2, E2,
+    //                            -E3, E3,
+    //                            -E4, E4};
     // double tau_wheel_ref[8]{};
     double tau_wheel_c2[8]{};
     double force_dist_mat_whl[3 * 2 * robot.mobile_base->mediator->kelo_base_config->nWheels]{};
@@ -335,6 +339,9 @@ int main()
     kelo_pltf_slv_inv_frc_dist_cgls(robot.mobile_base->mediator->kelo_base_config->nWheels,
                                     force_dist_mat_whl, w_drive, platform_force, tau_wheel_ref,
                                     tau_wheel_c2);
+
+    std::cout << "tau_wheel: ";
+    print_array(tau_wheel_c2, 8);
 
     // set torques
     set_mobile_base_torques(&robot, tau_wheel_c2);
@@ -479,7 +486,7 @@ int main()
     // double w3_lin_log_vee_omega = atan2(w3_lin_diff_matrix(1, 0), w3_lin_diff_matrix(0, 0));
     // double w3_ang_log_vee_omega = atan2(w3_ang_diff_matrix(1, 0), w3_ang_diff_matrix(0, 0));
 
-    // // wheel 4
+    // // wheel 40
     // KDL::Vector attachment_vector_w4 = frame4.p;
     // attachment_vector_w4.Normalize();
 
