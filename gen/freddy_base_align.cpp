@@ -78,27 +78,53 @@ int main()
   char ethernet_interface[100] = "eno1";
   initialize_robot(robot_urdf, ethernet_interface, &robot);
 
-  const double desired_frequency = 1000.0;                                             // Hz
+  const double desired_frequency = 500.0;                                             // Hz
   const auto desired_period = std::chrono::duration<double>(1.0 / desired_frequency);  // s
   double control_loop_timestep = desired_period.count();                               // s
   double *control_loop_dt = &control_loop_timestep;                                    // s
 
   // pid controller variables
-  double kp = 5.0;
-  double ki = 2.5;
-  double kd = 1.5;
+  // double kp = 8.0;
+  // double ki = 2.0;
+  // double kd = 0.01;
 
-  // double wheel_lin_prev_error[4]{};
-  // double wheel_lin_error_sum[4]{};
-  // double wheel_ang_prev_error[4]{};
-  // double wheel_ang_error_sum[4]{};
+  // double w1_lin_prev_error = 0.0;
+  // double w1_lin_error_sum = 0.0;
+  // double w1_ang_prev_error = 0.0;
+  // double w1_ang_error_sum = 0.0;
 
-  double w2_lin_prev_error = 0.0;
-  double w2_lin_error_sum = 0.0;
-  double w2_ang_prev_error = 0.0;
-  double w2_ang_error_sum = 0.0;
+  // double w2_lin_prev_error = 0.0;
+  // double w2_lin_error_sum = 0.0;
+  // double w2_ang_prev_error = 0.0;
+  // double w2_ang_error_sum = 0.0;
+
+  // double w3_lin_prev_error = 0.0;
+  // double w3_lin_error_sum = 0.0;
+  // double w3_ang_prev_error = 0.0;
+  // double w3_ang_error_sum = 0.0;
+
+  // double w4_lin_prev_error = 0.0;
+  // double w4_lin_error_sum = 0.0;
+  // double w4_ang_prev_error = 0.0;
+  // double w4_ang_error_sum = 0.0;
 
   get_robot_data(&robot, *control_loop_dt);
+
+  // double platform_force[3] = {50.0, 50.0, 0.0};  // [N], [N], [Nm]
+  // double platform_force[3] = {0.0, -400.0, 0.0};  // [N], [N], [Nm]
+
+  // double lin_offsets[robot.mobile_base->mediator->kelo_base_config->nWheels];
+  // double ang_offsets[robot.mobile_base->mediator->kelo_base_config->nWheels];
+  // get_pivot_alignment_offsets(&robot, platform_force, lin_offsets, ang_offsets);
+
+  // w1_lin_prev_error = lin_offsets[0];
+  // w1_ang_prev_error = ang_offsets[0];
+  // w2_lin_prev_error = lin_offsets[1];
+  // w2_ang_prev_error = ang_offsets[1];
+  // w3_lin_prev_error = lin_offsets[2];
+  // w3_ang_prev_error = ang_offsets[2];
+  // w4_lin_prev_error = lin_offsets[3];
+  // w4_ang_prev_error = ang_offsets[3];
 
   int count = 0;
 
@@ -123,75 +149,95 @@ int main()
     std::cout << std::endl;
 
     // solver
-    double platform_force[3] = {-50.0, -50.0, 0.0};  // [N], [N], [Nm]
-
+    // double platform_force[3] = {50.0, 50.0, 0.0};  // [N], [N], [Nm]
+    double platform_force[3] = {0.0, -100.0, 0.0};  // [N], [N], [Nm]
     std::cout << "platform force: ";
     print_array(platform_force, 3);
 
-    double platform_weights[2] = {1.0, 1.0};
+    double platform_weights[2] = {2.0, 1.0};
 
     double lin_offsets[robot.mobile_base->mediator->kelo_base_config->nWheels];
     double ang_offsets[robot.mobile_base->mediator->kelo_base_config->nWheels];
     get_pivot_alignment_offsets(&robot, platform_force, lin_offsets, ang_offsets);
 
-    double lin_signals[4]{};
-    double ang_signals[4]{};
+    std::cout << "lin_offsets: ";
+    print_array(lin_offsets, 4);
+    std::cout << "ang_offsets: ";
+    print_array(ang_offsets, 4);
 
-    // pidController(lin_offsets[0], kp, ki, kd, control_loop_timestep, wheel_lin_error_sum[0],
-    //               2.0, wheel_lin_prev_error[0], lin_signals[0]);
-    // pidController(lin_offsets[1], kp, ki, kd, control_loop_timestep, wheel_lin_error_sum[1],
-    //               2.0, wheel_lin_prev_error[1], lin_signals[1]);
-    // pidController(lin_offsets[2], kp, ki, kd, control_loop_timestep, wheel_lin_error_sum[2],
-    //               2.0, wheel_lin_prev_error[2], lin_signals[2]);
-    // pidController(lin_offsets[3], kp, ki, kd, control_loop_timestep, wheel_lin_error_sum[3],
-    //               2.0, wheel_lin_prev_error[3], lin_signals[3]);
+    // double lin_signal_w1 = 0.0;
+    // double ang_signal_w1 = 0.0;
+    // double lin_signal_w2 = 0.0;
+    // double ang_signal_w2 = 0.0;
+    // double lin_signal_w3 = 0.0;
+    // double ang_signal_w3 = 0.0;
+    // double lin_signal_w4 = 0.0;
+    // double ang_signal_w4 = 0.0;
 
-    // pidController(ang_offsets[0], kp, ki, kd, control_loop_timestep, wheel_ang_error_sum[0],
-    //               2.0, wheel_ang_prev_error[0], ang_signals[0]);
-    // pidController(ang_offsets[1], kp, ki, kd, control_loop_timestep, wheel_ang_error_sum[1],
-    //               2.0, wheel_ang_prev_error[1], ang_signals[1]);  
-    // pidController(ang_offsets[2], kp, ki, kd, control_loop_timestep, wheel_ang_error_sum[2],
-    //               2.0, wheel_ang_prev_error[2], ang_signals[2]);
-    // pidController(ang_offsets[3], kp, ki, kd, control_loop_timestep, wheel_ang_error_sum[3],
-    //               2.0, wheel_ang_prev_error[3], ang_signals[3]);
+    // std::cout << "lin_w1: " << lin_offsets[0] << " " << w1_lin_error_sum << " " << w1_lin_prev_error << std::endl;
+    // pidController(lin_offsets[0], kp, ki, kd, control_loop_timestep, w1_lin_error_sum,
+    //               5.0, w1_lin_prev_error, lin_signal_w1);
+    // std::cout << std::endl;
+    
+    // pidController(ang_offsets[0], kp, ki, kd, control_loop_timestep, w1_ang_error_sum,
+    //               5.0, w1_ang_prev_error, ang_signal_w1);
 
-    pidController(lin_offsets[1], kp, ki, kd, control_loop_timestep, w2_lin_error_sum,
-                  5.0, w2_lin_prev_error, lin_signals[1]);
-    pidController(ang_offsets[1], kp, ki, kd, control_loop_timestep, w2_ang_error_sum,
-                  5.0, w2_ang_prev_error, ang_signals[1]);
+    // std::cout << "lin_w2: " << lin_offsets[1] << " " << w2_lin_error_sum << " " << w2_lin_prev_error << std::endl;
+    // pidController(lin_offsets[1], kp, ki, kd, control_loop_timestep, w2_lin_error_sum,
+    //               5.0, w2_lin_prev_error, lin_signal_w2);
+    // std::cout << std::endl;
 
-    std::cout << "lin signals: ";
-    print_array(lin_signals, 4);
-    std::cout << "ang signals: ";
-    print_array(ang_signals, 4);
+    // pidController(ang_offsets[1], kp, ki, kd, control_loop_timestep, w2_ang_error_sum,
+    //               5.0, w2_ang_prev_error, ang_signal_w2);
+
+    // std::cout << "lin_w3: " << lin_offsets[2] << " " << w3_lin_error_sum << " " << w3_lin_prev_error << std::endl;
+    // pidController(lin_offsets[2], kp, ki, kd, control_loop_timestep, w3_lin_error_sum,
+    //               5.0, w3_lin_prev_error, lin_signal_w3);
+    // std::cout << std::endl;
+                  
+    // pidController(ang_offsets[2], kp, ki, kd, control_loop_timestep, w2_ang_error_sum,
+    //               5.0, w2_ang_prev_error, ang_signal_w3);
+
+    // std::cout << "lin_w4: " << lin_offsets[3] << " " << w4_lin_error_sum << " " << w4_lin_prev_error << std::endl;
+    // pidController(lin_offsets[3], kp, ki, kd, control_loop_timestep, w4_lin_error_sum,
+    //               5.0, w4_lin_prev_error, lin_signal_w4);
+    // std::cout << std::endl;
+    
+    // pidController(ang_offsets[3], kp, ki, kd, control_loop_timestep, w2_ang_error_sum,
+    //               5.0, w2_ang_prev_error, ang_signal_w4);
+
+    // double lin_signals[4] = {lin_signal_w1, lin_signal_w2, lin_signal_w3, lin_signal_w4};
+    // double ang_signals[4] = {ang_signal_w1, ang_signal_w2, ang_signal_w3, ang_signal_w4};
+
+    // std::cout << "lin signals: ";
+    // print_array(lin_signals, 4);
 
     double tau_wheel_c[8]{};
-    // base_fd_solver_with_alignment(&robot, platform_force, lin_offsets, ang_offsets,
-    //                               platform_weights, tau_wheel_c);
-    base_fd_solver_with_alignment(&robot, platform_force, lin_signals, ang_signals,
+    base_fd_solver_with_alignment(&robot, platform_force, lin_offsets, ang_offsets,
                                   platform_weights, tau_wheel_c);
+    // base_fd_solver_with_alignment(&robot, platform_force, lin_signals, ang_signals,
+    //                               platform_weights, tau_wheel_c);
 
     // set torques
-    double tau_wheel_c1[8]{};
-    tau_wheel_c1[2] = tau_wheel_c[2];
-    tau_wheel_c1[3] = tau_wheel_c[3];
 
     std::cout << "torques: ";
-    print_array(tau_wheel_c1, 8);
+    print_array(tau_wheel_c, 8);
 
     for (size_t i = 0; i < 8; i++)
     {
-      if (tau_wheel_c1[i] > 5.0)
+      if (tau_wheel_c[i] > 5.0)
       {
-        tau_wheel_c1[i] = 5.0;
+        tau_wheel_c[i] = 5.0;
       }
-      else if (tau_wheel_c1[i] < -5.0)
+      else if (tau_wheel_c[i] < -5.0)
       {
-        tau_wheel_c1[i] = -5.0;
+        tau_wheel_c[i] = -5.0;
       }
     }
 
-    set_mobile_base_torques(&robot, tau_wheel_c1);
+    set_mobile_base_torques(&robot, tau_wheel_c);
+
+    // usleep(10000);
 
     auto end_time = std::chrono::high_resolution_clock::now();
     auto elapsed_time = std::chrono::duration<double>(end_time - start_time);
@@ -203,7 +249,7 @@ int main()
       elapsed_time = std::chrono::duration<double>(end_time - start_time);
     }
     control_loop_timestep = elapsed_time.count();
-    // std::cout << "control loop timestep: " << control_loop_timestep << std::endl;
+    std::cout << "control loop timestep: " << control_loop_timestep << std::endl;
   }
 
   free_robot_data(&robot);
