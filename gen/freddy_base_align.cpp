@@ -78,7 +78,7 @@ int main()
   char ethernet_interface[100] = "eno1";
   initialize_robot(robot_urdf, ethernet_interface, &robot);
 
-  const double desired_frequency = 500.0;                                             // Hz
+  const double desired_frequency = 1000.0;                                             // Hz
   const auto desired_period = std::chrono::duration<double>(1.0 / desired_frequency);  // s
   double control_loop_timestep = desired_period.count();                               // s
   double *control_loop_dt = &control_loop_timestep;                                    // s
@@ -108,7 +108,7 @@ int main()
   // double w4_ang_prev_error = 0.0;
   // double w4_ang_error_sum = 0.0;
 
-  get_robot_data(&robot, *control_loop_dt);
+  // get_robot_data(&robot, *control_loop_dt);
 
   // double platform_force[3] = {50.0, 50.0, 0.0};  // [N], [N], [Nm]
   // double platform_force[3] = {0.0, -400.0, 0.0};  // [N], [N], [Nm]
@@ -147,12 +147,14 @@ int main()
                       robot.mobile_base->mediator->ethercat_config);
     get_robot_data(&robot, *control_loop_dt);
     std::cout << std::endl;
+    std::cout << "odom: ";
+    print_array(robot.mobile_base->state->x_platform, 3);
 
     // solver
     // double platform_force[3] = {50.0, 50.0, 0.0};  // [N], [N], [Nm]
-    double platform_force[3] = {0.0, -100.0, 0.0};  // [N], [N], [Nm]
-    std::cout << "platform force: ";
-    print_array(platform_force, 3);
+    double platform_force[3] = {0.0, -200.0, 0.0};  // [N], [N], [Nm]
+    // std::cout << "platform force: ";
+    // print_array(platform_force, 3);
 
     double platform_weights[2] = {2.0, 1.0};
 
@@ -160,10 +162,10 @@ int main()
     double ang_offsets[robot.mobile_base->mediator->kelo_base_config->nWheels];
     get_pivot_alignment_offsets(&robot, platform_force, lin_offsets, ang_offsets);
 
-    std::cout << "lin_offsets: ";
-    print_array(lin_offsets, 4);
-    std::cout << "ang_offsets: ";
-    print_array(ang_offsets, 4);
+    // std::cout << "lin_offsets: ";
+    // print_array(lin_offsets, 4);
+    // std::cout << "ang_offsets: ";
+    // print_array(ang_offsets, 4);
 
     // double lin_signal_w1 = 0.0;
     // double ang_signal_w1 = 0.0;
@@ -220,8 +222,8 @@ int main()
 
     // set torques
 
-    std::cout << "torques: ";
-    print_array(tau_wheel_c, 8);
+    // std::cout << "torques: ";
+    // print_array(tau_wheel_c, 8);
 
     for (size_t i = 0; i < 8; i++)
     {
@@ -235,7 +237,7 @@ int main()
       }
     }
 
-    set_mobile_base_torques(&robot, tau_wheel_c);
+    // set_mobile_base_torques(&robot, tau_wheel_c);
 
     // usleep(10000);
 
@@ -249,7 +251,7 @@ int main()
       elapsed_time = std::chrono::duration<double>(end_time - start_time);
     }
     control_loop_timestep = elapsed_time.count();
-    std::cout << "control loop timestep: " << control_loop_timestep << std::endl;
+    // std::cout << "control loop timestep: " << control_loop_timestep << std::endl;
   }
 
   free_robot_data(&robot);
