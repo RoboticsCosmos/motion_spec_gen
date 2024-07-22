@@ -184,13 +184,13 @@ int main()
   std::string kinova_right_half_arm_2_link = "kinova_right_forearm_link";
   std::string kinova_left_half_arm_2_link = "kinova_left_forearm_link";
 
-  double kr_bl_position_lin_y_pid_controller_kp = 60.0;
+  double kr_bl_position_lin_y_pid_controller_kp = 100.0;
   double kr_bl_position_lin_y_pid_controller_ki = 2.9;
-  double kr_bl_position_lin_y_pid_controller_kd = 70.5;
+  double kr_bl_position_lin_y_pid_controller_kd = 80.5;
 
-  double kl_bl_position_lin_y_pid_controller_kp = 60.0;
+  double kl_bl_position_lin_y_pid_controller_kp = 100.0;
   double kl_bl_position_lin_y_pid_controller_ki = 2.9;
-  double kl_bl_position_lin_y_pid_controller_kd = 70.5;
+  double kl_bl_position_lin_y_pid_controller_kd = 80.5;
 
   double kr_bl_position_lin_z_pid_controller_kp = 100.0;
   double kr_bl_position_lin_z_pid_controller_ki = 2.9;
@@ -205,8 +205,8 @@ int main()
   double kr_elbow_base_base_distance_z_impedance_controller_stiffness_diag_mat[1] = {300.0};
   double kl_elbow_base_base_distance_z_impedance_controller_stiffness_diag_mat[1] = {300.0};
 
-  double kr_arm_table_contact_force_reference_value = -5.0;
-  double kl_arm_table_contact_force_reference_value = -5.0;
+  double kr_arm_table_contact_force_reference_value = -10.0;
+  double kl_arm_table_contact_force_reference_value = -10.0;
 
   double kl_bl_orientation_ang_x_pid_controller_kp = 80.0;
   double kl_bl_orientation_ang_x_pid_controller_ki = 2.9;
@@ -305,16 +305,16 @@ int main()
   double kr_bl_orientation_coord_ang_z_initial_vector[6] = {0, 0, 0, 0, 0, 1};
 
   // uc1 vars
-  double arms_bl_base_distance_reference_value = 0.8;
+  double arms_bl_base_distance_reference_value = 0.75;
   double kr_bl_base_distance = 0.0;
-  double kr_bl_base_distance_pid_controller_kp = 500.0;
+  double kr_bl_base_distance_pid_controller_kp = 1000.0;
   double kr_bl_base_distance_pid_controller_ki = 7.5;
   double kr_bl_base_distance_pid_controller_kd = 100.0;
   double kr_bl_base_distance_pid_error_sum = 0.0;
   double kr_bl_base_distance_pid_controller_signal = 0.0;
 
   double kl_bl_base_distance = 0.0;
-  double kl_bl_base_distance_pid_controller_kp = 500.0;
+  double kl_bl_base_distance_pid_controller_kp = 1000.0;
   double kl_bl_base_distance_pid_controller_ki = 7.5;
   double kl_bl_base_distance_pid_controller_kd = 100.0;
   double kl_bl_base_distance_pid_error_sum = 0.0;
@@ -958,10 +958,11 @@ int main()
         fd_solver_robile_platform_wrench, 6);
     add(fd_solver_robile_output_external_wrench_kr, fd_solver_robile_platform_wrench,
         fd_solver_robile_platform_wrench, 6);
-    base_fd_solver(&robot, fd_solver_robile_platform_wrench, fd_solver_robile_output_torques);
     double plat_force[3] = {fd_solver_robile_platform_wrench[0],
                             fd_solver_robile_platform_wrench[1],
                             fd_solver_robile_platform_wrench[5]};
+
+    // double plat_force[3] = {-300.0, 0.0, 0.0};
 
     std::cout << "plat_force: ";
     print_array(plat_force, 3);
@@ -969,7 +970,7 @@ int main()
     double lin_offsets[robot.mobile_base->mediator->kelo_base_config->nWheels];
     double ang_offsets[robot.mobile_base->mediator->kelo_base_config->nWheels];
     get_pivot_alignment_offsets(&robot, plat_force, lin_offsets, ang_offsets);
-    double platform_weights[2] = {1.0, 0.0};
+    double platform_weights[2] = {3.0, 0.25};
     base_fd_solver_with_alignment(&robot, plat_force, lin_offsets, ang_offsets, platform_weights,
                                   fd_solver_robile_output_torques);
 
@@ -1170,7 +1171,7 @@ int main()
       elapsed_time = std::chrono::duration<double>(end_time - start_time);
     }
     control_loop_timestep = elapsed_time.count();
-    std::cout << "control loop timestep: " << control_loop_timestep << std::endl;
+    // std::cout << "control loop timestep: " << control_loop_timestep << std::endl;
   }
 
   free_robot_data(&robot);

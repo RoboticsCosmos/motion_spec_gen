@@ -18,7 +18,6 @@ extern "C"
 
 #include <unsupported/Eigen/MatrixFunctions>
 
-#include "kdl/treefksolverpos_recursive.hpp"
 
 volatile sig_atomic_t flag = 0;
 
@@ -146,17 +145,17 @@ int main()
     update_base_state(robot.mobile_base->mediator->kelo_base_config,
                       robot.mobile_base->mediator->ethercat_config);
     get_robot_data(&robot, *control_loop_dt);
-    std::cout << std::endl;
-    std::cout << "odom: ";
-    print_array(robot.mobile_base->state->x_platform, 3);
+    // std::cout << std::endl;
+    // std::cout << "odom: ";
+    // print_array(robot.mobile_base->state->x_platform, 3);
 
     // solver
     // double platform_force[3] = {50.0, 50.0, 0.0};  // [N], [N], [Nm]
-    double platform_force[3] = {0.0, -200.0, 0.0};  // [N], [N], [Nm]
+    double platform_force[3] = {200.0, -100.0, 10.0};  // [N], [N], [Nm]
     // std::cout << "platform force: ";
     // print_array(platform_force, 3);
 
-    double platform_weights[2] = {2.0, 1.0};
+    double platform_weights[2] = {3.0, 0.25};
 
     double lin_offsets[robot.mobile_base->mediator->kelo_base_config->nWheels];
     double ang_offsets[robot.mobile_base->mediator->kelo_base_config->nWheels];
@@ -237,7 +236,7 @@ int main()
       }
     }
 
-    // set_mobile_base_torques(&robot, tau_wheel_c);
+    set_mobile_base_torques(&robot, tau_wheel_c);
 
     // usleep(10000);
 
