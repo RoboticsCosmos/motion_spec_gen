@@ -86,8 +86,8 @@ int main()
   std::string robot_urdf = (path.parent_path().parent_path() / "urdf" / "freddy.urdf").string();
 
   char ethernet_interface[100] = "eno1";
-  initialize_robot(robot_urdf, ethernet_interface, &robot);
-
+  initialize_robot(&robot, robot_urdf, ethernet_interface);
+  
   const double desired_frequency = 1000.0;                                             // Hz
   const auto desired_period = std::chrono::duration<double>(1.0 / desired_frequency);  // s
   double control_loop_timestep = desired_period.count();                               // s
