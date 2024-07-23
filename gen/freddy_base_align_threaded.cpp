@@ -18,6 +18,10 @@ extern "C"
 
 #include <unsupported/Eigen/MatrixFunctions>
 
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+
 volatile sig_atomic_t flag = 0;
 
 void handle_signal(int sig)
@@ -41,6 +45,12 @@ int main(int argc, char **argv)
       perror("sigaction");
     }
   }
+
+  std::mutex data_mutex;
+  std::condition_variable cv;
+  bool run_thread = true;
+  bool communicate = false;
+  double tau_command[8];
 
   // read the platform force from the command line
   double pf[3] = {0.0, 0.0, 0.0};
@@ -138,6 +148,9 @@ int main(int argc, char **argv)
   w4_lin_prev_error = lin_offsets[3];
   w4_ang_prev_error = ang_offsets[3];
 
+  std::thread comm_thread(base_communication_thread, &robot, tau_command, std::ref(data_mutex),
+                          std::ref(run_thread), std::ref(cv), std::ref(communicate));
+
   int count = 0;
 
   while (true)
@@ -147,6 +160,9 @@ int main(int argc, char **argv)
     if (flag)
     {
       printf("Exiting somewhat cleanly...\n");
+      run_thread = false;
+      cv.notify_all();
+      comm_thread.join();
       free_robot_data(&robot);
       exit(0);
     }
@@ -235,14 +251,14 @@ int main(int argc, char **argv)
     }
 
     double tau_wheel_c[8]{};
-    base_fd_solver_with_alignment(&robot, platform_force, lin_signals, ang_signals,
-                                  platform_weights, tau_wheel_c);
+    // base_fd_solver_with_alignment(&robot, platform_force, lin_signals, ang_signals,
+    //                               platform_weights, tau_wheel_c);
 
-    // base_fd_solver(&robot, platform_force, tau_wheel_c);
-    // for (size_t i = 0; i < 8; i++)
-    // {
-    //   tau_wheel_c[i] += tau_wheel_ref[i];
-    // }
+    base_fd_solver(&robot, platform_force, tau_wheel_c);
+    for (size_t i = 0; i < 8; i++)
+    {
+      tau_wheel_c[i] += tau_wheel_ref[i];
+    }
 
     // set torques
     for (size_t i = 0; i < 8; i++)
@@ -257,7 +273,14 @@ int main(int argc, char **argv)
       }
     }
 
-    set_mobile_base_torques(&robot, tau_wheel_c);
+    {
+      std::lock_guard<std::mutex> lk(data_mutex);
+      std::copy(std::begin(tau_wheel_c), std::end(tau_wheel_c), tau_command);
+      communicate = true;
+    }
+    cv.notify_one();
+
+    // set_mobile_base_torques(&robot, tau_wheel_c);
 
     auto end_time = std::chrono::high_resolution_clock::now();
     auto elapsed_time = std::chrono::duration<double>(end_time - start_time);
@@ -271,6 +294,10 @@ int main(int argc, char **argv)
     control_loop_timestep = elapsed_time.count();
     // std::cout << "control loop timestep: " << control_loop_timestep << std::endl;
   }
+
+  run_thread = false;
+  cv.notify_all();
+  comm_thread.join();
 
   free_robot_data(&robot);
 

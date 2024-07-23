@@ -76,7 +76,6 @@ int main()
   bool kinova_left_torque_control_mode_set = false;
 
   Freddy robot = {&kinova_left, &kinova_right, &freddy_base};
-  // Freddy robot = {nullptr, nullptr, &freddy_base};
 
   // get current file path
   std::filesystem::path path = __FILE__;
