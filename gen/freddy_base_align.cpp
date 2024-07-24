@@ -97,7 +97,7 @@ int main(int argc, char **argv)
   double *control_loop_dt = &control_loop_timestep;                                    // s
 
   // pid controller variables
-  double kp = 10.0;
+  double kp = 5.0;
   double ki = 0.01;
   double kd = 0.5;
 
@@ -235,14 +235,14 @@ int main(int argc, char **argv)
     }
 
     double tau_wheel_c[8]{};
-    base_fd_solver_with_alignment(&robot, platform_force, lin_signals, ang_signals,
-                                  platform_weights, tau_wheel_c);
+    // base_fd_solver_with_alignment(&robot, platform_force, lin_signals, ang_signals,
+    //                               platform_weights, tau_wheel_c);
 
     // base_fd_solver(&robot, platform_force, tau_wheel_c);
-    // for (size_t i = 0; i < 8; i++)
-    // {
-    //   tau_wheel_c[i] += tau_wheel_ref[i];
-    // }
+    for (size_t i = 0; i < 8; i++)
+    {
+      tau_wheel_c[i] += tau_wheel_ref[i];
+    }
 
     // set torques
     for (size_t i = 0; i < 8; i++)
@@ -257,7 +257,10 @@ int main(int argc, char **argv)
       }
     }
 
-    set_mobile_base_torques(&robot, tau_wheel_c);
+    if (count != 1)
+    {
+      set_mobile_base_torques(&robot, tau_wheel_c);
+    }
 
     auto end_time = std::chrono::high_resolution_clock::now();
     auto elapsed_time = std::chrono::duration<double>(end_time - start_time);
