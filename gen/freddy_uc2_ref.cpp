@@ -84,7 +84,7 @@ int main()
   std::string robot_urdf = (path.parent_path().parent_path() / "urdf" / "freddy.urdf").string();
 
   char ethernet_interface[100] = "eno1";
-  initialize_robot(&robot, robot_urdf, ethernet_interface, false);
+  initialize_robot(&robot, robot_urdf, ethernet_interface);
 
   const double desired_frequency = 1000.0;                                             // Hz
   const auto desired_period = std::chrono::duration<double>(1.0 / desired_frequency);  // s
@@ -94,7 +94,6 @@ int main()
   // initialize variables
   double kl_elbow_base_base_distance_z_embed_map_vector[3] = {0.0, 0.0, 1.0};
   double kr_bl_orientation_ang_x_pid_controller_signal = 0.0;
-  double kinova_left_bracelet_table_contact_force_lin_z_vector_z[6] = {0, 0, 1, 0, 0, 0};
   int kr_achd_solver_nc = 5;
   double kr_achd_solver_alpha[5][6] = {{0.0, 1.0, 0.0, 0.0, 0.0, 0.0},
                                        {0.0, 0.0, 1.0, 0.0, 0.0, 0.0},
@@ -103,11 +102,7 @@ int main()
                                        {0.0, 0.0, 0.0, 0.0, 0.0, 1.0}};
   double kr_bl_position_lin_z_pid_controller_signal = 0.0;
   double kl_bl_position_coord_lin_z_initial = 0.0;
-  double kinova_right_bracelet_table_contact_force_pid_controller_error_sum = 0.0;
   double kl_bl_position_coord_lin_z_vector[6] = {0, 0, 1, 0, 0, 0};
-  double kinova_left_bracelet_table_contact_force_pid_controller_kp = 1.0;
-  double kinova_left_bracelet_table_contact_force_pid_controller_ki = 0.0;
-  double kinova_left_bracelet_table_contact_force_pid_controller_kd = 0.0;
   double kl_bl_position_lin_z_twist_embed_map_vector[6] = {0.0, 0.0, 1.0, 0.0, 0.0, 0.0};
   double kl_bl_position_lin_z_pid_controller_prev_error = 0.0;
   double kl_bl_orientation_ang_z_twist_embed_map_vector[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 1.0};
@@ -117,7 +112,6 @@ int main()
   double kr_bl_orientation_ang_x_pid_controller_error_sum = 0.0;
   double kr_bl_orientation_coord_ang_y = 0.0;
   double kr_bl_orientation_coord_ang_x = 0.0;
-  double kinova_right_bracelet_table_contact_force_pid_controller_signal = 0.0;
   double kl_achd_solver_root_acceleration[6] = {-9.6, 0.92, 1.4, 0.0, 0.0, 0.0};
   double kl_bl_position_lin_z_twist_embed_map_kl_achd_solver_output_acceleration_energy[6]{};
   double kr_achd_solver_feed_forward_torques[7]{};
@@ -137,16 +131,12 @@ int main()
   std::string kinova_left_bracelet_link_origin_point = "kinova_left_bracelet_link";
   double kr_bl_position_lin_y_pid_controller_prev_error = 0.0;
   double kr_bl_orientation_ang_y_twist_embed_map_vector[6] = {0.0, 0.0, 0.0, 0.0, 1.0, 0.0};
-  double
-      kinova_left_bracelet_table_contact_force_embed_map_kl_achd_solver_fext_output_external_wrench
-          [6]{};
+
   double kl_achd_solver_predicted_accelerations[7]{};
   double kl_achd_solver_fext_output_torques[7]{};
   int kl_achd_solver_nc = 5;
   double kl_bl_orientation_ang_z_pid_controller_signal = 0.0;
-  double
-      kinova_right_bracelet_table_contact_force_embed_map_kr_achd_solver_fext_output_external_wrench
-          [6]{};
+
   double kr_bl_position_lin_y_twist_embed_map_vector[6] = {0.0, 1.0, 0.0, 0.0, 0.0, 0.0};
   double kl_bl_orientation_coord_ang_y_initial = 0.0;
   double kr_bl_position_coord_lin_z_initial_vector[6] = {0, 0, 1, 0, 0, 0};
@@ -157,10 +147,8 @@ int main()
   int kl_achd_solver_nj = 7;
   double kl_bl_orientation_coord_ang_y_vector[6] = {0, 0, 0, 0, 1, 0};
   double kl_elbow_base_distance_coord_lin_z_axis[6] = {0, 0, 1, 0, 0, 0};
-  double kinova_right_bracelet_table_contact_force_pid_controller_prev_error = 0.0;
   double kr_bl_position_coord_lin_y = 0.0;
   double kr_bl_position_coord_lin_z = 0.0;
-  double kinova_left_bracelet_table_contact_force_lin_z = 0.0;
   double kl_bl_orientation_ang_x_twist_embed_map_kl_achd_solver_output_acceleration_energy[6]{};
   double kr_bl_orientation_ang_y_pid_controller_prev_error = 0.0;
   double kl_elbow_base_distance_coord_lin_z = 0.0;
@@ -203,9 +191,6 @@ int main()
   double kr_elbow_base_base_distance_z_impedance_controller_stiffness_diag_mat[1] = {300.0};
   double kl_elbow_base_base_distance_z_impedance_controller_stiffness_diag_mat[1] = {300.0};
 
-  double kr_arm_table_contact_force_reference_value = -10.0;
-  double kl_arm_table_contact_force_reference_value = -10.0;
-
   double kl_bl_orientation_ang_x_pid_controller_kp = 80.0;
   double kl_bl_orientation_ang_x_pid_controller_ki = 2.9;
   double kl_bl_orientation_ang_x_pid_controller_kd = 50.5;
@@ -243,15 +228,10 @@ int main()
   double kl_bl_position_lin_y_twist_embed_map_vector[6] = {0.0, 1.0, 0.0, 0.0, 0.0, 0.0};
   double kr_bl_position_coord_lin_y_vector[6] = {0, 1, 0, 0, 0, 0};
   double kr_bl_orientation_ang_y_pid_controller_error_sum = 0.0;
-  double kinova_left_bracelet_table_contact_force_embed_map_vector[6] = {0.0, 0.0, 1.0,
-                                                                         0.0, 0.0, 0.0};
   double kr_elbow_base_base_distance_z_embed_map_vector[3] = {0.0, 0.0, 1.0};
   double kl_bl_orientation_ang_x_pid_controller_error_sum = 0.0;
   double kl_bl_position_coord_lin_y_initial_vector[6] = {0, 1, 0, 0, 0, 0};
-  double kinova_right_bracelet_table_contact_force_lin_z = 0.0;
   double kr_bl_position_coord_lin_y_initial_vector[6] = {0, 1, 0, 0, 0, 0};
-  double kinova_right_bracelet_table_contact_force_lin_z_vector_z[6] = {0, 0, 1, 0, 0, 0};
-  double kinova_left_bracelet_table_contact_force_pid_controller_error_sum = 0.0;
   std::string table = "table";
   double kr_bl_position_lin_z_pid_controller_prev_error = 0.0;
   double kr_bl_orientation_ang_z_twist_embed_map_vector[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 1.0};
@@ -268,14 +248,9 @@ int main()
                                        {0.0, 0.0, 0.0, 1.0, 0.0, 0.0},
                                        {0.0, 0.0, 0.0, 0.0, 1.0, 0.0},
                                        {0.0, 0.0, 0.0, 0.0, 0.0, 1.0}};
-  double kinova_right_bracelet_table_contact_force_pid_controller_kp = 1.0;
   double kr_bl_orientation_coord_ang_x_initial = 0.0;
-  double kinova_right_bracelet_table_contact_force_pid_controller_ki = 0.0;
   double kr_achd_solver_fext_output_torques[7]{};
-  double kinova_right_bracelet_table_contact_force_pid_controller_kd = 0.0;
   double kr_achd_solver_output_torques[7]{};
-  double kinova_right_bracelet_table_contact_force_embed_map_vector[6] = {0.0, 0.0, 1.0,
-                                                                          0.0, 0.0, 0.0};
   double kr_elbow_base_base_distance_z_embed_map_kr_achd_solver_fext_output_external_wrench[6]{};
   double kr_bl_position_lin_y_pid_controller_error_sum = 0.0;
   double kr_bl_orientation_ang_x_twist_embed_map_vector[6] = {0.0, 0.0, 0.0, 1.0, 0.0, 0.0};
@@ -284,7 +259,6 @@ int main()
   double kl_bl_orientation_ang_x_pid_controller_signal = 0.0;
   double kr_bl_position_lin_z_twist_embed_map_vector[6] = {0.0, 0.0, 1.0, 0.0, 0.0, 0.0};
   double kr_bl_orientation_ang_z_pid_controller_error_sum = 0.0;
-  double kinova_left_bracelet_table_contact_force_pid_controller_signal = 0.0;
   double kr_achd_solver_predicted_accelerations[7]{};
   double kl_bl_position_lin_y_pid_controller_prev_error = 0.0;
   double kr_elbow_base_distance_coord_lin_z = 0.0;
@@ -296,7 +270,6 @@ int main()
   double kl_bl_position_coord_lin_y = 0.0;
   double kl_bl_position_coord_lin_z = 0.0;
   double kr_bl_position_lin_y_twist_embed_map_kr_achd_solver_output_acceleration_energy[6]{};
-  double kinova_left_bracelet_table_contact_force_pid_controller_prev_error = 0.0;
   double kl_bl_orientation_coord_ang_x_vector[6] = {0, 0, 0, 1, 0, 0};
   double kl_bl_position_lin_y_pid_controller_error_sum = 0.0;
   std::string base_link_origin_point = "base_link";
@@ -305,14 +278,14 @@ int main()
   // uc1 vars
   double arms_bl_base_distance_reference_value = 0.75;
   double kr_bl_base_distance = 0.0;
-  double kr_bl_base_distance_pid_controller_kp = 700.0;
+  double kr_bl_base_distance_pid_controller_kp = 600.0;
   double kr_bl_base_distance_pid_controller_ki = 7.5;
   double kr_bl_base_distance_pid_controller_kd = 100.0;
   double kr_bl_base_distance_pid_error_sum = 0.0;
   double kr_bl_base_distance_pid_controller_signal = 0.0;
 
   double kl_bl_base_distance = 0.0;
-  double kl_bl_base_distance_pid_controller_kp = 700.0;
+  double kl_bl_base_distance_pid_controller_kp = 600.0;
   double kl_bl_base_distance_pid_controller_ki = 7.5;
   double kl_bl_base_distance_pid_controller_kd = 100.0;
   double kl_bl_base_distance_pid_error_sum = 0.0;
@@ -417,7 +390,7 @@ int main()
 
   int count = 0;
 
-  while (count < 2)
+  while (true)
   {
     auto start_time = std::chrono::high_resolution_clock::now();
 
@@ -432,8 +405,8 @@ int main()
     printf("\n");
 
     // explicitly referesh the robot data
-    robot.kinova_left->mediator->refresh_feedback();
-    robot.kinova_right->mediator->refresh_feedback();
+    // robot.kinova_left->mediator->refresh_feedback();
+    // robot.kinova_right->mediator->refresh_feedback();
     update_base_state(robot.mobile_base->mediator->kelo_base_config,
                     robot.mobile_base->mediator->ethercat_config);
     get_robot_data(&robot, *control_loop_dt);
@@ -548,22 +521,6 @@ int main()
         kr_bl_orientation_ang_z_pid_controller_prev_error,
         kr_bl_orientation_ang_z_pid_controller_signal);
 
-    // pid controller
-    getLinkForce(kinova_left_bracelet_link, table, kinova_left_bracelet_link,
-                 kinova_left_bracelet_table_contact_force_lin_z_vector_z, &robot,
-                 kinova_left_bracelet_table_contact_force_lin_z);
-    double kinova_left_bracelet_table_contact_force_pid_controller_error = 0;
-    computeEqualityError(kinova_left_bracelet_table_contact_force_lin_z,
-                         kl_arm_table_contact_force_reference_value,
-                         kinova_left_bracelet_table_contact_force_pid_controller_error);
-    pidController(kinova_left_bracelet_table_contact_force_pid_controller_error,
-                  kinova_left_bracelet_table_contact_force_pid_controller_kp,
-                  kinova_left_bracelet_table_contact_force_pid_controller_ki,
-                  kinova_left_bracelet_table_contact_force_pid_controller_kd, *control_loop_dt,
-                  kinova_left_bracelet_table_contact_force_pid_controller_error_sum, 1.0,
-                  kinova_left_bracelet_table_contact_force_pid_controller_prev_error,
-                  kinova_left_bracelet_table_contact_force_pid_controller_signal);
-
     // impedance controller
     double kl_elbow_base_base_distance_z_impedance_controller_stiffness_error = 0;
     std::string kl_elbow_base_distance_entities[2] = {kinova_left_half_arm_2_link, base_link};
@@ -610,22 +567,6 @@ int main()
                   kl_bl_position_lin_z_pid_controller_error_sum, 1.0,
                   kl_bl_position_lin_z_pid_controller_prev_error,
                   kl_bl_position_lin_z_pid_controller_signal);
-
-    // pid controller
-    getLinkForce(kinova_right_bracelet_link, table, kinova_right_bracelet_link,
-                 kinova_right_bracelet_table_contact_force_lin_z_vector_z, &robot,
-                 kinova_right_bracelet_table_contact_force_lin_z);
-    double kinova_right_bracelet_table_contact_force_pid_controller_error = 0;
-    computeEqualityError(kinova_right_bracelet_table_contact_force_lin_z,
-                         kr_arm_table_contact_force_reference_value,
-                         kinova_right_bracelet_table_contact_force_pid_controller_error);
-    pidController(kinova_right_bracelet_table_contact_force_pid_controller_error,
-                  kinova_right_bracelet_table_contact_force_pid_controller_kp,
-                  kinova_right_bracelet_table_contact_force_pid_controller_ki,
-                  kinova_right_bracelet_table_contact_force_pid_controller_kd, *control_loop_dt,
-                  kinova_right_bracelet_table_contact_force_pid_controller_error_sum, 1.0,
-                  kinova_right_bracelet_table_contact_force_pid_controller_prev_error,
-                  kinova_right_bracelet_table_contact_force_pid_controller_signal);
 
     // impedance controller
     double kr_elbow_base_base_distance_z_impedance_controller_stiffness_error = 0;
@@ -703,22 +644,9 @@ int main()
                   kl_bl_base_distance_pid_prev_error, kl_bl_base_distance_pid_controller_signal);
 
     // embed maps
-    double
-        kinova_left_bracelet_table_contact_force_embed_map_kl_achd_solver_fext_output_external_wrench
-            [6]{};
+
     double kl_elbow_base_base_distance_z_embed_map_kl_achd_solver_fext_output_external_wrench[6]{};
 
-    for (size_t i = 0;
-         i < sizeof(kinova_left_bracelet_table_contact_force_embed_map_vector) /
-                 sizeof(kinova_left_bracelet_table_contact_force_embed_map_vector[0]);
-         i++)
-    {
-      if (kinova_left_bracelet_table_contact_force_embed_map_vector[i] != 0.0)
-      {
-        kinova_left_bracelet_table_contact_force_embed_map_kl_achd_solver_fext_output_external_wrench
-            [i] += kinova_left_bracelet_table_contact_force_pid_controller_signal;
-      }
-    }
     for (size_t i = 0; i < sizeof(kl_elbow_base_base_distance_z_embed_map_vector) /
                                sizeof(kl_elbow_base_base_distance_z_embed_map_vector[0]);
          i++)
@@ -841,22 +769,9 @@ int main()
             kr_bl_orientation_ang_z_pid_controller_signal;
       }
     }
-    double
-        kinova_right_bracelet_table_contact_force_embed_map_kr_achd_solver_fext_output_external_wrench
-            [6]{};
+
     double kr_elbow_base_base_distance_z_embed_map_kr_achd_solver_fext_output_external_wrench[6]{};
 
-    for (size_t i = 0;
-         i < sizeof(kinova_right_bracelet_table_contact_force_embed_map_vector) /
-                 sizeof(kinova_right_bracelet_table_contact_force_embed_map_vector[0]);
-         i++)
-    {
-      if (kinova_right_bracelet_table_contact_force_embed_map_vector[i] != 0.0)
-      {
-        kinova_right_bracelet_table_contact_force_embed_map_kr_achd_solver_fext_output_external_wrench
-            [i] += kinova_right_bracelet_table_contact_force_pid_controller_signal;
-      }
-    }
     for (size_t i = 0; i < sizeof(kr_elbow_base_base_distance_z_embed_map_vector) /
                                sizeof(kr_elbow_base_base_distance_z_embed_map_vector[0]);
          i++)
@@ -892,26 +807,23 @@ int main()
     std::cout << "kr_wrench: ";
     print_array(fd_solver_robile_output_external_wrench_kr, 6);
 
-    // std::cout << std::endl;
-
     // solvers
-
     // achd_solver_fext
     double kl_achd_solver_fext_ext_wrenches[7][6];
     int link_id = -1;
     double
-        kinova_left_bracelet_table_contact_force_embed_map_kl_achd_solver_fext_output_external_wrench_transf
+        kinova_left_bracelet_table_force_embed_map_kl_achd_solver_fext_output_external_wrench_transf
             [6]{};
     transform_wrench(
         &robot, kinova_left_bracelet_link, kinova_left_base_link,
-        kinova_left_bracelet_table_contact_force_embed_map_kl_achd_solver_fext_output_external_wrench,
-        kinova_left_bracelet_table_contact_force_embed_map_kl_achd_solver_fext_output_external_wrench_transf);
+        fd_solver_robile_output_external_wrench_kl,
+        kinova_left_bracelet_table_force_embed_map_kl_achd_solver_fext_output_external_wrench_transf);
     getLinkId(&robot, kinova_left_base_link, kinova_left_bracelet_link, kinova_left_bracelet_link,
               link_id);
     for (size_t i = 0; i < 6; i++)
     {
       kl_achd_solver_fext_ext_wrenches[link_id][i] =
-          kinova_left_bracelet_table_contact_force_embed_map_kl_achd_solver_fext_output_external_wrench_transf
+          kinova_left_bracelet_table_force_embed_map_kl_achd_solver_fext_output_external_wrench_transf
               [i];
     }
 
@@ -1001,18 +913,18 @@ int main()
     double kr_achd_solver_fext_ext_wrenches[7][6]{};
     link_id = -1;
     double
-        kinova_right_bracelet_table_contact_force_embed_map_kr_achd_solver_fext_output_external_wrench_transf
+        kinova_right_bracelet_table_force_embed_map_kr_achd_solver_fext_output_external_wrench_transf
             [6]{};
     transform_wrench(
         &robot, kinova_right_bracelet_link, kinova_right_base_link,
-        kinova_right_bracelet_table_contact_force_embed_map_kr_achd_solver_fext_output_external_wrench,
-        kinova_right_bracelet_table_contact_force_embed_map_kr_achd_solver_fext_output_external_wrench_transf);
+        fd_solver_robile_output_external_wrench_kr,
+        kinova_right_bracelet_table_force_embed_map_kr_achd_solver_fext_output_external_wrench_transf);
     getLinkId(&robot, kinova_right_base_link, kinova_right_bracelet_link,
               kinova_right_bracelet_link, link_id);
     for (size_t i = 0; i < 6; i++)
     {
       kr_achd_solver_fext_ext_wrenches[link_id][i] =
-          kinova_right_bracelet_table_contact_force_embed_map_kr_achd_solver_fext_output_external_wrench_transf
+          kinova_right_bracelet_table_force_embed_map_kr_achd_solver_fext_output_external_wrench_transf
               [i];
     }
     double
@@ -1049,8 +961,8 @@ int main()
     cap_and_convert_manipulator_torques(kinova_left_cmd_tau, 7, kinova_left_cmd_tau_kdl);
 
     // set torques
-    // set_manipulator_torques(&robot, kinova_left_base_link, &kinova_left_cmd_tau_kdl);
-    // set_manipulator_torques(&robot, kinova_right_base_link, &kinova_right_cmd_tau_kdl);
+    set_manipulator_torques(&robot, kinova_left_base_link, &kinova_left_cmd_tau_kdl);
+    set_manipulator_torques(&robot, kinova_right_base_link, &kinova_right_cmd_tau_kdl);
 
     auto end_time = std::chrono::high_resolution_clock::now();
     auto elapsed_time = std::chrono::duration<double>(end_time - start_time);
