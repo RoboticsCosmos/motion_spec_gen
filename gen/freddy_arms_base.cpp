@@ -85,7 +85,7 @@ int main()
   // get the robot urdf path
   std::string robot_urdf = (path.parent_path().parent_path() / "urdf" / "freddy.urdf").string();
 
-  char ethernet_interface[100] = "eno1";
+  char ethernet_interface[100] = "enx00133bfba9fe";
   initialize_robot(&robot, robot_urdf, ethernet_interface);
 
   const double desired_frequency = 1000.0;                                             // Hz
@@ -1210,7 +1210,10 @@ int main()
     cap_and_convert_manipulator_torques(kl_rne_output_torques, 7, kinova_left_cmd_tau_kdl1);
 
     // set torques
-    set_mobile_base_torques(&robot, fd_solver_robile_output_torques);
+    if (count != 1)
+    {
+      set_mobile_base_torques(&robot, fd_solver_robile_output_torques);
+    }
     set_manipulator_torques(&robot, kinova_left_base_link, &kinova_left_cmd_tau_kdl1);
     set_manipulator_torques(&robot, kinova_right_base_link, &kinova_right_cmd_tau_kdl1);
 

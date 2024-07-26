@@ -1,7 +1,5 @@
 extern "C"
 {
-#include "kelo_motion_control/EthercatCommunication.h"
-#include "kelo_motion_control/KeloMotionControl.h"
 #include "kelo_motion_control/mediator.h"
 }
 #include <array>
@@ -13,7 +11,6 @@ extern "C"
 #include <motion_spec_utils/utils.hpp>
 #include <motion_spec_utils/math_utils.hpp>
 #include <motion_spec_utils/solver_utils.hpp>
-#include <kinova_mediator/mediator.hpp>
 #include <csignal>
 
 #include <unsupported/Eigen/MatrixFunctions>
@@ -29,18 +26,18 @@ void handle_signal(int sig)
 int main(int argc, char **argv)
 {
   // handle signals
-  struct sigaction sa;
-  sa.sa_handler = handle_signal;
-  sigemptyset(&sa.sa_mask);
-  sa.sa_flags = 0;
+  // struct sigaction sa;
+  // sa.sa_handler = handle_signal;
+  // sigemptyset(&sa.sa_mask);
+  // sa.sa_flags = 0;
 
-  for (int i = 1; i < NSIG; ++i)
-  {
-    if (sigaction(i, &sa, NULL) == -1)
-    {
-      perror("sigaction");
-    }
-  }
+  // for (int i = 1; i < NSIG; ++i)
+  // {
+  //   if (sigaction(i, &sa, NULL) == -1)
+  //   {
+  //     perror("sigaction");
+  //   }
+  // }
 
   // read the platform force from the command line
   double pf[3] = {0.0, 0.0, 0.0};
@@ -62,6 +59,7 @@ int main(int argc, char **argv)
   KeloBaseConfig kelo_base_config;
   kelo_base_config.nWheels = 4;
   int index_to_EtherCAT[4] = {6, 7, 3, 4};
+  // int index_to_EtherCAT[4] = {2, 3, 5, 6};
   kelo_base_config.index_to_EtherCAT = index_to_EtherCAT;
   kelo_base_config.radius = 0.115 / 2;
   kelo_base_config.castor_offset = 0.01;
@@ -144,12 +142,12 @@ int main(int argc, char **argv)
   {
     auto start_time = std::chrono::high_resolution_clock::now();
 
-    if (flag)
-    {
-      printf("Exiting somewhat cleanly...\n");
-      free_robot_data(&robot);
-      exit(0);
-    }
+    // if (flag)
+    // {
+    //   printf("Exiting somewhat cleanly...\n");
+    //   free_robot_data(&robot);
+    //   exit(0);
+    // }
 
     count++;
     printf("\n");
@@ -230,8 +228,8 @@ int main(int argc, char **argv)
     double tau_wheel_ref[robot.mobile_base->mediator->kelo_base_config->nWheels * 2];
     for (size_t i = 0; i < robot.mobile_base->mediator->kelo_base_config->nWheels; i++)
     {
-      tau_wheel_ref[2 * i] = alignment_taus[i];
-      tau_wheel_ref[2 * i + 1] = -alignment_taus[i];
+      tau_wheel_ref[2 * i] = 1;
+      tau_wheel_ref[2 * i + 1] = -1;
     }
 
     double tau_wheel_c[8]{};
@@ -239,7 +237,7 @@ int main(int argc, char **argv)
     //                               platform_weights, tau_wheel_c);
 
     // base_fd_solver(&robot, platform_force, tau_wheel_c);
-    for (size_t i = 0; i < 8; i++)
+    for (size_t i = 0; i < 2; i++)
     {
       tau_wheel_c[i] += tau_wheel_ref[i];
     }
@@ -247,13 +245,13 @@ int main(int argc, char **argv)
     // set torques
     for (size_t i = 0; i < 8; i++)
     {
-      if (tau_wheel_c[i] > 5.0)
+      if (tau_wheel_c[i] > 3.0)
       {
-        tau_wheel_c[i] = 5.0;
+        tau_wheel_c[i] = 3.0;
       }
-      else if (tau_wheel_c[i] < -5.0)
+      else if (tau_wheel_c[i] < -3.0)
       {
-        tau_wheel_c[i] = -5.0;
+        tau_wheel_c[i] = -3.0;
       }
     }
 

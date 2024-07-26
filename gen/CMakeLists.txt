@@ -18,6 +18,7 @@ link_directories(${CMAKE_INSTALL_PREFIX}/lib/)
 find_package(Eigen3 REQUIRED)
 find_package(controllers REQUIRED)
 find_package(motion_spec_utils REQUIRED)
+find_package(robif2b REQUIRED)
 
 list(APPEND local_INCLUDE_DIRS ${CMAKE_INSTALL_PREFIX}/include/)
 
@@ -50,6 +51,8 @@ foreach(source ${SOURCES})
     controllers::pid_controller
     gsl
 	  gslcblas
+    robif2b::ethercat
+    robif2b::kelo
   )
 
   # set runtime path
@@ -58,4 +61,3 @@ foreach(source ${SOURCES})
    INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
   install(TARGETS ${name} RUNTIME DESTINATION bin)
 endforeach(source ${SOURCES})
-
