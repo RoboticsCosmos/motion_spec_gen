@@ -162,8 +162,8 @@ int main()
         state.kelo_cmd.trq[i * 2 + 0] = 0.0;
         state.kelo_cmd.trq[i * 2 + 1] = 0.0;
     }
-    // state.kelo_cmd.trq[0] = 1.0;
-    // state.kelo_cmd.trq[1] = -1.0;
+    state.kelo_cmd.trq[0] = 1.0;
+    state.kelo_cmd.trq[1] = -1.0;
 
     // Schedule
     robif2b_ethercat_configure(&ecat);

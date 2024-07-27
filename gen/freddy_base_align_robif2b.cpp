@@ -8,6 +8,9 @@
 #include <robif2b/functions/ethercat.h>
 #include <robif2b/functions/kelo_drive.h>
 
+#include <controllers/pid_controller.hpp>
+#include <motion_spec_utils/utils.hpp>
+#include <unsupported/Eigen/MatrixFunctions>
 
 #define NUM_DRIVES 4
 #define NUM_SLAVES 8
@@ -83,6 +86,8 @@ int main(int argc, char **argv)
   //   }
   // }
 
+  double wheel_coordinates[8] = {0.188, 0.2075, -0.188, 0.2075, -0.188, -0.2075, 0.188, -0.2075};
+
   // read the platform force from the command line
   double pf[3] = {0.0, 0.0, 0.0};
   if (argc == 4)
@@ -129,62 +134,52 @@ int main(int argc, char **argv)
   }
 
   // Connections
-    struct robif2b_ethercat ecat;
-    ecat.ethernet_if        = state.ecat.ethernet_if;
-    ecat.num_exposed_slaves = &state.ecat.num_exposed_slaves;
-    ecat.slave_idx          = state.ecat.slave_idx;
-    ecat.name               = state.ecat.name;
-    ecat.product_code       = state.ecat.prod_code;
-    ecat.input_size         = state.ecat.input_size;
-    ecat.output_size        = state.ecat.output_size;
-    ecat.error_code         = &state.ecat.error_code;
-    ecat.num_initial_slaves = &state.ecat.num_found_slaves;
-    ecat.num_current_slaves = &state.ecat.num_active_slaves;
-    ecat.is_connected       = state.ecat.is_connected;
-    
-    void *ecat_input[NUM_DRIVES] = {
-        &state.ecat_comm.drv_msr_pdo[0],
-        &state.ecat_comm.drv_msr_pdo[1],
-        &state.ecat_comm.drv_msr_pdo[2],
-        &state.ecat_comm.drv_msr_pdo[3]
-    };
-    const void *ecat_output[NUM_DRIVES] = {
-        &state.ecat_comm.drv_cmd_pdo[0],
-        &state.ecat_comm.drv_cmd_pdo[1],
-        &state.ecat_comm.drv_cmd_pdo[2],
-        &state.ecat_comm.drv_cmd_pdo[3]
-    };
+  struct robif2b_ethercat ecat;
+  ecat.ethernet_if = state.ecat.ethernet_if;
+  ecat.num_exposed_slaves = &state.ecat.num_exposed_slaves;
+  ecat.slave_idx = state.ecat.slave_idx;
+  ecat.name = state.ecat.name;
+  ecat.product_code = state.ecat.prod_code;
+  ecat.input_size = state.ecat.input_size;
+  ecat.output_size = state.ecat.output_size;
+  ecat.error_code = &state.ecat.error_code;
+  ecat.num_initial_slaves = &state.ecat.num_found_slaves;
+  ecat.num_current_slaves = &state.ecat.num_active_slaves;
+  ecat.is_connected = state.ecat.is_connected;
 
-    ecat.input  = ecat_input;
-    ecat.output = ecat_output;
+  void *ecat_input[NUM_DRIVES] = {&state.ecat_comm.drv_msr_pdo[0], &state.ecat_comm.drv_msr_pdo[1],
+                                  &state.ecat_comm.drv_msr_pdo[2],
+                                  &state.ecat_comm.drv_msr_pdo[3]};
+  const void *ecat_output[NUM_DRIVES] = {
+      &state.ecat_comm.drv_cmd_pdo[0], &state.ecat_comm.drv_cmd_pdo[1],
+      &state.ecat_comm.drv_cmd_pdo[2], &state.ecat_comm.drv_cmd_pdo[3]};
 
-    struct robif2b_kelo_drive_encoder drive_enc = {
-        .num_drives    = &state.num_drives,
-        .msr_pdo       = &state.ecat_comm.drv_msr_pdo[0],
-        .wheel_pos_msr = &state.kelo_msr.whl_pos[0],
-        .wheel_vel_msr = &state.kelo_msr.whl_vel[0],
-        .pivot_pos_off = &state.kelo_msr.pvt_off[0],
-        .pivot_pos_msr = &state.kelo_msr.pvt_pos[0],
-        .pivot_vel_msr = &state.kelo_msr.pvt_vel[0],
-    };
+  ecat.input = ecat_input;
+  ecat.output = ecat_output;
 
-    struct robif2b_kelo_drive_imu imu = {
-        .num_drives      = &state.num_drives,
-        .msr_pdo         = &state.ecat_comm.drv_msr_pdo[0],
-        .imu_ang_vel_msr = &state.kelo_msr.imu_ang_vel[0],
-        .imu_lin_acc_msr = &state.kelo_msr.imu_lin_acc[0]
-    };
+  struct robif2b_kelo_drive_encoder drive_enc = {
+      .num_drives = &state.num_drives,
+      .msr_pdo = &state.ecat_comm.drv_msr_pdo[0],
+      .wheel_pos_msr = &state.kelo_msr.whl_pos[0],
+      .wheel_vel_msr = &state.kelo_msr.whl_vel[0],
+      .pivot_pos_off = &state.kelo_msr.pvt_off[0],
+      .pivot_pos_msr = &state.kelo_msr.pvt_pos[0],
+      .pivot_vel_msr = &state.kelo_msr.pvt_vel[0],
+  };
 
-    struct robif2b_kelo_drive_actuator wheel_act = {
-        .num_drives  = &state.num_drives,
-        .cmd_pdo     = &state.ecat_comm.drv_cmd_pdo[0],
-        .ctrl_mode   = &state.kelo_cmd.ctrl_mode[0],
-        .act_vel_cmd = &state.kelo_cmd.vel[0],
-        .act_trq_cmd = &state.kelo_cmd.trq[0],
-        .act_cur_cmd = &state.kelo_cmd.cur[0],
-        .max_current = &state.kelo_cmd.max_current[0],
-        .trq_const   = &state.kelo_cmd.trq_const[0]
-    };
+  struct robif2b_kelo_drive_imu imu = {.num_drives = &state.num_drives,
+                                       .msr_pdo = &state.ecat_comm.drv_msr_pdo[0],
+                                       .imu_ang_vel_msr = &state.kelo_msr.imu_ang_vel[0],
+                                       .imu_lin_acc_msr = &state.kelo_msr.imu_lin_acc[0]};
+
+  struct robif2b_kelo_drive_actuator wheel_act = {.num_drives = &state.num_drives,
+                                                  .cmd_pdo = &state.ecat_comm.drv_cmd_pdo[0],
+                                                  .ctrl_mode = &state.kelo_cmd.ctrl_mode[0],
+                                                  .act_vel_cmd = &state.kelo_cmd.vel[0],
+                                                  .act_trq_cmd = &state.kelo_cmd.trq[0],
+                                                  .act_cur_cmd = &state.kelo_cmd.cur[0],
+                                                  .max_current = &state.kelo_cmd.max_current[0],
+                                                  .trq_const = &state.kelo_cmd.trq_const[0]};
 
   const double desired_frequency = 1000.0;                                             // Hz
   const auto desired_period = std::chrono::duration<double>(1.0 / desired_frequency);  // s
@@ -192,9 +187,9 @@ int main(int argc, char **argv)
   double *control_loop_dt = &control_loop_timestep;                                    // s
 
   // pid controller variables
-  double kp = 5.0;
-  double ki = 0.01;
-  double kd = 0.5;
+  double Kp = 5.0;
+  double Ki = 0.5;
+  double Kd = 0.0;
 
   double w1_lin_prev_error = 0.0;
   double w1_lin_error_sum = 0.0;
@@ -216,9 +211,10 @@ int main(int argc, char **argv)
   double w4_ang_prev_error = 0.0;
   double w4_ang_error_sum = 0.0;
 
-  for (int i = 0; i < NUM_DRIVES; i++) {
-      state.kelo_cmd.trq[i * 2 + 0] = 0.0;
-      state.kelo_cmd.trq[i * 2 + 1] = 0.0;
+  for (int i = 0; i < NUM_DRIVES; i++)
+  {
+    state.kelo_cmd.trq[i * 2 + 0] = 0.0;
+    state.kelo_cmd.trq[i * 2 + 1] = 0.0;
   }
 
   // Schedule
@@ -229,16 +225,6 @@ int main(int argc, char **argv)
   robif2b_ethercat_start(&ecat);
   if (state.ecat.error_code < 0)
     return -1;
-
-  double lin_offsets[NUM_DRIVES];
-  double ang_offsets[NUM_DRIVES];
-
-  // Freddy robot;
-
-  // get_pivot_alignment_offsets(&robot, pf, lin_offsets, ang_offsets);
-
-  state.kelo_cmd.trq[0] = 1.0;
-  state.kelo_cmd.trq[1] = -1.0;
 
   int count = 0;
 
@@ -265,114 +251,204 @@ int main(int argc, char **argv)
       return -1;
     robif2b_kelo_drive_encoder_update(&drive_enc);
 
-    for (int i = 0; i < NUM_DRIVES; i++)
-    {
-      printf(
-          "drive [id=%i, conn=%i]: "
-          "w_vel[0]=%5.2f - w_vel[1]=%5.2f - p_pos=%5.2f\n",
-          i, state.ecat.is_connected[i + 1], state.kelo_msr.whl_vel[i * 2 + 0],
-          state.kelo_msr.whl_vel[i * 2 + 1], state.kelo_msr.pvt_pos[i]);
-    }
-
-    // update_base_state(robot.mobile_base->mediator->kelo_base_config,
-    //                   robot.mobile_base->mediator->ethercat_config);
-    // get_robot_data(&robot, *control_loop_dt);
+    // for (int i = 0; i < NUM_DRIVES; i++)
+    // {
+    //   printf(
+    //       "drive [id=%i, conn=%i]: "
+    //       "w_vel[0]=%5.2f - w_vel[1]=%5.2f - p_pos=%5.2f\n",
+    //       i, state.ecat.is_connected[i + 1], state.kelo_msr.whl_vel[i * 2 + 0],
+    //       state.kelo_msr.whl_vel[i * 2 + 1], state.kelo_msr.pvt_pos[i]);
+    // }
 
     // solver
-    // double platform_force[3] = {pf[0], pf[1], pf[2]};  // [N], [N], [Nm]
+    double platform_force[3] = {pf[0], pf[1], pf[2]};  // [N], [N], [Nm]
 
     // compute the weights for the platform force
-    // double platform_weights[2];
-    // platform_weights[0] = abs(platform_force[2]) < 1e-6
-                              // ? 1.0
-    //                           : sqrt(pow(platform_force[0], 2) + pow(platform_force[1], 2)) /
-    //                                 (sqrt(pow(platform_force[0], 2) + pow(platform_force[1], 2)
-    //                                 +
-    //                                       pow(platform_force[2], 2)));
+    double platform_weights[2];
+    platform_weights[0] = abs(platform_force[2]) < 1e-6
+                              ? 1.0
+                              : sqrt(pow(platform_force[0], 2) + pow(platform_force[1], 2)) /
+                                    (sqrt(pow(platform_force[0], 2) + pow(platform_force[1], 2) +
+                                          pow(platform_force[2], 2)));
+    platform_weights[1] = 1.0 - platform_weights[0];
 
-    // platform_weights[1] = 1.0 - platform_weights[0];
+    double lin_offsets[NUM_DRIVES];
+    double ang_offsets[NUM_DRIVES];
 
-    // // std::cout << "platform weights: ";
-    // // print_array(platform_weights, 2);
+    Eigen::Rotation2Dd rot_ccw(M_PI / 2);
+    Eigen::Rotation2Dd rot_cw(-M_PI / 2);
 
-    // double lin_offsets[NUM_DRIVES];
-    // double ang_offsets[NUM_DRIVES];
-    // // get_pivot_alignment_offsets(&robot, platform_force, lin_offsets, ang_offsets);
+    Eigen::Vector2d lin_platform_force;
+    lin_platform_force << platform_force[0], platform_force[1];
+    lin_platform_force.normalize();
 
-    // Eigen::Vector2d lin_pf = Eigen::Vector2d(platform_force[0], platform_force[1]);
+    // compute the direction vectors of the pivot links
+    for (size_t i = 0; i < NUM_DRIVES; i++)
+    {
+      double pd_x = cos(state.kelo_msr.pvt_pos[i]);
+      double pd_y = sin(state.kelo_msr.pvt_pos[i]);
 
-    // double lin_force_weight = lin_pf.norm() == 0.0 ? 0.0 : platform_weights[0];
-    // double moment_weight = platform_force[2] == 0.0 ? 0.0 : platform_weights[1];
+      Eigen::Vector2d pivot_dir;
+      pivot_dir << pd_x, pd_y;
 
-    // double lin_signal_w1 = 0.0;
-    // double ang_signal_w1 = 0.0;
-    // double lin_signal_w2 = 0.0;
-    // double ang_signal_w2 = 0.0;
-    // double lin_signal_w3 = 0.0;
-    // double ang_signal_w3 = 0.0;
-    // double lin_signal_w4 = 0.0;
-    // double ang_signal_w4 = 0.0;
+      Eigen::Vector2d attachment;
+      attachment << wheel_coordinates[2 * i], wheel_coordinates[2 * i + 1];
 
-    // pidController(lin_offsets[0], kp, ki, kd, control_loop_timestep, w1_lin_error_sum, 1.0,
-    //               w1_lin_prev_error, lin_signal_w1);
-    // pidController(ang_offsets[0], kp, ki, kd, control_loop_timestep, w1_ang_error_sum, 1.0,
-    //               w1_ang_prev_error, ang_signal_w1);
+      // compute tangent vector of the attachment vector in cw or ccw based on platform force[2] -
+      // moment if the moment is positive, the tangents are in ccw, otherwise in cw
+      Eigen::Vector2d tangent = platform_force[2] > 0 ? rot_ccw * attachment : rot_cw * attachment;
 
-    // pidController(lin_offsets[1], kp, ki, kd, control_loop_timestep, w2_lin_error_sum, 1.0,
-    //               w2_lin_prev_error, lin_signal_w2);
-    // pidController(ang_offsets[1], kp, ki, kd, control_loop_timestep, w2_ang_error_sum, 1.0,
-    //               w2_ang_prev_error, ang_signal_w2);
+      // get the angular offsets between the pivot direction and the tangent
+      ang_offsets[i] = atan2(pivot_dir.x() * tangent.y() - pivot_dir.y() * tangent.x(),
+                             pivot_dir.x() * tangent.x() + pivot_dir.y() * tangent.y());
 
-    // pidController(lin_offsets[2], kp, ki, kd, control_loop_timestep, w3_lin_error_sum, 1.0,
-    //               w3_lin_prev_error, lin_signal_w3);
-    // pidController(ang_offsets[2], kp, ki, kd, control_loop_timestep, w3_ang_error_sum, 1.0,
-    //               w3_ang_prev_error, ang_signal_w3);
+      // get the linear offsets between the pivot direction and platform linear force
+      lin_offsets[i] =
+          atan2(pivot_dir.x() * lin_platform_force.y() - pivot_dir.y() * lin_platform_force.x(),
+                pivot_dir.x() * lin_platform_force.x() + pivot_dir.y() * lin_platform_force.y());
+    }
 
-    // pidController(lin_offsets[3], kp, ki, kd, control_loop_timestep, w4_lin_error_sum, 1.0,
-    //               w4_lin_prev_error, lin_signal_w4);
-    // pidController(ang_offsets[3], kp, ki, kd, control_loop_timestep, w4_ang_error_sum, 1.0,
-    //               w4_ang_prev_error, ang_signal_w4);
+    Eigen::Vector2d lin_pf = Eigen::Vector2d(platform_force[0], platform_force[1]);
 
-    // double lin_signals[4] = {lin_signal_w1, lin_signal_w2, lin_signal_w3, lin_signal_w4};
-    // double ang_signals[4] = {ang_signal_w1, ang_signal_w2, ang_signal_w3, ang_signal_w4};
+    double lin_force_weight = lin_pf.norm() == 0.0 ? 0.0 : platform_weights[0];
+    double moment_weight = platform_force[2] == 0.0 ? 0.0 : platform_weights[1];
 
-    // double alignment_taus[NUM_DRIVES];
-    // for (size_t i = 0; i < NUM_DRIVES; i++)
-    // {
-    //   alignment_taus[i] = lin_signals[i] * lin_force_weight + ang_signals[i] * moment_weight;
-    // }
+    double lin_signal_w1 = 0.0;
+    double ang_signal_w1 = 0.0;
+    double lin_signal_w2 = 0.0;
+    double ang_signal_w2 = 0.0;
+    double lin_signal_w3 = 0.0;
+    double ang_signal_w3 = 0.0;
+    double lin_signal_w4 = 0.0;
+    double ang_signal_w4 = 0.0;
 
-    // double tau_wheel_ref[NUM_DRIVES * 2];
-    // for (size_t i = 0; i < NUM_DRIVES; i++)
-    // {
-    //   tau_wheel_ref[2 * i] = alignment_taus[i];
-    //   tau_wheel_ref[2 * i + 1] = -alignment_taus[i];
-    // }
+    double kp[4] = {Kp, Kp, Kp, Kp};
+    double ki[4] = {Ki, Ki, Ki, Ki};
+    double kd[4] = {Kd, Kd, Kd, Kd};
 
-    // double tau_wheel_c[8]{};
-    // base_fd_solver_with_alignment(&robot, platform_force, lin_signals, ang_signals,
-    //                               platform_weights, tau_wheel_c);
+    for (size_t i = 0; i < NUM_DRIVES; i++)
+    {
+      if (lin_offsets[i] > M_PI / 3 || lin_offsets[i] < -M_PI / 3)
+      {
+        kp[i] /= 9.0;
+      }
+      else if ((lin_offsets[i] > M_PI / 6) && (lin_offsets[i] < M_PI / 3) ||
+               (lin_offsets[i] < -M_PI / 6) && (lin_offsets[i] > -M_PI / 3))
+      {
+        kp[i] /= 2.5;
+      }
+      else
+      {
+        kp[i] /= 1.125;
+      }
+    }
 
-    // base_fd_solver(&robot, platform_force, tau_wheel_c);
-    // for (size_t i = 0; i < 2; i++)
-    // {
-    //   tau_wheel_c[i] += tau_wheel_ref[i];
-    // }
+    for (size_t i = 0; i < NUM_DRIVES; i++)
+    {
+      if (ang_offsets[i] > M_PI / 3 || ang_offsets[i] < -M_PI / 3)
+      {
+        kp[i] /= 9.0;
+      }
+      else if ((ang_offsets[i] > M_PI / 6) && (ang_offsets[i] < M_PI / 3) ||
+               (ang_offsets[i] < -M_PI / 6) && (ang_offsets[i] > -M_PI / 3))
+      {
+        kp[i] /= 2.5;
+      }
+      else
+      {
+        kp[i] /= 1.125;
+      }
+    }
+
+    pidController(lin_offsets[0], kp[0], ki[0], kd[0], control_loop_timestep, w1_lin_error_sum,
+                  3.0, w1_lin_prev_error, lin_signal_w1);
+    pidController(ang_offsets[0], kp[0], ki[0], kd[0], control_loop_timestep, w1_ang_error_sum,
+                  3.0, w1_ang_prev_error, ang_signal_w1);
+
+    pidController(lin_offsets[1], kp[1], ki[1], kd[1], control_loop_timestep, w2_lin_error_sum,
+                  3.0, w2_lin_prev_error, lin_signal_w2);
+    pidController(ang_offsets[1], kp[1], ki[1], kd[1], control_loop_timestep, w2_ang_error_sum,
+                  3.0, w2_ang_prev_error, ang_signal_w2);
+
+    pidController(lin_offsets[2], kp[2], ki[2], kd[2], control_loop_timestep, w3_lin_error_sum,
+                  3.0, w3_lin_prev_error, lin_signal_w3);
+    pidController(ang_offsets[2], kp[2], ki[2], kd[2], control_loop_timestep, w3_ang_error_sum,
+                  3.0, w3_ang_prev_error, ang_signal_w3);
+
+    pidController(lin_offsets[3], kp[3], ki[3], kd[3], control_loop_timestep, w4_lin_error_sum,
+                  3.0, w4_lin_prev_error, lin_signal_w4);
+    pidController(ang_offsets[3], kp[3], ki[3], kd[3], control_loop_timestep, w4_ang_error_sum,
+                  3.0, w4_ang_prev_error, ang_signal_w4);
+
+    double lin_signals[4] = {lin_signal_w1, lin_signal_w2, lin_signal_w3, lin_signal_w4};
+    double ang_signals[4] = {ang_signal_w1, ang_signal_w2, ang_signal_w3, ang_signal_w4};
+
+    printf("lin_signals: ");
+    for (size_t i = 0; i < 4; i++)
+    {
+      printf("%5.2f ", lin_signals[i]);
+    }
+    printf("\n\n");
+
+    double alignment_taus[NUM_DRIVES];
+    for (size_t i = 0; i < NUM_DRIVES; i++)
+    {
+      alignment_taus[i] = lin_signals[i] * lin_force_weight + ang_signals[i] * moment_weight;
+    }
+
+    double tau_wheel_ref[NUM_DRIVES * 2];
+    for (size_t i = 0; i < NUM_DRIVES; i++)
+    {
+      tau_wheel_ref[2 * i] = alignment_taus[i];
+      tau_wheel_ref[2 * i + 1] = -alignment_taus[i];
+    }
+
+    double tau_wheel_c[8]{};
+
+    int wheel = 0;
+
+    tau_wheel_c[2 * wheel] = tau_wheel_ref[2 * wheel];
+    tau_wheel_c[2 * wheel + 1] = tau_wheel_ref[2 * wheel + 1];
+
+    wheel = 1;
+    tau_wheel_c[2 * wheel] = tau_wheel_ref[2 * wheel];
+    tau_wheel_c[2 * wheel + 1] = tau_wheel_ref[2 * wheel + 1];
+
+    wheel = 2;
+    tau_wheel_c[2 * wheel] = tau_wheel_ref[2 * wheel];
+    tau_wheel_c[2 * wheel + 1] = tau_wheel_ref[2 * wheel + 1];
+
+    wheel = 3;
+    tau_wheel_c[2 * wheel] = tau_wheel_ref[2 * wheel];
+    tau_wheel_c[2 * wheel + 1] = tau_wheel_ref[2 * wheel + 1];
 
     // set torques
-    // for (size_t i = 0; i < 8; i++)
-    // {
-    //   if (tau_wheel_c[i] > 3.0)
-    //   {
-    //     tau_wheel_c[i] = 3.0;
-    //   }
-    //   else if (tau_wheel_c[i] < -3.0)
-    //   {
-    //     tau_wheel_c[i] = -3.0;
-    //   }
-    // }
+    double tau_limit = 5.0;
+    for (size_t i = 0; i < 8; i++)
+    {
+      if (tau_wheel_c[i] > tau_limit)
+      {
+        tau_wheel_c[i] = tau_limit;
+      }
+      else if (tau_wheel_c[i] < -tau_limit)
+      {
+        tau_wheel_c[i] = -tau_limit;
+      }
+    }
 
-    if (count != 1)
+    printf("tau_wheel_c: ");
+    for (size_t i = 0; i < 8; i++)
+    {
+      printf("%5.2f ", tau_wheel_c[i]);
+    }
+
+    for (size_t i = 0; i < 4; i++)
+    {
+      state.kelo_cmd.trq[2 * i] = -tau_wheel_c[2 * i];
+      state.kelo_cmd.trq[2 * i + 1] = tau_wheel_c[2 * i + 1];
+    }
+
+    if (count > 1)
     {
       robif2b_kelo_drive_actuator_update(&wheel_act);
     }
