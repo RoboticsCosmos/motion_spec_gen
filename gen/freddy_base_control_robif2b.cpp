@@ -3,13 +3,15 @@
 #include <filesystem>
 #include <iostream>
 #include <chrono>
+#include <controllers/pid_controller.hpp>
+#include <motion_spec_utils/utils.hpp>
+#include <motion_spec_utils/math_utils.hpp>
+#include <motion_spec_utils/solver_utils.hpp>
 #include <csignal>
 
 #include <robif2b/functions/ethercat.h>
 #include <robif2b/functions/kelo_drive.h>
 
-#include <controllers/pid_controller.hpp>
-#include <motion_spec_utils/utils.hpp>
 #include <unsupported/Eigen/MatrixFunctions>
 
 #define NUM_DRIVES 4
@@ -19,8 +21,13 @@ volatile sig_atomic_t flag = 0;
 
 void handle_signal(int sig)
 {
-  flag = 1;
-  printf("Caught signal %d\n", sig);
+  static int signal_caught = 0;
+  if (!signal_caught)
+  {
+    signal_caught = 1;
+    flag = 1;
+    printf("Caught signal %d (%s)\n", sig, strsignal(sig));
+  }
 }
 
 static struct
@@ -73,20 +80,18 @@ static struct
 int main(int argc, char **argv)
 {
   // handle signals
-  // struct sigaction sa;
-  // sa.sa_handler = handle_signal;
-  // sigemptyset(&sa.sa_mask);
-  // sa.sa_flags = 0;
+  struct sigaction sa;
+  sa.sa_handler = handle_signal;
+  sigemptyset(&sa.sa_mask);
+  sa.sa_flags = 0;
 
-  // for (int i = 1; i < NSIG; ++i)
-  // {
-  //   if (sigaction(i, &sa, NULL) == -1)
-  //   {
-  //     perror("sigaction");
-  //   }
-  // }
-
-  double wheel_coordinates[8] = {0.188, 0.2075, -0.188, 0.2075, -0.188, -0.2075, 0.188, -0.2075};
+  for (int i = 1; i < NSIG; ++i)
+  {
+    if (sigaction(i, &sa, NULL) == -1)
+    {
+      perror("sigaction");
+    }
+  }
 
   // read the platform force from the command line
   double pf[3] = {0.0, 0.0, 0.0};
@@ -102,6 +107,41 @@ int main(int argc, char **argv)
         "Usage: ./freddy_base_align <platform_force_x> <platform_force_y> <platform_torque_z>\n");
     exit(1);
   }
+
+  // Initialize the robot structs
+  KeloBaseConfig *kelo_base_config = new KeloBaseConfig();
+  kelo_base_config->nWheels = 4;
+  int index_to_EtherCAT[4] = {6, 7, 3, 4};
+  kelo_base_config->index_to_EtherCAT = index_to_EtherCAT;
+  kelo_base_config->radius = 0.115 / 2;
+  kelo_base_config->castor_offset = 0.01;
+  kelo_base_config->half_wheel_distance = 0.0775 / 2;
+  double wheel_coordinates[8] = {0.188, 0.2075, -0.188, 0.2075, -0.188, -0.2075, 0.188, -0.2075};
+  kelo_base_config->wheel_coordinates = wheel_coordinates;
+  double pivot_angles_deviation[4] = {5.310, 5.533, 1.563, 1.625};
+  kelo_base_config->pivot_angles_deviation = pivot_angles_deviation;
+
+  EthercatConfig *ethercat_config = new EthercatConfig();
+
+  MobileBase<Robile> freddy_base;
+  Robile robile;
+  robile.ethercat_config = nullptr;
+  robile.kelo_base_config = kelo_base_config;
+
+  freddy_base.mediator = &robile;
+  freddy_base.state = new MobileBaseState();
+
+  Freddy robot = {nullptr, nullptr, &freddy_base};
+
+  // get current file path
+  std::filesystem::path path = __FILE__;
+
+  // get the robot urdf path
+  std::string robot_urdf =
+      (path.parent_path().parent_path() / "urdf" / "freddy_corrected_base.urdf").string();
+
+  char ethernet_interface[100] = "eno1";
+  initialize_robot(&robot, robot_urdf, ethernet_interface, false);
 
   // Configuration
   state.num_drives = NUM_DRIVES;
@@ -211,12 +251,6 @@ int main(int argc, char **argv)
   double w4_ang_prev_error = 0.0;
   double w4_ang_error_sum = 0.0;
 
-  for (int i = 0; i < NUM_DRIVES; i++)
-  {
-    state.kelo_cmd.trq[i * 2 + 0] = 0.0;
-    state.kelo_cmd.trq[i * 2 + 1] = 0.0;
-  }
-
   // Schedule
   robif2b_ethercat_configure(&ecat);
   if (state.ecat.error_code < 0)
@@ -225,6 +259,8 @@ int main(int argc, char **argv)
   robif2b_ethercat_start(&ecat);
   if (state.ecat.error_code < 0)
     return -1;
+  
+  get_robot_data(&robot, *control_loop_dt);
 
   int count = 0;
 
@@ -232,86 +268,40 @@ int main(int argc, char **argv)
   {
     auto start_time = std::chrono::high_resolution_clock::now();
 
-    // if (flag)
-    // {
-    //   robif2b_kelo_drive_actuator_stop(&wheel_act);
-    //   robif2b_ethercat_stop(&ecat);
-    //   robif2b_ethercat_shutdown(&ecat);
-    //   free_robot_data(&robot);
-    //   printf("Exiting somewhat cleanly...\n");
-    //   exit(0);
-    // }
+    if (flag)
+    {
+      printf("Exiting somewhat cleanly...\n");
+      free_robot_data(&robot);
+      exit(0);
+    }
 
     count++;
-    printf("\n");
-    // printf("count: %d\n", count);
+    // printf("\n");
+    printf("count: %d\n", count);
 
     robif2b_ethercat_update(&ecat);
     if (state.ecat.error_code < 0)
       return -1;
     robif2b_kelo_drive_encoder_update(&drive_enc);
 
-    // for (int i = 0; i < NUM_DRIVES; i++)
-    // {
-    //   printf(
-    //       "drive [id=%i, conn=%i]: "
-    //       "w_vel[0]=%5.2f - w_vel[1]=%5.2f - p_pos=%5.2f\n",
-    //       i, state.ecat.is_connected[i + 1], state.kelo_msr.whl_vel[i * 2 + 0],
-    //       state.kelo_msr.whl_vel[i * 2 + 1], state.kelo_msr.pvt_pos[i]);
-    // }
+    for (int i = 0; i < 4; ++i) {
+        robot.mobile_base->state->pivot_angles[i] = state.kelo_msr.pvt_pos[i];
+    }
+    for (int i = 0; i < 8; ++i) {
+        robot.mobile_base->state->wheel_encoder_values[i] = state.kelo_msr.whl_pos[i];
+        robot.mobile_base->state->qd_wheel[i] = state.kelo_msr.whl_vel[i];
+    }
+
+    get_robot_data(&robot, *control_loop_dt);
 
     // solver
     double platform_force[3] = {pf[0], pf[1], pf[2]};  // [N], [N], [Nm]
 
-    // compute the weights for the platform force
-    double platform_weights[2];
-    platform_weights[0] = abs(platform_force[2]) < 1e-6
-                              ? 1.0
-                              : sqrt(pow(platform_force[0], 2) + pow(platform_force[1], 2)) /
-                                    (sqrt(pow(platform_force[0], 2) + pow(platform_force[1], 2) +
-                                          pow(platform_force[2], 2)));
-    platform_weights[1] = 1.0 - platform_weights[0];
-
-    double lin_offsets[NUM_DRIVES];
-    double ang_offsets[NUM_DRIVES];
-
-    Eigen::Rotation2Dd rot_ccw(M_PI / 2);
-    Eigen::Rotation2Dd rot_cw(-M_PI / 2);
-
-    Eigen::Vector2d lin_platform_force;
-    lin_platform_force << platform_force[0], platform_force[1];
-    lin_platform_force.normalize();
-
-    // compute the direction vectors of the pivot links
-    for (size_t i = 0; i < NUM_DRIVES; i++)
-    {
-      double pd_x = cos(state.kelo_msr.pvt_pos[i]);
-      double pd_y = sin(state.kelo_msr.pvt_pos[i]);
-
-      Eigen::Vector2d pivot_dir;
-      pivot_dir << pd_x, pd_y;
-
-      Eigen::Vector2d attachment;
-      attachment << wheel_coordinates[2 * i], wheel_coordinates[2 * i + 1];
-
-      // compute tangent vector of the attachment vector in cw or ccw based on platform force[2] -
-      // moment if the moment is positive, the tangents are in ccw, otherwise in cw
-      Eigen::Vector2d tangent = platform_force[2] > 0 ? rot_ccw * attachment : rot_cw * attachment;
-
-      // get the angular offsets between the pivot direction and the tangent
-      ang_offsets[i] = atan2(pivot_dir.x() * tangent.y() - pivot_dir.y() * tangent.x(),
-                             pivot_dir.x() * tangent.x() + pivot_dir.y() * tangent.y());
-
-      // get the linear offsets between the pivot direction and platform linear force
-      lin_offsets[i] =
-          atan2(pivot_dir.x() * lin_platform_force.y() - pivot_dir.y() * lin_platform_force.x(),
-                pivot_dir.x() * lin_platform_force.x() + pivot_dir.y() * lin_platform_force.y());
-    }
+    double lin_offsets[robot.mobile_base->mediator->kelo_base_config->nWheels];
+    double ang_offsets[robot.mobile_base->mediator->kelo_base_config->nWheels];
+    get_pivot_alignment_offsets(&robot, platform_force, lin_offsets, ang_offsets);
 
     Eigen::Vector2d lin_pf = Eigen::Vector2d(platform_force[0], platform_force[1]);
-
-    double lin_force_weight = lin_pf.norm() == 0.0 ? 0.0 : platform_weights[0];
-    double moment_weight = platform_force[2] == 0.0 ? 0.0 : platform_weights[1];
 
     double lin_signal_w1 = 0.0;
     double ang_signal_w1 = 0.0;
@@ -322,8 +312,8 @@ int main(int argc, char **argv)
     double lin_signal_w4 = 0.0;
     double ang_signal_w4 = 0.0;
 
-    double kp[4] = {Kp, Kp, 1.5*Kp, Kp};
-    double ki[4] = {Ki, Ki, 2.0*Ki, Ki};
+    double kp[4] = {Kp, Kp, Kp, Kp};
+    double ki[4] = {Ki, Ki, Ki, Ki};
     double kd[4] = {Kd, Kd, Kd, Kd};
 
     pidController(lin_offsets[0], kp[0], ki[0], kd[0], control_loop_timestep, w1_lin_error_sum,
@@ -349,37 +339,14 @@ int main(int argc, char **argv)
     double lin_signals[4] = {lin_signal_w1, lin_signal_w2, lin_signal_w3, lin_signal_w4};
     double ang_signals[4] = {ang_signal_w1, ang_signal_w2, ang_signal_w3, ang_signal_w4};
 
-    double alignment_taus[NUM_DRIVES];
-    for (size_t i = 0; i < NUM_DRIVES; i++)
-    {
-      alignment_taus[i] = lin_signals[i] * lin_force_weight + ang_signals[i] * moment_weight;
-    }
+    printf("pivot angles: ");
+    print_array(robot.mobile_base->state->pivot_angles, 4);
 
-    double tau_wheel_ref[NUM_DRIVES * 2];
-    for (size_t i = 0; i < NUM_DRIVES; i++)
-    {
-      tau_wheel_ref[2 * i] = alignment_taus[i];
-      tau_wheel_ref[2 * i + 1] = -alignment_taus[i];
-    }
-
+    // base solver
     double tau_wheel_c[8]{};
-
-    int wheel = 0;
-
-    tau_wheel_c[2 * wheel] = tau_wheel_ref[2 * wheel];
-    tau_wheel_c[2 * wheel + 1] = tau_wheel_ref[2 * wheel + 1];
-
-    wheel = 1;
-    tau_wheel_c[2 * wheel] = tau_wheel_ref[2 * wheel];
-    tau_wheel_c[2 * wheel + 1] = tau_wheel_ref[2 * wheel + 1];
-
-    wheel = 2;
-    tau_wheel_c[2 * wheel] = tau_wheel_ref[2 * wheel];
-    tau_wheel_c[2 * wheel + 1] = tau_wheel_ref[2 * wheel + 1];
-
-    wheel = 3;
-    tau_wheel_c[2 * wheel] = tau_wheel_ref[2 * wheel];
-    tau_wheel_c[2 * wheel + 1] = tau_wheel_ref[2 * wheel + 1];
+    base_fd_solver_with_alignment(&robot, platform_force, lin_signals, ang_signals, tau_wheel_c);
+    printf("torques1: ");
+    print_array(tau_wheel_c, 8);
 
     // set torques
     double tau_limit = 5.0;
@@ -395,11 +362,10 @@ int main(int argc, char **argv)
       }
     }
 
-    printf("tau_wheel_c: ");
-    for (size_t i = 0; i < 8; i++)
-    {
-      printf("%5.2f ", tau_wheel_c[i]);
-    }
+    // printf("torques3: ");
+    // print_array(tau_wheel_c, 8);
+
+    printf("\n");
 
     for (size_t i = 0; i < 4; i++)
     {
@@ -407,7 +373,7 @@ int main(int argc, char **argv)
       state.kelo_cmd.trq[2 * i + 1] = tau_wheel_c[2 * i + 1];
     }
 
-    if (count > 1)
+    if (count > 2)
     {
       robif2b_kelo_drive_actuator_update(&wheel_act);
     }
@@ -428,8 +394,7 @@ int main(int argc, char **argv)
   robif2b_kelo_drive_actuator_stop(&wheel_act);
   robif2b_ethercat_stop(&ecat);
   robif2b_ethercat_shutdown(&ecat);
-
-  // free_robot_data(&robot);
+  free_robot_data(&robot);
 
   return 0;
 }

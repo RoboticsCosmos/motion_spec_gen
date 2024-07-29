@@ -1,9 +1,4 @@
-extern "C"
-{
-#include "kelo_motion_control/EthercatCommunication.h"
-#include "kelo_motion_control/KeloMotionControl.h"
 #include "kelo_motion_control/mediator.h"
-}
 #include <array>
 #include <string>
 #include <filesystem>
@@ -20,8 +15,13 @@ volatile sig_atomic_t flag = 0;
 
 void handle_signal(int sig)
 {
-  flag = 1;
-  printf("Caught signal %d\n", sig);
+  static int signal_caught = 0;
+  if (!signal_caught)
+  {
+    signal_caught = 1;
+    flag = 1;
+    printf("Caught signal %d (%s)\n", sig, strsignal(sig));
+  }
 }
 
 int main()
@@ -276,7 +276,7 @@ int main()
   double kr_bl_orientation_coord_ang_z_initial_vector[6] = {0, 0, 0, 0, 0, 1};
 
   // uc1 vars
-  double arms_bl_base_distance_reference_value = 0.75;
+  double arms_bl_base_distance_reference_value = 0.8;
   double kr_bl_base_distance = 0.0;
   double kr_bl_base_distance_pid_controller_kp = 300.0;
   double kr_bl_base_distance_pid_controller_ki = 7.5;
@@ -389,9 +389,9 @@ int main()
   kl_bl_base_distance_pid_prev_error = kl_bl_base_distance_controller_error;
 
   // base wheels alignment controllers
-  double base_wheel_alignment_controller_kp = 5.0;
-  double base_wheel_alignment_controller_ki = 0.01;
-  double base_wheel_alignment_controller_kd = 0.5;
+  double base_wheel_alignment_controller_Kp = 1.0;
+  double base_wheel_alignment_controller_Ki = 0.5;
+  double base_wheel_alignment_controller_Kd = 0.0;
 
   double base_w1_lin_prev_error = 0.0;
   double base_w2_lin_prev_error = 0.0;
@@ -429,11 +429,6 @@ int main()
     count++;
     printf("\n");
 
-    // explicitly referesh the robot data
-    // robot.kinova_left->mediator->refresh_feedback();
-    // robot.kinova_right->mediator->refresh_feedback();
-    update_base_state(robot.mobile_base->mediator->kelo_base_config,
-                      robot.mobile_base->mediator->ethercat_config);
     get_robot_data(&robot, *control_loop_dt);
 
     KDL::Frame base_to_world;
@@ -852,9 +847,7 @@ int main()
                     kinova_left_base_link, kl_bl_base_distance_pid_controller_signal,
                     kl_uc1_wrench);
 
-    transform_wrench2(&robot, kinova_left_base_link, base_link,
-                      kl_uc1_wrench,
-                      kl_uc1_wrench);
+    transform_wrench2(&robot, kinova_left_base_link, base_link, kl_uc1_wrench, kl_uc1_wrench);
 
     // std::cout << "kl_uc1_wrench: ";
     // print_array(kl_uc1_wrench, 6);
@@ -864,9 +857,7 @@ int main()
                     kinova_right_base_link, kr_bl_base_distance_pid_controller_signal,
                     kr_uc1_wrench);
 
-    transform_wrench2(&robot, kinova_right_base_link, base_link,
-                      kr_uc1_wrench,
-                      kr_uc1_wrench);
+    transform_wrench2(&robot, kinova_right_base_link, base_link, kr_uc1_wrench, kr_uc1_wrench);
 
     // std::cout << "kr_uc1_wrench: ";
     // print_array(kr_uc1_wrench, 6);
@@ -881,81 +872,93 @@ int main()
     // std::cout << "plat_force: ";
     // print_array(plat_force, 3);
 
-    double platform_weights[2]{};
+    double lin_offsets[robot.mobile_base->mediator->kelo_base_config->nWheels];
+    double ang_offsets[robot.mobile_base->mediator->kelo_base_config->nWheels];
+    get_pivot_alignment_offsets(&robot, plat_force, lin_offsets, ang_offsets);
+
+    double base_w1_lin_signal, base_w2_lin_signal, base_w3_lin_signal, base_w4_lin_signal = 0.0;
+    double base_w1_ang_signal, base_w2_ang_signal, base_w3_ang_signal, base_w4_ang_signal = 0.0;
+
+    double base_wheel_alignment_controller_kp[4] = {
+        base_wheel_alignment_controller_Kp, base_wheel_alignment_controller_Kp,
+        1.5 * base_wheel_alignment_controller_Kp, base_wheel_alignment_controller_Kp};
+    double base_wheel_alignment_controller_ki[4] = {
+        base_wheel_alignment_controller_Ki, base_wheel_alignment_controller_Ki,
+        2.0 * base_wheel_alignment_controller_Ki, base_wheel_alignment_controller_Ki};
+    double base_wheel_alignment_controller_kd[4] = {
+        base_wheel_alignment_controller_Kd, base_wheel_alignment_controller_Kd,
+        base_wheel_alignment_controller_Kd, base_wheel_alignment_controller_Kd};
+
+    pidController(lin_offsets[0], base_wheel_alignment_controller_kp[0],
+                  base_wheel_alignment_controller_ki[0], base_wheel_alignment_controller_kd[0],
+                  *control_loop_dt, base_w1_lin_error_sum, 10.0, base_w1_lin_prev_error,
+                  base_w1_lin_signal);
+    pidController(lin_offsets[1], base_wheel_alignment_controller_kp[1],
+                  base_wheel_alignment_controller_ki[1], base_wheel_alignment_controller_kd[1],
+                  *control_loop_dt, base_w2_lin_error_sum, 10.0, base_w2_lin_prev_error,
+                  base_w2_lin_signal);
+    pidController(lin_offsets[2], base_wheel_alignment_controller_kp[2],
+                  base_wheel_alignment_controller_ki[2], base_wheel_alignment_controller_kd[2],
+                  *control_loop_dt, base_w3_lin_error_sum, 10.0, base_w3_lin_prev_error,
+                  base_w3_lin_signal);
+    pidController(lin_offsets[3], base_wheel_alignment_controller_kp[3],
+                  base_wheel_alignment_controller_ki[3], base_wheel_alignment_controller_kd[3],
+                  *control_loop_dt, base_w4_lin_error_sum, 10.0, base_w4_lin_prev_error,
+                  base_w4_lin_signal);
+
+    pidController(ang_offsets[0], base_wheel_alignment_controller_kp[0],
+                  base_wheel_alignment_controller_ki[0], base_wheel_alignment_controller_kd[0],
+                  *control_loop_dt, base_w1_ang_error_sum, 10.0, base_w1_ang_prev_error,
+                  base_w1_ang_signal);
+    pidController(ang_offsets[1], base_wheel_alignment_controller_kp[1],
+                  base_wheel_alignment_controller_ki[1], base_wheel_alignment_controller_kd[1],
+                  *control_loop_dt, base_w2_ang_error_sum, 10.0, base_w2_ang_prev_error,
+                  base_w2_ang_signal);
+    pidController(ang_offsets[2], base_wheel_alignment_controller_kp[2],
+                  base_wheel_alignment_controller_ki[2], base_wheel_alignment_controller_kd[2],
+                  *control_loop_dt, base_w3_ang_error_sum, 10.0, base_w3_ang_prev_error,
+                  base_w3_ang_signal);
+    pidController(ang_offsets[3], base_wheel_alignment_controller_kp[3],
+                  base_wheel_alignment_controller_ki[3], base_wheel_alignment_controller_kd[3],
+                  *control_loop_dt, base_w4_ang_error_sum, 10.0, base_w4_ang_prev_error,
+                  base_w4_ang_signal);
+
+    double wheel_alignment_lin_signals[4] = {base_w1_lin_signal, base_w2_lin_signal,
+                                             base_w3_lin_signal, base_w4_lin_signal};
+    double wheel_alignment_ang_signals[4] = {base_w1_ang_signal, base_w2_ang_signal,
+                                             base_w3_ang_signal, base_w4_ang_signal};
+
+    // compute the weights for the platform force
+    double platform_weights[2];
     platform_weights[0] =
         abs(plat_force[2]) < 1e-6
             ? 1.0
             : sqrt(pow(plat_force[0], 2) + pow(plat_force[1], 2)) /
                   (sqrt(pow(plat_force[0], 2) + pow(plat_force[1], 2) + pow(plat_force[2], 2)));
-    platform_weights[1] = 1.0 - platform_weights[0];
 
-    double lin_offsets[robot.mobile_base->mediator->kelo_base_config->nWheels];
-    double ang_offsets[robot.mobile_base->mediator->kelo_base_config->nWheels];
-    get_pivot_alignment_offsets(&robot, plat_force, lin_offsets, ang_offsets);
+    platform_weights[1] = 1.0 - platform_weights[0];
 
     Eigen::Vector2d lin_pf = Eigen::Vector2d(plat_force[0], plat_force[1]);
 
     double lin_force_weight = lin_pf.norm() == 0.0 ? 0.0 : platform_weights[0];
     double moment_weight = plat_force[2] == 0.0 ? 0.0 : platform_weights[1];
 
-    double base_w1_lin_signal, base_w2_lin_signal, base_w3_lin_signal, base_w4_lin_signal = 0.0;
-    double base_w1_ang_signal, base_w2_ang_signal, base_w3_ang_signal, base_w4_ang_signal = 0.0;
-
-    pidController(lin_offsets[0], base_wheel_alignment_controller_kp,
-                  base_wheel_alignment_controller_ki, base_wheel_alignment_controller_kd,
-                  *control_loop_dt, base_w1_lin_error_sum, 1.0, base_w1_lin_prev_error,
-                  base_w1_lin_signal);
-    pidController(lin_offsets[1], base_wheel_alignment_controller_kp,
-                  base_wheel_alignment_controller_ki, base_wheel_alignment_controller_kd,
-                  *control_loop_dt, base_w2_lin_error_sum, 1.0, base_w2_lin_prev_error,
-                  base_w2_lin_signal);
-    pidController(lin_offsets[2], base_wheel_alignment_controller_kp,
-                  base_wheel_alignment_controller_ki, base_wheel_alignment_controller_kd,
-                  *control_loop_dt, base_w3_lin_error_sum, 1.0, base_w3_lin_prev_error,
-                  base_w3_lin_signal);
-    pidController(lin_offsets[3], base_wheel_alignment_controller_kp,
-                  base_wheel_alignment_controller_ki, base_wheel_alignment_controller_kd,
-                  *control_loop_dt, base_w4_lin_error_sum, 1.0, base_w4_lin_prev_error,
-                  base_w4_lin_signal);
-
-    pidController(ang_offsets[0], base_wheel_alignment_controller_kp,
-                  base_wheel_alignment_controller_ki, base_wheel_alignment_controller_kd,
-                  *control_loop_dt, base_w1_ang_error_sum, 1.0, base_w1_ang_prev_error,
-                  base_w1_ang_signal);
-    pidController(ang_offsets[1], base_wheel_alignment_controller_kp,
-                  base_wheel_alignment_controller_ki, base_wheel_alignment_controller_kd,
-                  *control_loop_dt, base_w2_ang_error_sum, 1.0, base_w2_ang_prev_error,
-                  base_w2_ang_signal);
-    pidController(ang_offsets[2], base_wheel_alignment_controller_kp,
-                  base_wheel_alignment_controller_ki, base_wheel_alignment_controller_kd,
-                  *control_loop_dt, base_w3_ang_error_sum, 1.0, base_w3_ang_prev_error,
-                  base_w3_ang_signal);
-    pidController(ang_offsets[3], base_wheel_alignment_controller_kp,
-                  base_wheel_alignment_controller_ki, base_wheel_alignment_controller_kd,
-                  *control_loop_dt, base_w4_ang_error_sum, 1.0, base_w4_ang_prev_error,
-                  base_w4_ang_signal);
-
-    double wheel_alignment_lin_signals[4] = {base_w1_lin_signal, base_w2_lin_signal, base_w3_lin_signal,
-                                            base_w4_lin_signal};
-    double wheel_alignment_ang_signals[4] = {base_w1_ang_signal, base_w2_ang_signal, base_w3_ang_signal,
-                                            base_w4_ang_signal};
-
     double wheel_alignment_taus[4]{};
     for (size_t i = 0; i < 4; i++)
     {
       wheel_alignment_taus[i] = wheel_alignment_lin_signals[i] * lin_force_weight +
-                               wheel_alignment_ang_signals[i] * moment_weight;
+                          wheel_alignment_ang_signals[i] * moment_weight;
     }
 
-    double fd_solver_robile_output_ref_torques[8];
-    for (size_t i = 0; i < 8; i++)
+    double fd_solver_robile_output_torques[8]{};
+    for (size_t i = 0; i < 4; i++)
     {
-      fd_solver_robile_output_ref_torques[2 * i] = wheel_alignment_taus[i];
-      fd_solver_robile_output_ref_torques[2 * i + 1] = -wheel_alignment_taus[i];
+      fd_solver_robile_output_torques[2 * i] = wheel_alignment_taus[i];
+      fd_solver_robile_output_torques[2 * i + 1] = -wheel_alignment_taus[i];
     }
 
     // achd_solver_fext
-    double kl_achd_solver_fext_ext_wrenches[7][6];
+    double kl_achd_solver_fext_ext_wrenches[7][6]{};
     int link_id = -1;
     double
         kinova_left_bracelet_table_force_embed_map_kl_achd_solver_fext_output_external_wrench_transf
@@ -1106,22 +1109,23 @@ int main()
     KDL::JntArray kinova_left_cmd_tau_kdl(7);
     cap_and_convert_manipulator_torques(kinova_left_cmd_tau, 7, kinova_left_cmd_tau_kdl);
 
+    double base_tau_limit = 5.0;
     for (size_t i = 0; i < 8; i++)
     {
-      if (fd_solver_robile_output_ref_torques[i] > 3.0)
+      if (fd_solver_robile_output_torques[i] > base_tau_limit)
       {
-        fd_solver_robile_output_ref_torques[i] = 3.0;
+        fd_solver_robile_output_torques[i] = base_tau_limit;
       }
-      else if (fd_solver_robile_output_ref_torques[i] < -3.0)
+      else if (fd_solver_robile_output_torques[i] < -base_tau_limit)
       {
-        fd_solver_robile_output_ref_torques[i] = -3.0;
+        fd_solver_robile_output_torques[i] = -base_tau_limit;
       }
     }
 
     // set torques
-    if (count != 1)
+    if (count > 1)
     {
-      set_mobile_base_torques(&robot, fd_solver_robile_output_ref_torques);
+      set_mobile_base_torques(&robot, fd_solver_robile_output_torques);
     }
     set_manipulator_torques(&robot, kinova_left_base_link, &kinova_left_cmd_tau_kdl);
     set_manipulator_torques(&robot, kinova_right_base_link, &kinova_right_cmd_tau_kdl);

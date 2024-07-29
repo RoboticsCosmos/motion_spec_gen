@@ -49,6 +49,7 @@ foreach(source ${SOURCES})
     motion_spec_utils::tf_utils
     motion_spec_utils::mutils 
     controllers::pid_controller
+    controllers::abag_controller
     gsl
 	  gslcblas
     robif2b::ethercat

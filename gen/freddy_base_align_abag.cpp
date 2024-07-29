@@ -5,6 +5,7 @@
 #include <iostream>
 #include <chrono>
 #include <controllers/pid_controller.hpp>
+#include "controllers/abag.h"
 #include <motion_spec_utils/utils.hpp>
 #include <motion_spec_utils/math_utils.hpp>
 #include <motion_spec_utils/solver_utils.hpp>
@@ -52,19 +53,6 @@ int main(int argc, char **argv)
   }
 
   // Initialize the robot structs
-
-  // KeloBaseConfig kelo_base_config;
-  // kelo_base_config.nWheels = 4;
-  // int index_to_EtherCAT[4] = {6, 7, 3, 4};
-  // kelo_base_config.index_to_EtherCAT = index_to_EtherCAT;
-  // kelo_base_config.radius = 0.115 / 2;
-  // kelo_base_config.castor_offset = 0.01;
-  // kelo_base_config.half_wheel_distance = 0.0775 / 2;
-  // double wheel_coordinates[8] = {0.188, 0.2075, -0.188, 0.2075, -0.188, -0.2075, 0.188,
-  // -0.2075}; kelo_base_config.wheel_coordinates = wheel_coordinates; double
-  // pivot_angles_deviation[4] = {5.310, 5.533, 1.563, 1.625};
-  // kelo_base_config.pivot_angles_deviation = pivot_angles_deviation;
-
   KeloBaseConfig *kelo_base_config = new KeloBaseConfig();
   kelo_base_config->nWheels = 4;
   int index_to_EtherCAT[4] = {6, 7, 3, 4};
@@ -104,34 +92,21 @@ int main(int argc, char **argv)
   double control_loop_timestep = desired_period.count();                               // s
   double *control_loop_dt = &control_loop_timestep;                                    // s
 
-  // pid controller variables
-  double Kp = 2.0;
-  double Ki = 0.5;
-  double Kd = 0.05;
-
-  double w1_lin_prev_error = 0.0;
-  double w1_lin_error_sum = 0.0;
-  double w1_ang_prev_error = 0.0;
-  double w1_ang_error_sum = 0.0;
-
-  double w2_lin_prev_error = 0.0;
-  double w2_lin_error_sum = 0.0;
-  double w2_ang_prev_error = 0.0;
-  double w2_ang_error_sum = 0.0;
-
-  double w3_lin_prev_error = 0.0;
-  double w3_lin_error_sum = 0.0;
-  double w3_ang_prev_error = 0.0;
-  double w3_ang_error_sum = 0.0;
-
-  double w4_lin_prev_error = 0.0;
-  double w4_lin_error_sum = 0.0;
-  double w4_ang_prev_error = 0.0;
-  double w4_ang_error_sum = 0.0;
-
-  update_base_state(robot.mobile_base->mediator->kelo_base_config,
-                    robot.mobile_base->mediator->ethercat_config);
-  get_robot_data(&robot, *control_loop_dt);
+  // ABAG parameters
+  const double alpha_parameter[8]          = { 0.950000, 0.950000, 0.950000, 0.950000, 0.950000, 0.950000, 0.950000, 0.950000 };
+  const double bias_threshold_parameter[8] = { 0.000407, 0.000407, 0.000407, 0.000407, 0.000407, 0.000407, 0.000407, 0.000407 };
+  const double bias_step_parameter[8]      = { 0.000400, 0.000400, 0.000400, 0.000400, 0.000400, 0.000400, 0.000400, 0.000400 };
+  const double gain_threshold_parameter[8] = { 0.550000, 0.550000, 0.550000, 0.550000, 0.550000, 0.550000, 0.550000, 0.550000 };
+  const double gain_step_parameter[8]      = { 0.003000, 0.003000, 0.003000, 0.003000, 0.003000, 0.003000, 0.003000, 0.003000 };
+  double desired_state[8] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+  double tube[8]          = { 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15 };
+  double ctrl_error[8]    = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+  double abag_command[8]  = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+  abagState_t abag_state[8];
+  for (int i = 0; i < 8; i++)
+  {
+      initialize_abagState(&abag_state[i]);
+  }
 
   int count = 0;
 
@@ -176,38 +151,73 @@ int main(int argc, char **argv)
     double lin_force_weight = lin_pf.norm() == 0.0 ? 0.0 : platform_weights[0];
     double moment_weight = platform_force[2] == 0.0 ? 0.0 : platform_weights[1];
 
-    double lin_signal_w1 = 0.0;
-    double ang_signal_w1 = 0.0;
-    double lin_signal_w2 = 0.0;
-    double ang_signal_w2 = 0.0;
-    double lin_signal_w3 = 0.0;
-    double ang_signal_w3 = 0.0;
-    double lin_signal_w4 = 0.0;
-    double ang_signal_w4 = 0.0;
+    double lin_signal_w1, lin_signal_w2, lin_signal_w3, lin_signal_w4 = 0.0;
+    double ang_signal_w1, ang_signal_w2, ang_signal_w3, ang_signal_w4 = 0.0;
 
-    double kp[4] = {Kp, Kp, 1.5*Kp, Kp};
-    double ki[4] = {Ki, Ki, 2*Ki, Ki};
-    double kd[4] = {Kd, Kd, Kd, Kd};
+    // ABAG
+    ctrl_error[0] = lin_offsets[0];
+    if (fabs(ctrl_error[0]) < tube[0]) ctrl_error[0] = 0.0;
+    abag_sched(&abag_state[0], &ctrl_error[0],
+                   &abag_command[0], &alpha_parameter[0],
+                   &bias_threshold_parameter[0], &bias_step_parameter[0],
+                   &gain_threshold_parameter[0], &gain_step_parameter[0]);
+    lin_signal_w1 = abag_command[0];
 
-    pidController(lin_offsets[0], kp[0], ki[0], kd[0], control_loop_timestep, w1_lin_error_sum,
-                  10.0, w1_lin_prev_error, lin_signal_w1);
-    pidController(ang_offsets[0], kp[0], ki[0], kd[0], control_loop_timestep, w1_ang_error_sum,
-                  10.0, w1_ang_prev_error, ang_signal_w1);
+    ctrl_error[1] = lin_offsets[1];
+    if (fabs(ctrl_error[1]) < tube[1]) ctrl_error[1] = 0.0;
+    abag_sched(&abag_state[1], &ctrl_error[1],
+                   &abag_command[1], &alpha_parameter[1],
+                   &bias_threshold_parameter[1], &bias_step_parameter[1],
+                   &gain_threshold_parameter[1], &gain_step_parameter[1]);
+    lin_signal_w2 = abag_command[1];
 
-    pidController(lin_offsets[1], kp[1], ki[1], kd[1], control_loop_timestep, w2_lin_error_sum,
-                  10.0, w2_lin_prev_error, lin_signal_w2);
-    pidController(ang_offsets[1], kp[1], ki[1], kd[1], control_loop_timestep, w2_ang_error_sum,
-                  10.0, w2_ang_prev_error, ang_signal_w2);
+    ctrl_error[2] = lin_offsets[2];
+    if (fabs(ctrl_error[2]) < tube[2]) ctrl_error[2] = 0.0;
+    abag_sched(&abag_state[2], &ctrl_error[2],
+                   &abag_command[2], &alpha_parameter[2],
+                   &bias_threshold_parameter[2], &bias_step_parameter[2],
+                   &gain_threshold_parameter[2], &gain_step_parameter[2]);
+    lin_signal_w3 = abag_command[2];
 
-    pidController(lin_offsets[2], kp[2], ki[2], kd[2], control_loop_timestep, w3_lin_error_sum,
-                  10.0, w3_lin_prev_error, lin_signal_w3);
-    pidController(ang_offsets[2], kp[2], ki[2], kd[2], control_loop_timestep, w3_ang_error_sum,
-                  10.0, w3_ang_prev_error, ang_signal_w3);
+    ctrl_error[3] = lin_offsets[3];
+    if (fabs(ctrl_error[3]) < tube[3]) ctrl_error[3] = 0.0;
+    abag_sched(&abag_state[3], &ctrl_error[3],
+                   &abag_command[3], &alpha_parameter[3],
+                   &bias_threshold_parameter[3], &bias_step_parameter[3],
+                   &gain_threshold_parameter[3], &gain_step_parameter[3]);
+    lin_signal_w4 = abag_command[3];
 
-    pidController(lin_offsets[3], kp[3], ki[3], kd[3], control_loop_timestep, w4_lin_error_sum,
-                  10.0, w4_lin_prev_error, lin_signal_w4);
-    pidController(ang_offsets[3], kp[3], ki[3], kd[3], control_loop_timestep, w4_ang_error_sum,
-                  10.0, w4_ang_prev_error, ang_signal_w4);
+    ctrl_error[4] = ang_offsets[0];
+    if (fabs(ctrl_error[4]) < tube[4]) ctrl_error[4] = 0.0;
+    abag_sched(&abag_state[4], &ctrl_error[4],
+                   &abag_command[4], &alpha_parameter[4],
+                   &bias_threshold_parameter[4], &bias_step_parameter[4],
+                   &gain_threshold_parameter[4], &gain_step_parameter[4]);
+    ang_signal_w1 = abag_command[4];
+
+    ctrl_error[5] = ang_offsets[1];
+    if (fabs(ctrl_error[5]) < tube[5]) ctrl_error[5] = 0.0;
+    abag_sched(&abag_state[5], &ctrl_error[5],
+                   &abag_command[5], &alpha_parameter[5],
+                   &bias_threshold_parameter[5], &bias_step_parameter[5],
+                   &gain_threshold_parameter[5], &gain_step_parameter[5]);
+    ang_signal_w2 = abag_command[5];
+
+    ctrl_error[6] = ang_offsets[2];
+    if (fabs(ctrl_error[6]) < tube[6]) ctrl_error[6] = 0.0;
+    abag_sched(&abag_state[6], &ctrl_error[6],
+                   &abag_command[6], &alpha_parameter[6],
+                   &bias_threshold_parameter[6], &bias_step_parameter[6],
+                   &gain_threshold_parameter[6], &gain_step_parameter[6]);
+    ang_signal_w3 = abag_command[6];
+
+    ctrl_error[7] = ang_offsets[3];
+    if (fabs(ctrl_error[7]) < tube[7]) ctrl_error[7] = 0.0;
+    abag_sched(&abag_state[7], &ctrl_error[7],
+                   &abag_command[7], &alpha_parameter[7],
+                   &bias_threshold_parameter[7], &bias_step_parameter[7],
+                   &gain_threshold_parameter[7], &gain_step_parameter[7]);
+    ang_signal_w4 = abag_command[7];
 
     double lin_signals[4] = {lin_signal_w1, lin_signal_w2, lin_signal_w3, lin_signal_w4};
     double ang_signals[4] = {ang_signal_w1, ang_signal_w2, ang_signal_w3, ang_signal_w4};
@@ -221,39 +231,18 @@ int main(int argc, char **argv)
     double tau_wheel_ref[robot.mobile_base->mediator->kelo_base_config->nWheels * 2];
     for (size_t i = 0; i < robot.mobile_base->mediator->kelo_base_config->nWheels; i++)
     {
-      tau_wheel_ref[2 * i] = alignment_taus[i];
-      tau_wheel_ref[2 * i + 1] = -alignment_taus[i];
+      tau_wheel_ref[2 * i] = alignment_taus[i] * 2.0;
+      tau_wheel_ref[2 * i + 1] = -alignment_taus[i] * 2.0;
     }
 
     double tau_wheel_c[8]{};
-
-    int wheel = 0;
-
-    tau_wheel_c[2 * wheel] = tau_wheel_ref[2 * wheel];
-    tau_wheel_c[2 * wheel + 1] = tau_wheel_ref[2 * wheel + 1];
-
-    wheel = 1;
-    tau_wheel_c[2 * wheel] = tau_wheel_ref[2 * wheel];
-    tau_wheel_c[2 * wheel + 1] = tau_wheel_ref[2 * wheel + 1];
-
-    wheel = 2;
-    tau_wheel_c[2 * wheel] = tau_wheel_ref[2 * wheel];
-    tau_wheel_c[2 * wheel + 1] = tau_wheel_ref[2 * wheel + 1];
-
-    wheel = 3;
-    tau_wheel_c[2 * wheel] = tau_wheel_ref[2 * wheel];
-    tau_wheel_c[2 * wheel + 1] = tau_wheel_ref[2 * wheel + 1];
-
-    // double tau_wheel_c1[8]{};
-    // base_fd_solver(&robot, platform_force, tau_wheel_c1);
-
-    // for (size_t i = 0; i < 8; i++)
-    // {
-    //   tau_wheel_c[i] += tau_wheel_c1[i];
-    // }
+    for (size_t i = 0; i < 8; i++)
+    {
+      tau_wheel_c[i] = tau_wheel_ref[i];
+    }
 
     // set torques
-    double tau_limit = 5.0;
+    double tau_limit = 4.0;
     for (size_t i = 0; i < 8; i++)
     {
       if (tau_wheel_c[i] > tau_limit)
@@ -273,8 +262,7 @@ int main(int argc, char **argv)
 
     if (count > 2)
     {
-      raise(SIGINT);
-      // set_mobile_base_torques(&robot, tau_wheel_c);
+      set_mobile_base_torques(&robot, tau_wheel_c);
     }
 
     auto end_time = std::chrono::high_resolution_clock::now();
