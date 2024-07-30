@@ -1,3 +1,4 @@
+#include "kelo_motion_control/mediator.h"
 #include <array>
 #include <string>
 #include <filesystem>
@@ -439,15 +440,15 @@ int main()
   // uc1 vars
   double arms_bl_base_distance_reference_value = 0.75;
   double kr_bl_base_distance = 0.0;
-  double kr_bl_base_distance_pid_controller_kp = 1000.0;
-  double kr_bl_base_distance_pid_controller_ki = 7.5;
+  double kr_bl_base_distance_pid_controller_kp = 100.0;
+  double kr_bl_base_distance_pid_controller_ki = 10.5;
   double kr_bl_base_distance_pid_controller_kd = 100.0;
   double kr_bl_base_distance_pid_error_sum = 0.0;
   double kr_bl_base_distance_pid_controller_signal = 0.0;
 
   double kl_bl_base_distance = 0.0;
-  double kl_bl_base_distance_pid_controller_kp = 1000.0;
-  double kl_bl_base_distance_pid_controller_ki = 7.5;
+  double kl_bl_base_distance_pid_controller_kp = 100.0;
+  double kl_bl_base_distance_pid_controller_ki = 10.5;
   double kl_bl_base_distance_pid_controller_kd = 100.0;
   double kl_bl_base_distance_pid_error_sum = 0.0;
   double kl_bl_base_distance_pid_controller_signal = 0.0;
@@ -567,7 +568,7 @@ int main()
   kl_bl_base_distance_pid_prev_error = kl_bl_base_distance_controller_error;
 
   // base wheels alignment controllers
-  double base_wheel_alignment_controller_Kp = 1.0;
+  double base_wheel_alignment_controller_Kp = 0.5;
   double base_wheel_alignment_controller_Ki = 0.75;
   double base_wheel_alignment_controller_Kd = 0.0;
 
@@ -623,6 +624,9 @@ int main()
         robot.mobile_base->state->wheel_encoder_values[i] = state.kelo_msr.whl_pos[i];
         robot.mobile_base->state->qd_wheel[i] = state.kelo_msr.whl_vel[i];
     }
+
+    robot.kinova_left->mediator->refresh_feedback();
+    robot.kinova_right->mediator->refresh_feedback();
 
     get_robot_data(&robot, *control_loop_dt);
 
@@ -775,10 +779,9 @@ int main()
                     kr_bl_position_coord_lin_y_vector, &robot, kr_bl_position_coord_lin_y);
 
     // transform from base to world
-    // KDL::Vector kr_bl_position_coord_lin_y_world =
-    //     base_to_world * KDL::Vector(0.0, kr_bl_position_coord_lin_y, 0.0);
-
-    // kr_bl_position_coord_lin_y = kr_bl_position_coord_lin_y_world.y();
+    KDL::Vector kr_bl_position_coord_lin_y_world =
+        base_to_world * KDL::Vector(0.0, kr_bl_position_coord_lin_y, 0.0);
+    kr_bl_position_coord_lin_y = kr_bl_position_coord_lin_y_world.y();
 
     double kr_bl_position_lin_y_pid_controller_error = 0;
     computeEqualityError(kr_bl_position_coord_lin_y, kr_bl_position_coord_lin_y_initial,
@@ -851,9 +854,9 @@ int main()
                     kl_bl_position_coord_lin_y_vector, &robot, kl_bl_position_coord_lin_y);
 
     // transform from base to world
-    // KDL::Vector kl_bl_position_coord_lin_y_world =
-    //     base_to_world * KDL::Vector(0.0, kl_bl_position_coord_lin_y, 0.0);
-    // kl_bl_position_coord_lin_y = kl_bl_position_coord_lin_y_world.y();
+    KDL::Vector kl_bl_position_coord_lin_y_world =
+        base_to_world * KDL::Vector(0.0, kl_bl_position_coord_lin_y, 0.0);
+    kl_bl_position_coord_lin_y = kl_bl_position_coord_lin_y_world.y();
 
     double kl_bl_position_lin_y_pid_controller_error = 0;
     computeEqualityError(kl_bl_position_coord_lin_y, kl_bl_position_coord_lin_y_initial,
@@ -893,6 +896,8 @@ int main()
                   kl_bl_base_distance_pid_controller_ki, kl_bl_base_distance_pid_controller_kd,
                   *control_loop_dt, kl_bl_base_distance_pid_error_sum, 20.0,
                   kl_bl_base_distance_pid_prev_error, kl_bl_base_distance_pid_controller_signal);
+
+    std::cout << "dists: " << kl_bl_base_distance << ", " << kr_bl_base_distance << std::endl;
 
     // embed maps
     double
@@ -1062,24 +1067,34 @@ int main()
 
     // uc1 embed maps
     double fd_solver_robile_output_external_wrench_kl[6]{};
-    decomposeSignal(&robot, kinova_left_base_link, kinova_left_bracelet_link,
+    decomposeSignal(&robot, kinova_left_bracelet_link, kinova_left_base_link,
                     kinova_left_base_link, kl_bl_base_distance_pid_controller_signal,
                     fd_solver_robile_output_external_wrench_kl);
+
+    // printf("kl_wrench: ");
+    // print_array(fd_solver_robile_output_external_wrench_kl, 6);
 
     transform_wrench2(&robot, kinova_left_base_link, base_link,
                       fd_solver_robile_output_external_wrench_kl,
                       fd_solver_robile_output_external_wrench_kl);
 
+    // printf("kl_wrench: ");
+    // print_array(fd_solver_robile_output_external_wrench_kl, 6);
+
     double fd_solver_robile_output_external_wrench_kr[6]{};
-    decomposeSignal(&robot, kinova_right_base_link, kinova_right_bracelet_link,
+    decomposeSignal(&robot, kinova_right_bracelet_link, kinova_right_base_link,
                     kinova_right_base_link, kr_bl_base_distance_pid_controller_signal,
                     fd_solver_robile_output_external_wrench_kr);
+
+    // printf("kr_wrench: ");
+    // print_array(fd_solver_robile_output_external_wrench_kr, 6);
 
     transform_wrench2(&robot, kinova_right_base_link, base_link,
                       fd_solver_robile_output_external_wrench_kr,
                       fd_solver_robile_output_external_wrench_kr);
 
-    std::cout << std::endl;
+    // printf("kr_wrench: ");
+    // print_array(fd_solver_robile_output_external_wrench_kr, 6);
 
     // solvers
     // fd solver
@@ -1092,8 +1107,6 @@ int main()
     double plat_force[3] = {fd_solver_robile_platform_wrench[0],
                             fd_solver_robile_platform_wrench[1],
                             fd_solver_robile_platform_wrench[5]};
-
-    // double plat_force[3] = {0.0, -200.0, 0.0};
 
     std::cout << "plat_force: ";
     print_array(plat_force, 3);

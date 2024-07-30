@@ -1,9 +1,4 @@
-extern "C"
-{
-#include "kelo_motion_control/EthercatCommunication.h"
-#include "kelo_motion_control/KeloMotionControl.h"
 #include "kelo_motion_control/mediator.h"
-}
 #include <array>
 #include <string>
 #include <filesystem>
@@ -20,8 +15,13 @@ volatile sig_atomic_t flag = 0;
 
 void handle_signal(int sig)
 {
-  flag = 1;
-  printf("Caught signal %d\n", sig);
+  static int signal_caught = 0;
+  if (!signal_caught)
+  {
+    signal_caught = 1;
+    flag = 1;
+    printf("Caught signal %d (%s)\n", sig, strsignal(sig));
+  }
 }
 
 int main()
@@ -84,7 +84,7 @@ int main()
   std::string robot_urdf = (path.parent_path().parent_path() / "urdf" / "freddy.urdf").string();
 
   char ethernet_interface[100] = "eno1";
-  initialize_robot(&robot, robot_urdf, ethernet_interface);
+  initialize_robot(&robot, robot_urdf, ethernet_interface, true);
 
   const double desired_frequency = 1000.0;                                             // Hz
   const auto desired_period = std::chrono::duration<double>(1.0 / desired_frequency);  // s
@@ -203,8 +203,8 @@ int main()
   double kr_elbow_base_base_distance_z_impedance_controller_stiffness_diag_mat[1] = {300.0};
   double kl_elbow_base_base_distance_z_impedance_controller_stiffness_diag_mat[1] = {300.0};
 
-  double kr_arm_table_contact_force_reference_value = -0.0;
-  double kl_arm_table_contact_force_reference_value = -0.0;
+  double kr_arm_table_contact_force_reference_value = -15.0;
+  double kl_arm_table_contact_force_reference_value = -15.0;
 
   double kl_bl_orientation_ang_x_pid_controller_kp = 80.0;
   double kl_bl_orientation_ang_x_pid_controller_ki = 2.9;
@@ -304,16 +304,17 @@ int main()
 
   // uc1 vars
   double arms_bl_base_distance_reference_value = 0.75;
+
   double kr_bl_base_distance = 0.0;
-  double kr_bl_base_distance_pid_controller_kp = 600.0;
-  double kr_bl_base_distance_pid_controller_ki = 7.5;
+  double kr_bl_base_distance_pid_controller_kp = 400.0;
+  double kr_bl_base_distance_pid_controller_ki = 50.5;
   double kr_bl_base_distance_pid_controller_kd = 100.0;
   double kr_bl_base_distance_pid_error_sum = 0.0;
   double kr_bl_base_distance_pid_controller_signal = 0.0;
 
   double kl_bl_base_distance = 0.0;
-  double kl_bl_base_distance_pid_controller_kp = 600.0;
-  double kl_bl_base_distance_pid_controller_ki = 7.5;
+  double kl_bl_base_distance_pid_controller_kp = 400.0;
+  double kl_bl_base_distance_pid_controller_ki = 50.5;
   double kl_bl_base_distance_pid_controller_kd = 100.0;
   double kl_bl_base_distance_pid_error_sum = 0.0;
   double kl_bl_base_distance_pid_controller_signal = 0.0;
@@ -417,7 +418,7 @@ int main()
   kl_bl_base_distance_pid_prev_error = kl_bl_base_distance_controller_error;
 
   // base wheels alignment controllers
-  double base_wheel_alignment_controller_Kp = 1.0;
+  double base_wheel_alignment_controller_Kp = 0.5;
   double base_wheel_alignment_controller_Ki = 0.75;
   double base_wheel_alignment_controller_Kd = 0.0;
 
@@ -458,31 +459,7 @@ int main()
     printf("\n");
     // printf("count: %d\n", count);
 
-    // update_base_state(robot.mobile_base->mediator->kelo_base_config,
-    //                   robot.mobile_base->mediator->ethercat_config);
     get_robot_data(&robot, *control_loop_dt);
-
-    // // print voltages and currents
-    // double kl_v, kl_c, kr_v, kr_c = 0.0;
-    // robot.kinova_left->mediator->get_arm_voltage(kl_v);
-    // robot.kinova_left->mediator->get_arm_current(kl_c);
-
-    // robot.kinova_right->mediator->get_arm_voltage(kr_v);
-    // robot.kinova_right->mediator->get_arm_current(kr_c);
-
-    // double wheel_voltages[8]{};
-    // double wheel_currents[8]{};
-
-    // get_kelo_wheel_voltages_and_currents(robot.mobile_base->mediator->kelo_base_config,
-    //                                      robot.mobile_base->mediator->ethercat_config,
-    //                                      wheel_voltages, wheel_currents);
-
-    // printf("kl: v: %f, c: %f\n", kl_v, kl_c);
-    // printf("kr: v: %f, c: %f\n", kr_v, kr_c);
-    // printf("wheels v: ");
-    // print_array(wheel_voltages, 8);
-    // printf("wheels c: ");
-    // print_array(wheel_currents, 8);
 
     KDL::Frame base_to_world;
     base_to_world.p = KDL::Vector(robot.mobile_base->state->x_platform[0],
@@ -667,10 +644,6 @@ int main()
     // transform from base to world
     KDL::Vector kr_bl_position_coord_lin_y_world =
         base_to_world * KDL::Vector(0.0, kr_bl_position_coord_lin_y, 0.0);
-
-    // std::cout << "kr_bl_position_coord_lin_world: " << kr_bl_position_coord_lin_y_world
-    //           << std::endl;
-
     kr_bl_position_coord_lin_y = kr_bl_position_coord_lin_y_world.y();
 
     double kr_bl_position_lin_y_pid_controller_error = 0;
@@ -770,7 +743,7 @@ int main()
                          kr_bl_base_distance_controller_error);
     pidController(kr_bl_base_distance_controller_error, kr_bl_base_distance_pid_controller_kp,
                   kr_bl_base_distance_pid_controller_ki, kr_bl_base_distance_pid_controller_kd,
-                  *control_loop_dt, kr_bl_base_distance_pid_error_sum, 20.0,
+                  *control_loop_dt, kr_bl_base_distance_pid_error_sum, 50.0,
                   kr_bl_base_distance_pid_prev_error, kr_bl_base_distance_pid_controller_signal);
     // impedanceController(
     //     kr_bl_base_distance_impedance_controller_stiffness_error, 0.0,
@@ -789,7 +762,7 @@ int main()
                          kl_bl_base_distance_controller_error);
     pidController(kl_bl_base_distance_controller_error, kl_bl_base_distance_pid_controller_kp,
                   kl_bl_base_distance_pid_controller_ki, kl_bl_base_distance_pid_controller_kd,
-                  *control_loop_dt, kl_bl_base_distance_pid_error_sum, 20.0,
+                  *control_loop_dt, kl_bl_base_distance_pid_error_sum, 50.0,
                   kl_bl_base_distance_pid_prev_error, kl_bl_base_distance_pid_controller_signal);
     // impedanceController(
     //     kl_bl_base_distance_impedance_controller_stiffness_error, 0.0,
@@ -969,38 +942,40 @@ int main()
       }
     }
 
+    std::cout << "dists: " << kl_bl_base_distance << ", " << kr_bl_base_distance << std::endl;
+
     // uc1 embed maps
     double fd_solver_robile_output_external_wrench_kl[6]{};
     decomposeSignal(&robot, kinova_left_base_link, kinova_left_bracelet_link,
-                    kinova_left_base_link, kl_bl_base_distance_pid_controller_signal,
+                    kinova_left_bracelet_link, kl_bl_base_distance_pid_controller_signal,
                     fd_solver_robile_output_external_wrench_kl);
 
-    // std::cout << "kl_wrench: ";
+    // printf("kl_wrench: ");
     // print_array(fd_solver_robile_output_external_wrench_kl, 6);
 
-    transform_wrench2(&robot, kinova_left_base_link, base_link,
+    transform_wrench2(&robot, kinova_left_bracelet_link, base_link,
                       fd_solver_robile_output_external_wrench_kl,
                       fd_solver_robile_output_external_wrench_kl);
 
-    // std::cout << "kl_wrench t: ";
+    // printf("kl_wrench: ");
     // print_array(fd_solver_robile_output_external_wrench_kl, 6);
 
     double fd_solver_robile_output_external_wrench_kr[6]{};
     decomposeSignal(&robot, kinova_right_base_link, kinova_right_bracelet_link,
-                    kinova_right_base_link, kr_bl_base_distance_pid_controller_signal,
+                    kinova_right_bracelet_link, kr_bl_base_distance_pid_controller_signal,
                     fd_solver_robile_output_external_wrench_kr);
 
-    // std::cout << "\nkr_wrench: ";
+    // printf("kr_wrench: ");
     // print_array(fd_solver_robile_output_external_wrench_kr, 6);
 
-    transform_wrench2(&robot, kinova_right_base_link, base_link,
+    transform_wrench2(&robot, kinova_right_bracelet_link, base_link,
                       fd_solver_robile_output_external_wrench_kr,
                       fd_solver_robile_output_external_wrench_kr);
 
-    // std::cout << "kr_wrench t: ";
+    // printf("kr_wrench: ");
     // print_array(fd_solver_robile_output_external_wrench_kr, 6);
 
-    std::cout << std::endl;
+    // std::cout << std::endl;
 
     // solvers
     // fd solver
@@ -1027,7 +1002,7 @@ int main()
 
     double base_wheel_alignment_controller_kp[4] = {
         base_wheel_alignment_controller_Kp, base_wheel_alignment_controller_Kp,
-        1.5 * base_wheel_alignment_controller_Kp, base_wheel_alignment_controller_Kp};
+        2.0 * base_wheel_alignment_controller_Kp, base_wheel_alignment_controller_Kp};
     double base_wheel_alignment_controller_ki[4] = {
         base_wheel_alignment_controller_Ki, base_wheel_alignment_controller_Ki,
         2.0 * base_wheel_alignment_controller_Ki, base_wheel_alignment_controller_Ki};
@@ -1095,8 +1070,8 @@ int main()
     double alignment_taus[robot.mobile_base->mediator->kelo_base_config->nWheels]{};
     for (size_t i = 0; i < robot.mobile_base->mediator->kelo_base_config->nWheels; i++)
     {
-      alignment_taus[i] =
-          wheel_alignment_lin_signals[i] * lin_force_weight + wheel_alignment_ang_signals[i] * moment_weight;
+      alignment_taus[i] = wheel_alignment_lin_signals[i] * lin_force_weight +
+                          wheel_alignment_ang_signals[i] * moment_weight;
     }
 
     double tau_wheel_ref[robot.mobile_base->mediator->kelo_base_config->nWheels * 2]{};
@@ -1107,7 +1082,7 @@ int main()
     }
 
     base_fd_solver(&robot, plat_force, fd_solver_robile_output_torques);
-    
+
     for (size_t i = 0; i < robot.mobile_base->mediator->kelo_base_config->nWheels * 2; i++)
     {
       fd_solver_robile_output_torques[i] += tau_wheel_ref[i];
@@ -1281,6 +1256,7 @@ int main()
     // set torques
     if (count > 1)
     {
+      // raise(SIGINT);
       set_mobile_base_torques(&robot, fd_solver_robile_output_torques);
     }
     set_manipulator_torques(&robot, kinova_left_base_link, &kinova_left_cmd_tau_kdl);
@@ -1296,7 +1272,7 @@ int main()
       elapsed_time = std::chrono::duration<double>(end_time - start_time);
     }
     control_loop_timestep = elapsed_time.count();
-    std::cout << "control loop timestep: " << control_loop_timestep << std::endl;
+    // std::cout << "control loop timestep: " << control_loop_timestep << std::endl;
   }
 
   free_robot_data(&robot);

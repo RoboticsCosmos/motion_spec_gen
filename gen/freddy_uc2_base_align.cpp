@@ -276,16 +276,16 @@ int main()
   double kr_bl_orientation_coord_ang_z_initial_vector[6] = {0, 0, 0, 0, 0, 1};
 
   // uc1 vars
-  double arms_bl_base_distance_reference_value = 0.8;
+  double arms_bl_base_distance_reference_value = 0.6;
   double kr_bl_base_distance = 0.0;
-  double kr_bl_base_distance_pid_controller_kp = 300.0;
+  double kr_bl_base_distance_pid_controller_kp = 1500.0;
   double kr_bl_base_distance_pid_controller_ki = 7.5;
   double kr_bl_base_distance_pid_controller_kd = 100.0;
   double kr_bl_base_distance_pid_error_sum = 0.0;
   double kr_bl_base_distance_pid_controller_signal = 0.0;
 
   double kl_bl_base_distance = 0.0;
-  double kl_bl_base_distance_pid_controller_kp = 300.0;
+  double kl_bl_base_distance_pid_controller_kp = 1500.0;
   double kl_bl_base_distance_pid_controller_ki = 7.5;
   double kl_bl_base_distance_pid_controller_kd = 100.0;
   double kl_bl_base_distance_pid_error_sum = 0.0;
@@ -389,8 +389,8 @@ int main()
   kl_bl_base_distance_pid_prev_error = kl_bl_base_distance_controller_error;
 
   // base wheels alignment controllers
-  double base_wheel_alignment_controller_Kp = 1.0;
-  double base_wheel_alignment_controller_Ki = 0.5;
+  double base_wheel_alignment_controller_Kp = 3.0;
+  double base_wheel_alignment_controller_Ki = 0.85;
   double base_wheel_alignment_controller_Kd = 0.0;
 
   double base_w1_lin_prev_error = 0.0;
@@ -819,9 +819,9 @@ int main()
     std::cout << "kl_wrench: ";
     print_array(fd_solver_robile_output_external_wrench_kl, 6);
 
-    double kl_bl_table_wrench_at_base[6]{};
-    transform_wrench2(&robot, kinova_left_bracelet_link, base_link,
-                      fd_solver_robile_output_external_wrench_kl, kl_bl_table_wrench_at_base);
+    // double kl_bl_table_wrench_at_base[6]{};
+    // transform_wrench2(&robot, kinova_left_bracelet_link, base_link,
+    //                   fd_solver_robile_output_external_wrench_kl, kl_bl_table_wrench_at_base);
 
     // std::cout << "kl_wrench at base: ";
     // print_array(kl_bl_table_wrench_at_base, 6);
@@ -834,9 +834,9 @@ int main()
     std::cout << "kr_wrench: ";
     print_array(fd_solver_robile_output_external_wrench_kr, 6);
 
-    double kr_bl_table_wrench_at_base[6]{};
-    transform_wrench2(&robot, kinova_right_bracelet_link, base_link,
-                      fd_solver_robile_output_external_wrench_kr, kr_bl_table_wrench_at_base);
+    // double kr_bl_table_wrench_at_base[6]{};
+    // transform_wrench2(&robot, kinova_right_bracelet_link, base_link,
+    //                   fd_solver_robile_output_external_wrench_kr, kr_bl_table_wrench_at_base);
 
     // std::cout << "kr_wrench at base: ";
     // print_array(kr_bl_table_wrench_at_base, 6);
@@ -844,20 +844,20 @@ int main()
     // uc1 embed maps
     double kl_uc1_wrench[6]{};
     decomposeSignal(&robot, kinova_left_base_link, kinova_left_bracelet_link,
-                    kinova_left_base_link, kl_bl_base_distance_pid_controller_signal,
+                    kinova_left_bracelet_link, kl_bl_base_distance_pid_controller_signal,
                     kl_uc1_wrench);
 
-    transform_wrench2(&robot, kinova_left_base_link, base_link, kl_uc1_wrench, kl_uc1_wrench);
+    transform_wrench2(&robot, kinova_left_bracelet_link, base_link, kl_uc1_wrench, kl_uc1_wrench);
 
     // std::cout << "kl_uc1_wrench: ";
     // print_array(kl_uc1_wrench, 6);
 
     double kr_uc1_wrench[6]{};
     decomposeSignal(&robot, kinova_right_base_link, kinova_right_bracelet_link,
-                    kinova_right_base_link, kr_bl_base_distance_pid_controller_signal,
+                    kinova_right_bracelet_link, kr_bl_base_distance_pid_controller_signal,
                     kr_uc1_wrench);
 
-    transform_wrench2(&robot, kinova_right_base_link, base_link, kr_uc1_wrench, kr_uc1_wrench);
+    transform_wrench2(&robot, kinova_right_bracelet_link, base_link, kr_uc1_wrench, kr_uc1_wrench);
 
     // std::cout << "kr_uc1_wrench: ";
     // print_array(kr_uc1_wrench, 6);
@@ -869,8 +869,8 @@ int main()
     add(kr_uc1_wrench, base_wrench, base_wrench, 6);
     double plat_force[3] = {base_wrench[0], base_wrench[1], base_wrench[5]};
 
-    // std::cout << "plat_force: ";
-    // print_array(plat_force, 3);
+    std::cout << "plat_force: ";
+    print_array(plat_force, 3);
 
     double lin_offsets[robot.mobile_base->mediator->kelo_base_config->nWheels];
     double ang_offsets[robot.mobile_base->mediator->kelo_base_config->nWheels];
@@ -1109,7 +1109,7 @@ int main()
     KDL::JntArray kinova_left_cmd_tau_kdl(7);
     cap_and_convert_manipulator_torques(kinova_left_cmd_tau, 7, kinova_left_cmd_tau_kdl);
 
-    double base_tau_limit = 5.0;
+    double base_tau_limit = 3.0;
     for (size_t i = 0; i < 8; i++)
     {
       if (fd_solver_robile_output_torques[i] > base_tau_limit)
