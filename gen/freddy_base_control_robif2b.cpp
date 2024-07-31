@@ -369,8 +369,8 @@ int main(int argc, char **argv)
 
     for (size_t i = 0; i < 4; i++)
     {
-      state.kelo_cmd.trq[2 * i] = -tau_wheel_c[2 * i];
-      state.kelo_cmd.trq[2 * i + 1] = tau_wheel_c[2 * i + 1];
+      state.kelo_cmd.trq[2 * i + 1] = tau_wheel_c[2 * i];
+      state.kelo_cmd.trq[2 * i]     = tau_wheel_c[2 * i + 1];
     }
 
     if (count > 2)

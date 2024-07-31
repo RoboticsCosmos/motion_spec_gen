@@ -219,10 +219,17 @@ int main(int argc, char **argv)
 
     printf("\n");
 
+    double base_taus[8]{};
+    for (size_t i = 0; i < 4; i++)
+    {
+      base_taus[2 * i]     = -tau_wheel_c[2 * i];
+      base_taus[2 * i + 1] = tau_wheel_c[2 * i + 1];
+    }
+
     if (count > 2)
     {
       // raise(SIGINT);
-      set_mobile_base_torques(&robot, tau_wheel_c);
+      set_mobile_base_torques(&robot, base_taus);
     }
 
     auto end_time = std::chrono::high_resolution_clock::now();

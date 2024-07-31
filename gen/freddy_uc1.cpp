@@ -11,8 +11,6 @@
 #include <kinova_mediator/mediator.hpp>
 #include <csignal>
 
-#include "motion_spec_utils/log_structs.hpp"
-
 volatile sig_atomic_t flag = 0;
 
 void handle_signal(int sig)
@@ -26,7 +24,7 @@ void handle_signal(int sig)
   }
 }
 
-int main(int argc, char **argv)
+int main()
 {
   // handle signals
   struct sigaction sa;
@@ -40,18 +38,6 @@ int main(int argc, char **argv)
     {
       perror("sigaction");
     }
-  }
-
-  // read the run description from the command line
-  std::string run_description = "";
-  if (argc > 1)
-  {
-    run_description = argv[1];
-  }
-  else
-  {
-    printf("Usage: ./freddy_uc1_log <run_description>\n");
-    exit(1);
   }
 
   // Initialize the robot structs
@@ -98,8 +84,8 @@ int main(int argc, char **argv)
   std::string robot_urdf = (path.parent_path().parent_path() / "urdf" / "freddy.urdf").string();
 
   char ethernet_interface[100] = "eno1";
-  initialize_robot(&robot, robot_urdf, ethernet_interface);
-  
+  initialize_robot(&robot, robot_urdf, ethernet_interface, true);
+
   const double desired_frequency = 1000.0;                                             // Hz
   const auto desired_period = std::chrono::duration<double>(1.0 / desired_frequency);  // s
   double control_loop_timestep = desired_period.count();                               // s
@@ -338,24 +324,6 @@ int main(int argc, char **argv)
   double kr_bl_base_distance_pid_prev_error = 0.0;
   double kl_bl_base_distance_pid_prev_error = 0.0;
 
-  // log structs
-  std::string log_dir = "../../logs/data/freddy_uc1_log";
-  char log_dir_name[100];
-  get_new_folder_name(log_dir.c_str(), log_dir_name);
-  std::filesystem::create_directories(log_dir_name);
-  std::filesystem::permissions(log_dir_name, std::filesystem::perms::all);
-
-  // write the run description to a .md file
-  std::string run_description_file = log_dir_name;
-  run_description_file += "/run_description.md";
-  std::ofstream run_description_file_stream(run_description_file);
-  run_description_file_stream << run_description;
-  run_description_file_stream.close();
-
-  LogManipulatorDataVector kr_log_data_vec("kinova_right", log_dir_name);
-  LogManipulatorDataVector kl_log_data_vec("kinova_left", log_dir_name);
-  LogMobileBaseDataVector base_log_data_vec(log_dir_name);
-
   // explicitly referesh the robot data
   robot.kinova_left->mediator->refresh_feedback();
   robot.kinova_right->mediator->refresh_feedback();
@@ -474,11 +442,6 @@ int main(int argc, char **argv)
   double base_w3_ang_error_sum = 0.0;
   double base_w4_ang_error_sum = 0.0;
 
-  double kr_achd_solver_beta[6]{};
-  double kl_achd_solver_beta[6]{};
-  double kinova_right_cmd_tau[7]{};
-  double kinova_left_cmd_tau[7]{};
-
   int count = 0;
 
   while (true)
@@ -487,23 +450,14 @@ int main(int argc, char **argv)
 
     if (flag)
     {
-      kr_log_data_vec.addManipulatorData(robot.kinova_right, kr_achd_solver_beta,
-                                          kinova_right_cmd_tau, nullptr);
-      kl_log_data_vec.addManipulatorData(robot.kinova_left, kl_achd_solver_beta,
-                                            kinova_left_cmd_tau, nullptr);
-      base_log_data_vec.addMobileBaseData(robot.mobile_base, robot.mobile_base->state->x_platform,
-                                            robot.mobile_base->state->xd_platform);
-      kr_log_data_vec.writeToOpenFile();
-      kl_log_data_vec.writeToOpenFile();
-      base_log_data_vec.writeToOpenFile();
-
       free_robot_data(&robot);
       printf("Exiting somewhat cleanly...\n");
       exit(0);
     }
 
     count++;
-    printf("count: %d\n", count);
+    printf("\n");
+    // printf("count: %d\n", count);
 
     get_robot_data(&robot, *control_loop_dt);
 
@@ -936,26 +890,40 @@ int main(int argc, char **argv)
       }
     }
 
+    std::cout << "dists: " << kl_bl_base_distance << ", " << kr_bl_base_distance << std::endl;
+
     // uc1 embed maps
     double fd_solver_robile_output_external_wrench_kl[6]{};
     decomposeSignal(&robot, kinova_left_base_link, kinova_left_bracelet_link,
                     kinova_left_bracelet_link, kl_bl_base_distance_pid_controller_signal,
                     fd_solver_robile_output_external_wrench_kl);
 
+    // printf("kl_wrench: ");
+    // print_array(fd_solver_robile_output_external_wrench_kl, 6);
+
     transform_wrench2(&robot, kinova_left_bracelet_link, base_link,
                       fd_solver_robile_output_external_wrench_kl,
                       fd_solver_robile_output_external_wrench_kl);
+
+    // printf("kl_wrench: ");
+    // print_array(fd_solver_robile_output_external_wrench_kl, 6);
 
     double fd_solver_robile_output_external_wrench_kr[6]{};
     decomposeSignal(&robot, kinova_right_base_link, kinova_right_bracelet_link,
                     kinova_right_bracelet_link, kr_bl_base_distance_pid_controller_signal,
                     fd_solver_robile_output_external_wrench_kr);
 
+    // printf("kr_wrench: ");
+    // print_array(fd_solver_robile_output_external_wrench_kr, 6);
+
     transform_wrench2(&robot, kinova_right_bracelet_link, base_link,
                       fd_solver_robile_output_external_wrench_kr,
                       fd_solver_robile_output_external_wrench_kr);
 
-    std::cout << std::endl;
+    // printf("kr_wrench: ");
+    // print_array(fd_solver_robile_output_external_wrench_kr, 6);
+
+    // std::cout << std::endl;
 
     // solvers
     // fd solver
@@ -966,9 +934,10 @@ int main(int argc, char **argv)
     add(fd_solver_robile_output_external_wrench_kr, fd_solver_robile_platform_wrench,
         fd_solver_robile_platform_wrench, 6);
     double plat_force[3] = {fd_solver_robile_platform_wrench[0],
-                            fd_solver_robile_platform_wrench[1] * 0,
-                            fd_solver_robile_platform_wrench[5] * 0};
+                            fd_solver_robile_platform_wrench[1],
+                            fd_solver_robile_platform_wrench[5]};
 
+    // double plat_force[3] = {-300.0, 0.0, 0.0};
     std::cout << "plat_force: ";
     print_array(plat_force, 3);
 
@@ -1027,6 +996,9 @@ int main(int argc, char **argv)
                                              base_w3_lin_signal, base_w4_lin_signal};
     double wheel_alignment_ang_signals[4] = {base_w1_ang_signal, base_w2_ang_signal,
                                              base_w3_ang_signal, base_w4_ang_signal};
+
+    // base_fd_solver_with_alignment(&robot, plat_force, wheel_alignment_lin_signals,
+    //                               wheel_alignment_ang_signals, fd_solver_robile_output_torques);
 
     Eigen::Vector2d lin_pf = Eigen::Vector2d(plat_force[0], plat_force[1]);
 
@@ -1229,16 +1201,10 @@ int main(int argc, char **argv)
       }
     }
 
-    kr_log_data_vec.addManipulatorData(robot.kinova_right, kr_achd_solver_beta,
-                                        kinova_right_cmd_tau, nullptr);
-    kl_log_data_vec.addManipulatorData(robot.kinova_left, kl_achd_solver_beta,
-                                          kinova_left_cmd_tau, nullptr);
-    base_log_data_vec.addMobileBaseData(robot.mobile_base, robot.mobile_base->state->x_platform,
-                                          robot.mobile_base->state->xd_platform);
-
     // set torques
     if (count > 1)
     {
+      // raise(SIGINT);
       set_mobile_base_torques(&robot, fd_solver_robile_output_torques);
     }
     set_manipulator_torques(&robot, kinova_left_base_link, &kinova_left_cmd_tau_kdl);
