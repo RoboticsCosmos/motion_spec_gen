@@ -966,8 +966,8 @@ int main(int argc, char **argv)
     add(fd_solver_robile_output_external_wrench_kr, fd_solver_robile_platform_wrench,
         fd_solver_robile_platform_wrench, 6);
     double plat_force[3] = {fd_solver_robile_platform_wrench[0],
-                            fd_solver_robile_platform_wrench[1] * 0,
-                            fd_solver_robile_platform_wrench[5] * 0};
+                            fd_solver_robile_platform_wrench[1],
+                            fd_solver_robile_platform_wrench[5]};
 
     std::cout << "plat_force: ";
     print_array(plat_force, 3);
