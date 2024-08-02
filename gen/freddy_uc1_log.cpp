@@ -99,7 +99,7 @@ int main(int argc, char **argv)
 
   char ethernet_interface[100] = "eno1";
   initialize_robot(&robot, robot_urdf, ethernet_interface);
-  
+
   const double desired_frequency = 1000.0;                                             // Hz
   const auto desired_period = std::chrono::duration<double>(1.0 / desired_frequency);  // s
   double control_loop_timestep = desired_period.count();                               // s
@@ -352,9 +352,9 @@ int main(int argc, char **argv)
   run_description_file_stream << run_description;
   run_description_file_stream.close();
 
-  LogManipulatorDataVector kr_log_data_vec("kinova_right", log_dir_name);
-  LogManipulatorDataVector kl_log_data_vec("kinova_left", log_dir_name);
-  LogMobileBaseDataVector base_log_data_vec(log_dir_name);
+  LogManipulatorDataVector kr_log_data_vec("kinova_right", log_dir_name, 1);
+  LogManipulatorDataVector kl_log_data_vec("kinova_left", log_dir_name, 2);
+  LogMobileBaseDataVector base_log_data_vec(log_dir_name, 3);
 
   // explicitly referesh the robot data
   robot.kinova_left->mediator->refresh_feedback();
@@ -487,12 +487,6 @@ int main(int argc, char **argv)
 
     if (flag)
     {
-      kr_log_data_vec.addManipulatorData(robot.kinova_right, kr_achd_solver_beta,
-                                          kinova_right_cmd_tau, nullptr);
-      kl_log_data_vec.addManipulatorData(robot.kinova_left, kl_achd_solver_beta,
-                                            kinova_left_cmd_tau, nullptr);
-      base_log_data_vec.addMobileBaseData(robot.mobile_base, robot.mobile_base->state->x_platform,
-                                            robot.mobile_base->state->xd_platform);
       kr_log_data_vec.writeToOpenFile();
       kl_log_data_vec.writeToOpenFile();
       base_log_data_vec.writeToOpenFile();
@@ -1230,11 +1224,12 @@ int main(int argc, char **argv)
     }
 
     kr_log_data_vec.addManipulatorData(robot.kinova_right, kr_achd_solver_beta,
-                                        kinova_right_cmd_tau, nullptr);
-    kl_log_data_vec.addManipulatorData(robot.kinova_left, kl_achd_solver_beta,
-                                          kinova_left_cmd_tau, nullptr);
+                                       kinova_right_cmd_tau, nullptr);
+    kl_log_data_vec.addManipulatorData(robot.kinova_left, kl_achd_solver_beta, kinova_left_cmd_tau,
+                                       nullptr);
     base_log_data_vec.addMobileBaseData(robot.mobile_base, robot.mobile_base->state->x_platform,
-                                          robot.mobile_base->state->xd_platform);
+                                        robot.mobile_base->state->xd_platform, plat_force,
+                                        fd_solver_robile_output_torques);
 
     // set torques
     if (count > 1)

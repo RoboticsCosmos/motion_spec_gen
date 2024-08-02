@@ -324,9 +324,9 @@ int main(int argc, char **argv)
   run_description_file_stream << run_description;
   run_description_file_stream.close();
 
-  LogManipulatorDataVector kr_log_data_vec("kinova_right", log_dir_name);
-  LogManipulatorDataVector kl_log_data_vec("kinova_left", log_dir_name);
-  LogMobileBaseDataVector base_log_data_vec(log_dir_name);
+  LogManipulatorDataVector kr_log_data_vec("kinova_right", log_dir_name, 1);
+  LogManipulatorDataVector kl_log_data_vec("kinova_left", log_dir_name, 2);
+  LogMobileBaseDataVector base_log_data_vec(log_dir_name, 3);
 
   // explicitly referesh the robot data
   robot.kinova_left->mediator->refresh_feedback();
@@ -458,12 +458,6 @@ int main(int argc, char **argv)
 
     if (flag)
     {
-      kr_log_data_vec.addManipulatorData(robot.kinova_right, kr_achd_solver_beta,
-                                         kinova_right_cmd_tau, nullptr);
-      kl_log_data_vec.addManipulatorData(robot.kinova_left, kl_achd_solver_beta,
-                                         kinova_left_cmd_tau, nullptr);
-      base_log_data_vec.addMobileBaseData(robot.mobile_base, robot.mobile_base->state->x_platform,
-                                          robot.mobile_base->state->xd_platform);
       kr_log_data_vec.writeToOpenFile();
       kl_log_data_vec.writeToOpenFile();
       base_log_data_vec.writeToOpenFile();
@@ -1137,11 +1131,13 @@ int main(int argc, char **argv)
     }
 
     kr_log_data_vec.addManipulatorData(robot.kinova_right, kr_achd_solver_beta,
-                                        kinova_right_cmd_tau, fd_solver_robile_output_external_wrench_kr);
-    kl_log_data_vec.addManipulatorData(robot.kinova_left, kl_achd_solver_beta,
-                                          kinova_left_cmd_tau, fd_solver_robile_output_external_wrench_kl);
+                                       kinova_right_cmd_tau,
+                                       fd_solver_robile_output_external_wrench_kr);
+    kl_log_data_vec.addManipulatorData(robot.kinova_left, kl_achd_solver_beta, kinova_left_cmd_tau,
+                                       fd_solver_robile_output_external_wrench_kl);
     base_log_data_vec.addMobileBaseData(robot.mobile_base, robot.mobile_base->state->x_platform,
-                                          robot.mobile_base->state->xd_platform);
+                                        robot.mobile_base->state->xd_platform, plat_force,
+                                        fd_solver_robile_output_torques);
 
     // set torques
     if (count > 1)

@@ -99,7 +99,7 @@ int main(int argc, char **argv)
 
   char ethernet_interface[100] = "eno1";
   initialize_robot(&robot, robot_urdf, ethernet_interface, false);
-  
+
   const double desired_frequency = 1000.0;                                             // Hz
   const auto desired_period = std::chrono::duration<double>(1.0 / desired_frequency);  // s
   double control_loop_timestep = desired_period.count();                               // s
@@ -343,8 +343,9 @@ int main(int argc, char **argv)
   char log_dir_name[100];
   get_new_folder_name(log_dir.c_str(), log_dir_name);
   std::filesystem::create_directories(log_dir_name);
-  std::filesystem::permissions(log_dir_name, 
-    std::filesystem::perms::others_all | std::filesystem::perms::group_all | std::filesystem::perms::owner_all);
+  std::filesystem::permissions(log_dir_name, std::filesystem::perms::others_all |
+                                                 std::filesystem::perms::group_all |
+                                                 std::filesystem::perms::owner_all);
 
   // write the run description to a .md file
   std::string run_description_file = log_dir_name;
@@ -353,9 +354,9 @@ int main(int argc, char **argv)
   run_description_file_stream << run_description;
   run_description_file_stream.close();
 
-  LogManipulatorDataVector kr_log_data_vec("kinova_right", log_dir_name);
-  LogManipulatorDataVector kl_log_data_vec("kinova_left", log_dir_name);
-  LogMobileBaseDataVector base_log_data_vec(log_dir_name);
+  LogManipulatorDataVector kr_log_data_vec("kinova_right", log_dir_name, 1);
+  LogManipulatorDataVector kl_log_data_vec("kinova_left", log_dir_name, 2);
+  LogMobileBaseDataVector base_log_data_vec(log_dir_name, 3);
 
   // explicitly referesh the robot data
   robot.kinova_left->mediator->refresh_feedback();
@@ -490,12 +491,6 @@ int main(int argc, char **argv)
 
     if (flag)
     {
-      kr_log_data_vec.addManipulatorData(robot.kinova_right, kr_achd_solver_beta,
-                                          kinova_right_cmd_tau, nullptr);
-      kl_log_data_vec.addManipulatorData(robot.kinova_left, kl_achd_solver_beta,
-                                            kinova_left_cmd_tau, nullptr);
-      base_log_data_vec.addMobileBaseData(robot.mobile_base, robot.mobile_base->state->x_platform,
-                                            robot.mobile_base->state->xd_platform);
       kr_log_data_vec.writeToOpenFile();
       kl_log_data_vec.writeToOpenFile();
       base_log_data_vec.writeToOpenFile();
@@ -974,7 +969,7 @@ int main(int argc, char **argv)
     //                         fd_solver_robile_platform_wrench[1],
     //                         fd_solver_robile_platform_wrench[5]};
 
-    double plat_force[3] = {-100, 0, 0};
+    double plat_force[3] = {100, 0, 0};
 
     // std::cout << "plat_force: ";
     // print_array(plat_force, 3);
@@ -991,7 +986,7 @@ int main(int argc, char **argv)
         2.0 * base_wheel_alignment_controller_Kp, base_wheel_alignment_controller_Kp};
     double base_wheel_alignment_controller_ki[4] = {
         base_wheel_alignment_controller_Ki, base_wheel_alignment_controller_Ki,
-        2.0 * base_wheel_alignment_controller_Ki, base_wheel_alignment_controller_Ki};
+        4.0 * base_wheel_alignment_controller_Ki, base_wheel_alignment_controller_Ki};
     double base_wheel_alignment_controller_kd[4] = {
         base_wheel_alignment_controller_Kd, base_wheel_alignment_controller_Kd,
         base_wheel_alignment_controller_Kd, base_wheel_alignment_controller_Kd};
@@ -1064,24 +1059,29 @@ int main(int argc, char **argv)
       tau_wheel_ref[2 * i + 1] = -alignment_taus[i];
     }
 
-    for (size_t i = 0; i < robot.mobile_base->mediator->kelo_base_config->nWheels * 2; i++)
-    {
-      if (tau_wheel_ref[i] > tau_wheel_ref_limit)
-      {
-        tau_wheel_ref[i] = tau_wheel_ref_limit;
-      }
-      else if (tau_wheel_ref[i] < -tau_wheel_ref_limit)
-      {
-        tau_wheel_ref[i] = -tau_wheel_ref_limit;
-      }
-    }
+    // for (size_t i = 0; i < robot.mobile_base->mediator->kelo_base_config->nWheels * 2; i++)
+    // {
+    //   // skip 3rd wheel
+    //   if (i == 2)
+    //   {
+    //     continue;
+    //   }
+    //   if (tau_wheel_ref[i] > tau_wheel_ref_limit)
+    //   {
+    //     tau_wheel_ref[i] = tau_wheel_ref_limit;
+    //   }
+    //   else if (tau_wheel_ref[i] < -tau_wheel_ref_limit)
+    //   {
+    //     tau_wheel_ref[i] = -tau_wheel_ref_limit;
+    //   }
+    // }
 
     base_fd_solver(&robot, plat_force, fd_solver_robile_output_torques);
 
-    for (size_t i = 0; i < robot.mobile_base->mediator->kelo_base_config->nWheels * 2; i++)
-    {
-      fd_solver_robile_output_torques[i] += tau_wheel_ref[i];
-    }
+    // for (size_t i = 0; i < robot.mobile_base->mediator->kelo_base_config->nWheels * 2; i++)
+    // {
+    //   fd_solver_robile_output_torques[i] += tau_wheel_ref[i];
+    // }
 
     // achd_solver_fext
     double kl_achd_solver_fext_ext_wrenches[7][6];
@@ -1249,11 +1249,12 @@ int main(int argc, char **argv)
     }
 
     kr_log_data_vec.addManipulatorData(robot.kinova_right, kr_achd_solver_beta,
-                                        kinova_right_cmd_tau, nullptr);
-    kl_log_data_vec.addManipulatorData(robot.kinova_left, kl_achd_solver_beta,
-                                          kinova_left_cmd_tau, nullptr);
+                                       kinova_right_cmd_tau, nullptr);
+    kl_log_data_vec.addManipulatorData(robot.kinova_left, kl_achd_solver_beta, kinova_left_cmd_tau,
+                                       nullptr);
     base_log_data_vec.addMobileBaseData(robot.mobile_base, robot.mobile_base->state->x_platform,
-                                          robot.mobile_base->state->xd_platform);
+                                        robot.mobile_base->state->xd_platform, plat_force,
+                                        fd_solver_robile_output_torques);
 
     // set torques
     if (count > 1)

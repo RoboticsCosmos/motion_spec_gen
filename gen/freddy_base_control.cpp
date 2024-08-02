@@ -12,6 +12,8 @@
 
 #include <unsupported/Eigen/MatrixFunctions>
 
+#include "motion_spec_utils/log_structs.hpp"
+
 volatile sig_atomic_t flag = 0;
 
 void handle_signal(int sig)
@@ -96,10 +98,29 @@ int main(int argc, char **argv)
   double control_loop_timestep = desired_period.count();                               // s
   double *control_loop_dt = &control_loop_timestep;                                    // s
 
+  // log structs
+  std::string log_dir = "../../logs/data/freddy_base_control";
+  char log_dir_name[100];
+  get_new_folder_name(log_dir.c_str(), log_dir_name);
+  std::filesystem::create_directories(log_dir_name);
+  std::filesystem::permissions(log_dir_name, std::filesystem::perms::all);
+
+  LogControlDataVector log_w1_lin_ctrl_data("w1_lin_ctrl", "pid", log_dir_name, 1);
+  LogControlDataVector log_w2_lin_ctrl_data("w2_lin_ctrl", "pid", log_dir_name, 2);
+  LogControlDataVector log_w3_lin_ctrl_data("w3_lin_ctrl", "pid", log_dir_name, 3);
+  LogControlDataVector log_w4_lin_ctrl_data("w4_lin_ctrl", "pid", log_dir_name, 4);
+
+  LogControlDataVector log_w1_ang_ctrl_data("w1_ang_ctrl", "pid", log_dir_name, 5);
+  LogControlDataVector log_w2_ang_ctrl_data("w2_ang_ctrl", "pid", log_dir_name, 6);
+  LogControlDataVector log_w3_ang_ctrl_data("w3_ang_ctrl", "pid", log_dir_name, 7);
+  LogControlDataVector log_w4_ang_ctrl_data("w4_ang_ctrl", "pid", log_dir_name, 8);
+
+  LogMobileBaseDataVector base_log_data_vec(log_dir_name, 9);
+
   // pid controller variables
   double Kp = 3.0;
   double Ki = 0.5;
-  double Kd = 0.05;
+  double Kd = 0.0;
 
   double w1_lin_prev_error = 0.0;
   double w1_lin_error_sum = 0.0;
@@ -133,6 +154,13 @@ int main(int argc, char **argv)
 
     if (flag)
     {
+      log_w1_lin_ctrl_data.writeToOpenFile();
+      log_w2_lin_ctrl_data.writeToOpenFile();
+      log_w3_lin_ctrl_data.writeToOpenFile();
+      log_w4_lin_ctrl_data.writeToOpenFile();
+
+      base_log_data_vec.writeToOpenFile();
+
       printf("Exiting somewhat cleanly...\n");
       free_robot_data(&robot);
       exit(0);
@@ -142,8 +170,8 @@ int main(int argc, char **argv)
     // printf("\n");
     printf("count: %d\n", count);
 
-    // update_base_state(robot.mobile_base->mediator->kelo_base_config,
-    //                   robot.mobile_base->mediator->ethercat_config);
+    update_base_state(robot.mobile_base->mediator->kelo_base_config,
+                      robot.mobile_base->mediator->ethercat_config);
     get_robot_data(&robot, *control_loop_dt);
 
     // solver
@@ -169,24 +197,40 @@ int main(int argc, char **argv)
     double kd[4] = {Kd, Kd, Kd, Kd};
 
     pidController(lin_offsets[0], kp[0], ki[0], kd[0], control_loop_timestep, w1_lin_error_sum,
-                  10.0, w1_lin_prev_error, lin_signal_w1);
+                  5.0, w1_lin_prev_error, lin_signal_w1);
+    log_w1_lin_ctrl_data.addControlDataPID(0.0, 0.0, lin_offsets[0], lin_signal_w1, kp[0], ki[0],
+                                           kd[0], w1_lin_error_sum);
     pidController(ang_offsets[0], kp[0], ki[0], kd[0], control_loop_timestep, w1_ang_error_sum,
-                  10.0, w1_ang_prev_error, ang_signal_w1);
+                  5.0, w1_ang_prev_error, ang_signal_w1);
+    log_w1_ang_ctrl_data.addControlDataPID(0.0, 0.0, ang_offsets[0], ang_signal_w1, kp[0], ki[0],
+                                           kd[0], w1_ang_error_sum);
 
     pidController(lin_offsets[1], kp[1], ki[1], kd[1], control_loop_timestep, w2_lin_error_sum,
-                  10.0, w2_lin_prev_error, lin_signal_w2);
+                  5.0, w2_lin_prev_error, lin_signal_w2);
+    log_w2_lin_ctrl_data.addControlDataPID(0.0, 0.0, lin_offsets[1], lin_signal_w2, kp[1], ki[1],
+                                           kd[1], w2_lin_error_sum);
     pidController(ang_offsets[1], kp[1], ki[1], kd[1], control_loop_timestep, w2_ang_error_sum,
-                  10.0, w2_ang_prev_error, ang_signal_w2);
+                  5.0, w2_ang_prev_error, ang_signal_w2);
+    log_w2_ang_ctrl_data.addControlDataPID(0.0, 0.0, ang_offsets[1], ang_signal_w2, kp[1], ki[1],
+                                           kd[1], w2_ang_error_sum);
 
     pidController(lin_offsets[2], kp[2], ki[2], kd[2], control_loop_timestep, w3_lin_error_sum,
-                  10.0, w3_lin_prev_error, lin_signal_w3);
+                  5.0, w3_lin_prev_error, lin_signal_w3);
+    log_w3_lin_ctrl_data.addControlDataPID(0.0, 0.0, lin_offsets[2], lin_signal_w3, kp[2], ki[2],
+                                           kd[2], w3_lin_error_sum);
     pidController(ang_offsets[2], kp[2], ki[2], kd[2], control_loop_timestep, w3_ang_error_sum,
-                  10.0, w3_ang_prev_error, ang_signal_w3);
+                  5.0, w3_ang_prev_error, ang_signal_w3);
+    log_w3_ang_ctrl_data.addControlDataPID(0.0, 0.0, ang_offsets[2], ang_signal_w3, kp[2], ki[2],
+                                           kd[2], w3_ang_error_sum);
 
     pidController(lin_offsets[3], kp[3], ki[3], kd[3], control_loop_timestep, w4_lin_error_sum,
-                  10.0, w4_lin_prev_error, lin_signal_w4);
+                  5.0, w4_lin_prev_error, lin_signal_w4);
+    log_w4_lin_ctrl_data.addControlDataPID(0.0, 0.0, lin_offsets[3], lin_signal_w4, kp[3], ki[3],
+                                           kd[3], w4_lin_error_sum);
     pidController(ang_offsets[3], kp[3], ki[3], kd[3], control_loop_timestep, w4_ang_error_sum,
-                  10.0, w4_ang_prev_error, ang_signal_w4);
+                  5.0, w4_ang_prev_error, ang_signal_w4);
+    log_w4_ang_ctrl_data.addControlDataPID(0.0, 0.0, ang_offsets[3], ang_signal_w4, kp[3], ki[3],
+                                           kd[3], w4_ang_error_sum);
 
     double lin_signals[4] = {lin_signal_w1, lin_signal_w2, lin_signal_w3, lin_signal_w4};
     double ang_signals[4] = {ang_signal_w1, ang_signal_w2, ang_signal_w3, ang_signal_w4};
@@ -197,11 +241,9 @@ int main(int argc, char **argv)
     // base solver
     double tau_wheel_c[8]{};
     base_fd_solver_with_alignment(&robot, platform_force, lin_signals, ang_signals, tau_wheel_c);
-    printf("torques1: ");
-    print_array(tau_wheel_c, 8);
 
     // set torques
-    double tau_limit = 5.0;
+    double tau_limit = 4.0;
     for (size_t i = 0; i < 8; i++)
     {
       if (tau_wheel_c[i] > tau_limit)
@@ -214,22 +256,19 @@ int main(int argc, char **argv)
       }
     }
 
-    // printf("torques3: ");
-    // print_array(tau_wheel_c, 8);
+    printf("torques: ");
+    print_array(tau_wheel_c, 8);
 
     printf("\n");
 
-    double base_taus[8]{};
-    for (size_t i = 0; i < 4; i++)
-    {
-      base_taus[2 * i]     = -tau_wheel_c[2 * i];
-      base_taus[2 * i + 1] = tau_wheel_c[2 * i + 1];
-    }
+    base_log_data_vec.addMobileBaseData(robot.mobile_base, robot.mobile_base->state->x_platform,
+                                        robot.mobile_base->state->xd_platform, platform_force,
+                                        tau_wheel_c);
 
     if (count > 2)
     {
       // raise(SIGINT);
-      set_mobile_base_torques(&robot, base_taus);
+      set_mobile_base_torques(&robot, tau_wheel_c);
     }
 
     auto end_time = std::chrono::high_resolution_clock::now();
@@ -242,7 +281,7 @@ int main(int argc, char **argv)
       elapsed_time = std::chrono::duration<double>(end_time - start_time);
     }
     control_loop_timestep = elapsed_time.count();
-    // std::cout << "control loop timestep: " << control_loop_timestep << std::endl;
+    std::cout << "control loop timestep: " << control_loop_timestep << std::endl;
   }
 
   free_robot_data(&robot);
