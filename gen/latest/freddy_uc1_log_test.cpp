@@ -965,14 +965,12 @@ int main(int argc, char **argv)
         fd_solver_robile_platform_wrench, 6);
     add(fd_solver_robile_output_external_wrench_kr, fd_solver_robile_platform_wrench,
         fd_solver_robile_platform_wrench, 6);
-    // double plat_force[3] = {fd_solver_robile_platform_wrench[0],
-    //                         fd_solver_robile_platform_wrench[1],
-    //                         fd_solver_robile_platform_wrench[5]};
+    double plat_force[3] = {fd_solver_robile_platform_wrench[0],
+                            fd_solver_robile_platform_wrench[1],
+                            fd_solver_robile_platform_wrench[5]};
 
-    double plat_force[3] = {100, 0, 0};
-
-    // std::cout << "plat_force: ";
-    // print_array(plat_force, 3);
+    std::cout << "plat_force: ";
+    print_array(plat_force, 3);
 
     double lin_offsets[robot.mobile_base->mediator->kelo_base_config->nWheels];
     double ang_offsets[robot.mobile_base->mediator->kelo_base_config->nWheels];
@@ -986,7 +984,7 @@ int main(int argc, char **argv)
         2.0 * base_wheel_alignment_controller_Kp, base_wheel_alignment_controller_Kp};
     double base_wheel_alignment_controller_ki[4] = {
         base_wheel_alignment_controller_Ki, base_wheel_alignment_controller_Ki,
-        4.0 * base_wheel_alignment_controller_Ki, base_wheel_alignment_controller_Ki};
+        2.0 * base_wheel_alignment_controller_Ki, base_wheel_alignment_controller_Ki};
     double base_wheel_alignment_controller_kd[4] = {
         base_wheel_alignment_controller_Kd, base_wheel_alignment_controller_Kd,
         base_wheel_alignment_controller_Kd, base_wheel_alignment_controller_Kd};
@@ -1061,11 +1059,6 @@ int main(int argc, char **argv)
 
     // for (size_t i = 0; i < robot.mobile_base->mediator->kelo_base_config->nWheels * 2; i++)
     // {
-    //   // skip 3rd wheel
-    //   if (i == 2)
-    //   {
-    //     continue;
-    //   }
     //   if (tau_wheel_ref[i] > tau_wheel_ref_limit)
     //   {
     //     tau_wheel_ref[i] = tau_wheel_ref_limit;
@@ -1076,7 +1069,7 @@ int main(int argc, char **argv)
     //   }
     // }
 
-    base_fd_solver(&robot, plat_force, fd_solver_robile_output_torques);
+    // base_fd_solver(&robot, plat_force, fd_solver_robile_output_torques);
 
     // for (size_t i = 0; i < robot.mobile_base->mediator->kelo_base_config->nWheels * 2; i++)
     // {
