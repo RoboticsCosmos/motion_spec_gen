@@ -118,7 +118,7 @@ int main(int argc, char **argv)
   // LogMobileBaseDataVector base_log_data_vec(log_dir_name, 9);
 
   // pid controller variables
-  double Kp = 3.0;
+  double Kp = 6.0;
   double Ki = 0.5;
   double Kd = 0.0;
 
@@ -141,6 +141,13 @@ int main(int argc, char **argv)
   double w4_lin_error_sum = 0.0;
   double w4_ang_prev_error = 0.0;
   double w4_ang_error_sum = 0.0;
+
+  double pf_lin_x_vel_prev_error = 0.0;
+  double pf_lin_x_vel_error_sum = 0.0;
+  double pf_lin_y_vel_prev_error = 0.0;
+  double pf_lin_y_vel_error_sum = 0.0;
+  double pf_ang_z_vel_prev_error = 0.0;
+  double pf_ang_z_vel_error_sum = 0.0;
 
   update_base_state(robot.mobile_base->mediator->kelo_base_config,
                     robot.mobile_base->mediator->ethercat_config);
@@ -177,8 +184,45 @@ int main(int argc, char **argv)
     printf("odometry: ");
     print_array(robot.mobile_base->state->x_platform, 3);
 
+    // printf("encoder: ");
+    // print_array(robot.mobile_base->state->wheel_encoder_values, 8);
+
     // solver
     double platform_force[3] = {pf[0], pf[1], pf[2]};  // [N], [N], [Nm]
+
+    // damping controller on the platform velocity
+    double stiffness = 300.0;
+    double inertia = 50.0;
+    double damping = 0.0;
+    double velocity_sp = 0.1;
+    double damping_force[3] = {0.0, 0.0, 0.0};
+    
+    double vel_error[3]{};
+    computeEqualityError(robot.mobile_base->state->xd_platform[0], velocity_sp, vel_error[0]);
+    computeEqualityError(robot.mobile_base->state->xd_platform[1], velocity_sp, vel_error[1]);
+    computeEqualityError(robot.mobile_base->state->xd_platform[2], velocity_sp, vel_error[2]);
+
+    pidController(vel_error[0], stiffness, inertia, damping, control_loop_timestep,
+                  pf_lin_x_vel_error_sum, 5.0, pf_lin_x_vel_prev_error, damping_force[0]);
+    printf("damping force: %f\n", damping_force[0]);
+    pidController(vel_error[1], stiffness, inertia, damping, control_loop_timestep,
+                  pf_lin_y_vel_error_sum, 5.0, pf_lin_y_vel_prev_error, damping_force[1]);
+    pidController(vel_error[2], stiffness, inertia, damping, control_loop_timestep,
+                  pf_ang_z_vel_error_sum, 5.0, pf_ang_z_vel_prev_error, damping_force[2]);
+
+    for (size_t i = 0; i < 3; i++)
+    {
+      if (platform_force[i] > 10 || platform_force[i] < -10)
+      {
+        platform_force[i] += damping_force[i];
+      }
+    }
+
+    printf("platform force: ");
+    print_array(platform_force, 3);
+
+    printf("platform velocity: ");
+    print_array(robot.mobile_base->state->xd_platform, 3);
 
     double lin_offsets[robot.mobile_base->mediator->kelo_base_config->nWheels];
     double ang_offsets[robot.mobile_base->mediator->kelo_base_config->nWheels];
@@ -201,38 +245,46 @@ int main(int argc, char **argv)
 
     pidController(lin_offsets[0], kp[0], ki[0], kd[0], control_loop_timestep, w1_lin_error_sum,
                   5.0, w1_lin_prev_error, lin_signal_w1);
-    // log_w1_lin_ctrl_data.addControlDataPID(0.0, 0.0, lin_offsets[0], lin_signal_w1, kp[0], ki[0],
+    // log_w1_lin_ctrl_data.addControlDataPID(0.0, 0.0, lin_offsets[0], lin_signal_w1, kp[0],
+    // ki[0],
     //                                        kd[0], w1_lin_error_sum);
     pidController(ang_offsets[0], kp[0], ki[0], kd[0], control_loop_timestep, w1_ang_error_sum,
                   5.0, w1_ang_prev_error, ang_signal_w1);
-    // log_w1_ang_ctrl_data.addControlDataPID(0.0, 0.0, ang_offsets[0], ang_signal_w1, kp[0], ki[0],
+    // log_w1_ang_ctrl_data.addControlDataPID(0.0, 0.0, ang_offsets[0], ang_signal_w1, kp[0],
+    // ki[0],
     //                                        kd[0], w1_ang_error_sum);
 
     pidController(lin_offsets[1], kp[1], ki[1], kd[1], control_loop_timestep, w2_lin_error_sum,
                   5.0, w2_lin_prev_error, lin_signal_w2);
-    // log_w2_lin_ctrl_data.addControlDataPID(0.0, 0.0, lin_offsets[1], lin_signal_w2, kp[1], ki[1],
+    // log_w2_lin_ctrl_data.addControlDataPID(0.0, 0.0, lin_offsets[1], lin_signal_w2, kp[1],
+    // ki[1],
     //                                        kd[1], w2_lin_error_sum);
     pidController(ang_offsets[1], kp[1], ki[1], kd[1], control_loop_timestep, w2_ang_error_sum,
                   5.0, w2_ang_prev_error, ang_signal_w2);
-    // log_w2_ang_ctrl_data.addControlDataPID(0.0, 0.0, ang_offsets[1], ang_signal_w2, kp[1], ki[1],
+    // log_w2_ang_ctrl_data.addControlDataPID(0.0, 0.0, ang_offsets[1], ang_signal_w2, kp[1],
+    // ki[1],
     //                                        kd[1], w2_ang_error_sum);
 
     pidController(lin_offsets[2], kp[2], ki[2], kd[2], control_loop_timestep, w3_lin_error_sum,
                   5.0, w3_lin_prev_error, lin_signal_w3);
-    // log_w3_lin_ctrl_data.addControlDataPID(0.0, 0.0, lin_offsets[2], lin_signal_w3, kp[2], ki[2],
+    // log_w3_lin_ctrl_data.addControlDataPID(0.0, 0.0, lin_offsets[2], lin_signal_w3, kp[2],
+    // ki[2],
     //                                        kd[2], w3_lin_error_sum);
     pidController(ang_offsets[2], kp[2], ki[2], kd[2], control_loop_timestep, w3_ang_error_sum,
                   5.0, w3_ang_prev_error, ang_signal_w3);
-    // log_w3_ang_ctrl_data.addControlDataPID(0.0, 0.0, ang_offsets[2], ang_signal_w3, kp[2], ki[2],
+    // log_w3_ang_ctrl_data.addControlDataPID(0.0, 0.0, ang_offsets[2], ang_signal_w3, kp[2],
+    // ki[2],
     //                                        kd[2], w3_ang_error_sum);
 
     pidController(lin_offsets[3], kp[3], ki[3], kd[3], control_loop_timestep, w4_lin_error_sum,
                   5.0, w4_lin_prev_error, lin_signal_w4);
-    // log_w4_lin_ctrl_data.addControlDataPID(0.0, 0.0, lin_offsets[3], lin_signal_w4, kp[3], ki[3],
+    // log_w4_lin_ctrl_data.addControlDataPID(0.0, 0.0, lin_offsets[3], lin_signal_w4, kp[3],
+    // ki[3],
     //                                        kd[3], w4_lin_error_sum);
     pidController(ang_offsets[3], kp[3], ki[3], kd[3], control_loop_timestep, w4_ang_error_sum,
                   5.0, w4_ang_prev_error, ang_signal_w4);
-    // log_w4_ang_ctrl_data.addControlDataPID(0.0, 0.0, ang_offsets[3], ang_signal_w4, kp[3], ki[3],
+    // log_w4_ang_ctrl_data.addControlDataPID(0.0, 0.0, ang_offsets[3], ang_signal_w4, kp[3],
+    // ki[3],
     //                                        kd[3], w4_ang_error_sum);
 
     double lin_signals[4] = {lin_signal_w1, lin_signal_w2, lin_signal_w3, lin_signal_w4};
@@ -259,8 +311,15 @@ int main(int argc, char **argv)
       }
     }
 
+    double wtau[8];
+    for (size_t i = 0; i < 4; i++)
+    {
+      wtau[2 * i] = tau_wheel_c[2 * i];
+      wtau[2 * i + 1] = tau_wheel_c[2 * i + 1];
+    }
+
     printf("torques: ");
-    print_array(tau_wheel_c, 8);
+    print_array(wtau, 8);
 
     printf("\n");
 
@@ -271,7 +330,7 @@ int main(int argc, char **argv)
     if (count > 2)
     {
       // raise(SIGINT);
-      set_mobile_base_torques(&robot, tau_wheel_c);
+      set_mobile_base_torques(&robot, wtau);
     }
 
     auto end_time = std::chrono::high_resolution_clock::now();

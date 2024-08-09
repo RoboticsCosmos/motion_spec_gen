@@ -98,7 +98,7 @@ int main(int argc, char **argv)
   std::string robot_urdf = (path.parent_path().parent_path() / "urdf" / "freddy.urdf").string();
 
   char ethernet_interface[100] = "eno1";
-  initialize_robot(&robot, robot_urdf, ethernet_interface, false);
+  initialize_robot(&robot, robot_urdf, ethernet_interface, true);
 
   const double desired_frequency = 1000.0;                                             // Hz
   const auto desired_period = std::chrono::duration<double>(1.0 / desired_frequency);  // s
@@ -217,8 +217,8 @@ int main(int argc, char **argv)
   double kr_elbow_base_base_distance_z_impedance_controller_stiffness_diag_mat[1] = {300.0};
   double kl_elbow_base_base_distance_z_impedance_controller_stiffness_diag_mat[1] = {300.0};
 
-  double kr_arm_table_contact_force_reference_value = -5.0;
-  double kl_arm_table_contact_force_reference_value = -5.0;
+  double kr_arm_table_contact_force_reference_value = -12.0;
+  double kl_arm_table_contact_force_reference_value = -12.0;
 
   double kl_bl_orientation_ang_x_pid_controller_kp = 80.0;
   double kl_bl_orientation_ang_x_pid_controller_ki = 2.9;
@@ -317,19 +317,19 @@ int main(int argc, char **argv)
   double kr_bl_orientation_coord_ang_z_initial_vector[6] = {0, 0, 0, 0, 0, 1};
 
   // uc1 vars
-  double arms_bl_base_distance_reference_value = 0.8;
+  double arms_bl_base_distance_reference_value = 0.75;
 
   double kr_bl_base_distance = 0.0;
-  double kr_bl_base_distance_pid_controller_kp = 400.0;
-  double kr_bl_base_distance_pid_controller_ki = 50.5;
-  double kr_bl_base_distance_pid_controller_kd = 100.0;
+  double kr_bl_base_distance_pid_controller_kp = 500.0;
+  double kr_bl_base_distance_pid_controller_ki = 10.5;
+  double kr_bl_base_distance_pid_controller_kd = 50.0;
   double kr_bl_base_distance_pid_error_sum = 0.0;
   double kr_bl_base_distance_pid_controller_signal = 0.0;
 
   double kl_bl_base_distance = 0.0;
-  double kl_bl_base_distance_pid_controller_kp = 400.0;
-  double kl_bl_base_distance_pid_controller_ki = 50.5;
-  double kl_bl_base_distance_pid_controller_kd = 100.0;
+  double kl_bl_base_distance_pid_controller_kp = 1000.0;
+  double kl_bl_base_distance_pid_controller_ki = 10.5;
+  double kl_bl_base_distance_pid_controller_kd = 50.0;
   double kl_bl_base_distance_pid_error_sum = 0.0;
   double kl_bl_base_distance_pid_controller_signal = 0.0;
 
@@ -480,6 +480,24 @@ int main(int argc, char **argv)
 
   double tau_wheel_ref_limit = 1.5;
 
+  double plat_vel_setpoint = 0.05;
+
+  double plat_vel_xy_pid_controller_kp = 200.0;
+  double plat_vel_xy_pid_controller_ki = 50.0;
+  double plat_vel_xy_pid_controller_kd = 0.0;
+
+  double plat_vel_ang_pid_controller_kp = 100.0;
+  double plat_vel_ang_pid_controller_ki = 10.0;
+  double plat_vel_ang_pid_controller_kd = 0.0;
+
+  double plat_vel_x_prev_error = 0.0;
+  double plat_vel_y_prev_error = 0.0;
+  double plat_vel_ang_prev_error = 0.0;
+
+  double plat_vel_x_error_sum = 0.0;
+  double plat_vel_y_error_sum = 0.0;
+  double plat_vel_ang_error_sum = 0.0;
+
   double kr_achd_solver_beta[6]{};
   double kl_achd_solver_beta[6]{};
   double kinova_right_cmd_tau[7]{};
@@ -505,6 +523,11 @@ int main(int argc, char **argv)
 
     count++;
     printf("count: %d\n", count);
+
+    robot.kinova_left->mediator->refresh_feedback();
+    robot.kinova_right->mediator->refresh_feedback();
+    update_base_state(robot.mobile_base->mediator->kelo_base_config,
+                      robot.mobile_base->mediator->ethercat_config);
 
     get_robot_data(&robot, *control_loop_dt);
 
@@ -752,9 +775,15 @@ int main(int argc, char **argv)
                     kr_bl_base_distance);
     computeEqualityError(arms_bl_base_distance_reference_value, kr_bl_base_distance,
                          kr_bl_base_distance_controller_error);
+    // double error_tube = 0.025;
+    // if (abs(kr_bl_base_distance_controller_error) < error_tube)
+    // {
+    //   kr_bl_base_distance_controller_error = 0.0;
+    // }
+    // printf("kr_error: %f\n", kr_bl_base_distance_controller_error);
     pidController(kr_bl_base_distance_controller_error, kr_bl_base_distance_pid_controller_kp,
                   kr_bl_base_distance_pid_controller_ki, kr_bl_base_distance_pid_controller_kd,
-                  *control_loop_dt, kr_bl_base_distance_pid_error_sum, 50.0,
+                  *control_loop_dt, kr_bl_base_distance_pid_error_sum, 5.0,
                   kr_bl_base_distance_pid_prev_error, kr_bl_base_distance_pid_controller_signal);
 
     // impedance controller
@@ -766,9 +795,13 @@ int main(int argc, char **argv)
                     kl_bl_base_distance);
     computeEqualityError(arms_bl_base_distance_reference_value, kl_bl_base_distance,
                          kl_bl_base_distance_controller_error);
+    // if (abs(kl_bl_base_distance_controller_error) < error_tube)
+    // {
+    //   kl_bl_base_distance_controller_error = 0.0;
+    // }
     pidController(kl_bl_base_distance_controller_error, kl_bl_base_distance_pid_controller_kp,
                   kl_bl_base_distance_pid_controller_ki, kl_bl_base_distance_pid_controller_kd,
-                  *control_loop_dt, kl_bl_base_distance_pid_error_sum, 50.0,
+                  *control_loop_dt, kl_bl_base_distance_pid_error_sum, 5.0,
                   kl_bl_base_distance_pid_prev_error, kl_bl_base_distance_pid_controller_signal);
 
     // embed maps
@@ -980,6 +1013,14 @@ int main(int argc, char **argv)
 
     std::cout << "dists: " << kl_bl_base_distance << " " << kr_bl_base_distance << std::endl;
 
+    // std::cout << "kr_signal: " << kr_bl_base_distance_pid_controller_signal << std::endl;
+    // printf("kr_force: ");
+    // print_array(kr_bl_base_dist_force_at_base, 3);
+    // std::cout << "kl_signal: " << kl_bl_base_distance_pid_controller_signal << std::endl;
+    // printf("kl_force: ");
+    // print_array(kl_bl_base_dist_force_at_base, 3);
+    // printf("\n");
+
     // solvers
     // fd solver
     double fd_solver_robile_output_torques[8]{};
@@ -992,27 +1033,64 @@ int main(int argc, char **argv)
                             fd_solver_robile_platform_wrench[1],
                             fd_solver_robile_platform_wrench[5]};
 
-    // double plat_force_tube = 25.0;
-    // for (size_t i = 0; i < 3; i++)
-    // {
-    //   if (plat_force[i] < plat_force_tube && plat_force[i] > -plat_force_tube)
-    //   {
-    //     plat_force[i] = 0.0;
-    //   }
-    // }
+    double plat_force_tube = 10.0;
+    for (size_t i = 0; i < 3; i++)
+    {
+      if (plat_force[i] < plat_force_tube && plat_force[i] > -plat_force_tube)
+      {
+        plat_force[i] = 0.0;
+      }
+    }
 
-    // double plat_force_limit = 500.0;
-    // for (size_t i = 0; i < 3; i++)
-    // {
-    //   if (plat_force[i] > plat_force_limit)
-    //   {
-    //     plat_force[i] = plat_force_limit;
-    //   }
-    //   else if (plat_force[i] < -plat_force_limit)
-    //   {
-    //     plat_force[i] = -plat_force_limit;
-    //   }
-    // }
+    double plat_vel_damping_force[3] = {0.0, 0.0, 0.0};
+    double plat_vel_damping_force_tube = 0.001;
+    double plat_vel_error[3] = {0.0, 0.0, 0.0};
+    computeEqualityError(robot.mobile_base->state->xd_platform[0], plat_vel_setpoint,
+                         plat_vel_error[0]);
+    computeEqualityError(robot.mobile_base->state->xd_platform[1], plat_vel_setpoint,
+                         plat_vel_error[1]);
+    computeEqualityError(robot.mobile_base->state->xd_platform[2], plat_vel_setpoint,
+                         plat_vel_error[2]);
+
+    // check if the velocity is within the tube
+    for (size_t i = 0; i < 3; i++)
+    {
+      if (plat_vel_error[i] < plat_vel_damping_force_tube &&
+          plat_vel_error[i] > -plat_vel_damping_force_tube)
+      {
+        plat_vel_damping_force[i] = 0.0;
+      }
+    }
+    pidController(plat_vel_error[0], plat_vel_xy_pid_controller_kp, plat_vel_xy_pid_controller_ki,
+                  plat_vel_xy_pid_controller_kd, *control_loop_dt, plat_vel_x_error_sum, 5.0,
+                  plat_vel_x_prev_error, plat_vel_damping_force[0]);
+    pidController(plat_vel_error[1], plat_vel_xy_pid_controller_kp, plat_vel_xy_pid_controller_ki,
+                  plat_vel_xy_pid_controller_kd, *control_loop_dt, plat_vel_y_error_sum, 5.0,
+                  plat_vel_y_prev_error, plat_vel_damping_force[1]);
+    pidController(plat_vel_error[2], plat_vel_ang_pid_controller_kp,
+                  plat_vel_ang_pid_controller_ki, plat_vel_ang_pid_controller_kd, *control_loop_dt,
+                  plat_vel_ang_error_sum, 5.0, plat_vel_ang_prev_error, plat_vel_damping_force[2]);
+
+    for (size_t i = 0; i < 3; i++)
+    {
+      if (plat_force[i] > 10 || plat_force[i] < -10)
+      {
+        plat_force[i] += plat_vel_damping_force[i];
+      }
+    }
+
+    double plat_force_limit = 300.0;
+    for (size_t i = 0; i < 3; i++)
+    {
+      if (plat_force[i] > plat_force_limit)
+      {
+        plat_force[i] = plat_force_limit;
+      }
+      else if (plat_force[i] < -plat_force_limit)
+      {
+        plat_force[i] = -plat_force_limit;
+      }
+    }
 
     std::cout << "plat_force: ";
     print_array(plat_force, 3);
@@ -1265,12 +1343,12 @@ int main(int argc, char **argv)
                                         fd_solver_robile_output_torques);
 
     // set torques
-    // if (count > 1)
-    // {
-    //   set_mobile_base_torques(&robot, fd_solver_robile_output_torques);
-    // }
-    // set_manipulator_torques(&robot, kinova_left_base_link, &kinova_left_cmd_tau_kdl);
-    // set_manipulator_torques(&robot, kinova_right_base_link, &kinova_right_cmd_tau_kdl);
+    if (count > 1)
+    {
+      // set_mobile_base_torques(&robot, fd_solver_robile_output_torques);
+    }
+    set_manipulator_torques(&robot, kinova_left_base_link, &kinova_left_cmd_tau_kdl);
+    set_manipulator_torques(&robot, kinova_right_base_link, &kinova_right_cmd_tau_kdl);
 
     auto end_time = std::chrono::high_resolution_clock::now();
     auto elapsed_time = std::chrono::duration<double>(end_time - start_time);
