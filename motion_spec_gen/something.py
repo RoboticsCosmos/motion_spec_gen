@@ -311,28 +311,26 @@ class ImpedanceControllerStep:
 
                 output_data["stiffness"]["vector"] = vec_comp
 
-            # TODO: this is wrong. should be for distane to base controller
-            # add additional type info and update
-            if g[coordinate : rdflib.RDF.type : GEOM_COORD.VelocityTwistCoordinate]:
                 of_dist = g.value(coordinate, GEOM_COORD.of)
 
                 asb_qn = g.compute_qname(asb)[2]
                 bw_ents = g.objects(of_dist, GEOM_REL["between-entities"])
                 bw_ents = [g.compute_qname(e)[2] for e in bw_ents]
 
+                # TODO: should be a better way to do this, maybe use 1D/2D/3D info
                 # if asb_qn in bw_ents: consider it as from for direction
                 if asb_qn in bw_ents:
                     dir_from = asb_qn
                     dir_to = [e for e in bw_ents if e != asb_qn][0]
-                else:
-                    raise ValueError("Dist. coord direction not supported")
-
-                output_data["stiffness"]["vector_direction"] = {
-                    "from": rdflib.URIRef(f"{prefix}{dir_from}"),
-                    "to": rdflib.URIRef(f"{prefix}{dir_to}"),
-                    "asb": asb,
-                }
-                output_data["stiffness"]["vector"] = (1, 1, 1)
+                
+                    output_data["stiffness"]["vector_direction"] = {
+                        "from": rdflib.URIRef(f"{prefix}{dir_from}"),
+                        "to": rdflib.URIRef(f"{prefix}{dir_to}"),
+                        "asb": asb,
+                    }
+                    output_data["stiffness"]["vector"] = (1, 1, 1)
+                
+                
 
             output_data["stiffness"]["var_name"] = rdflib.URIRef(
                 f"{prefix}{solver_name}_output_stiffness"

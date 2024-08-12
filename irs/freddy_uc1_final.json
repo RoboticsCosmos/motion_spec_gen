@@ -1,0 +1,2071 @@
+{
+  "variables": {
+    "arm_table_contact_force_reference_value": {
+      "type": null,
+      "dtype": "double",
+      "value": "-10.0"
+    },
+    "kl_bracelet_link": {
+      "type": null,
+      "dtype": "string",
+      "value": "kl_bracelet_link"
+    },
+    "table": {
+      "type": null,
+      "dtype": "string",
+      "value": "table"
+    },
+    "kl_bracelet_table_contact_force_lin_z_vector_lin_z": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    "kl_bracelet_table_contact_force_lin_z": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kl_bracelet_table_contact_force_pid_controller_time_step": {
+      "type": null,
+      "dtype": "double",
+      "value": "*control_loop_dt"
+    },
+    "kl_bracelet_table_contact_force_pid_controller_kp": {
+      "type": null,
+      "dtype": "double",
+      "value": "20.0"
+    },
+    "kl_bracelet_table_contact_force_pid_controller_ki": {
+      "type": null,
+      "dtype": "double",
+      "value": "0.9"
+    },
+    "kl_bracelet_table_contact_force_pid_controller_kd": {
+      "type": null,
+      "dtype": "double",
+      "value": 0.0
+    },
+    "kl_bracelet_table_contact_force_pid_controller_error_sum": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kl_bracelet_table_contact_force_pid_controller_prev_error": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kl_bracelet_table_contact_force_pid_controller_signal": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kl_bracelet_table_contact_force_pid_controller_error": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kl_bracelet_table_contact_force_embed_map_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "kr_bracelet_link": {
+      "type": null,
+      "dtype": "string",
+      "value": "kr_bracelet_link"
+    },
+    "kr_bracelet_table_contact_force_lin_z_vector_lin_z": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    "kr_bracelet_table_contact_force_lin_z": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bracelet_table_contact_force_pid_controller_time_step": {
+      "type": null,
+      "dtype": "double",
+      "value": "*control_loop_dt"
+    },
+    "kr_bracelet_table_contact_force_pid_controller_kp": {
+      "type": null,
+      "dtype": "double",
+      "value": "20.0"
+    },
+    "kr_bracelet_table_contact_force_pid_controller_ki": {
+      "type": null,
+      "dtype": "double",
+      "value": "0.9"
+    },
+    "kr_bracelet_table_contact_force_pid_controller_kd": {
+      "type": null,
+      "dtype": "double",
+      "value": 0.0
+    },
+    "kr_bracelet_table_contact_force_pid_controller_error_sum": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bracelet_table_contact_force_pid_controller_prev_error": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bracelet_table_contact_force_pid_controller_signal": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bracelet_table_contact_force_pid_controller_error": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bracelet_table_contact_force_embed_map_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "kr_bl_position_coord_lin_y_initial": {
+      "type": null,
+      "size": 1,
+      "dtype": "double",
+      "value": null
+    },
+    "kinova_right_bracelet_link_origin_point": {
+      "type": null,
+      "dtype": "string",
+      "value": "kinova_right_bracelet_link"
+    },
+    "base_link_origin_point": {
+      "type": null,
+      "dtype": "string",
+      "value": "base_link"
+    },
+    "base_link": {
+      "type": null,
+      "dtype": "string",
+      "value": "base_link"
+    },
+    "kr_bl_position_coord_lin_y_initial_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "kr_bl_position_coord_lin_y": {
+      "type": null,
+      "size": 1,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_position_coord_lin_y_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "kr_bl_position_lin_y_pid_controller_time_step": {
+      "type": null,
+      "dtype": "double",
+      "value": "*control_loop_dt"
+    },
+    "kr_bl_position_lin_y_pid_controller_kp": {
+      "type": null,
+      "dtype": "double",
+      "value": "10.0"
+    },
+    "kr_bl_position_lin_y_pid_controller_ki": {
+      "type": null,
+      "dtype": "double",
+      "value": "0.9"
+    },
+    "kr_bl_position_lin_y_pid_controller_kd": {
+      "type": null,
+      "dtype": "double",
+      "value": "1.0"
+    },
+    "kr_bl_position_lin_y_pid_controller_error_sum": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_position_lin_y_pid_controller_prev_error": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_position_lin_y_pid_controller_signal": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_position_lin_y_pid_controller_error": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_position_lin_y_embed_map_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "kr_bl_position_coord_lin_z_initial": {
+      "type": null,
+      "size": 1,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_position_coord_lin_z_initial_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    "kr_bl_position_coord_lin_z": {
+      "type": null,
+      "size": 1,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_position_coord_lin_z_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    "kr_bl_position_lin_z_pid_controller_time_step": {
+      "type": null,
+      "dtype": "double",
+      "value": "*control_loop_dt"
+    },
+    "kr_bl_position_lin_z_pid_controller_kp": {
+      "type": null,
+      "dtype": "double",
+      "value": "10.0"
+    },
+    "kr_bl_position_lin_z_pid_controller_ki": {
+      "type": null,
+      "dtype": "double",
+      "value": "0.9"
+    },
+    "kr_bl_position_lin_z_pid_controller_kd": {
+      "type": null,
+      "dtype": "double",
+      "value": "1.0"
+    },
+    "kr_bl_position_lin_z_pid_controller_error_sum": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_position_lin_z_pid_controller_prev_error": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_position_lin_z_pid_controller_signal": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_position_lin_z_pid_controller_error": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_position_lin_z_embed_map_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "kr_bl_orientation_coord_initial": {
+      "type": "array",
+      "size": 4,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_orientation": {
+      "type": null,
+      "size": 1,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_orientation_coord_initial_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0,
+        0,
+        0,
+        1,
+        1,
+        1
+      ]
+    },
+    "kr_bl_orientation_coord": {
+      "type": "array",
+      "size": 4,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_orientation_coord_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0,
+        0,
+        0,
+        1,
+        1,
+        1
+      ]
+    },
+    "kr_bl_orientation_pid_controller_time_step": {
+      "type": null,
+      "dtype": "double",
+      "value": "*control_loop_dt"
+    },
+    "kr_bl_orientation_pid_controller_kp": {
+      "type": null,
+      "dtype": "double",
+      "value": "20.0"
+    },
+    "kr_bl_orientation_pid_controller_ki": {
+      "type": null,
+      "dtype": "double",
+      "value": "0.9"
+    },
+    "kr_bl_orientation_pid_controller_kd": {
+      "type": null,
+      "dtype": "double",
+      "value": "2.5"
+    },
+    "kr_bl_orientation_pid_controller_error_sum": {
+      "type": "array",
+      "dtype": "double",
+      "value": null,
+      "size": 3
+    },
+    "kr_bl_orientation_pid_controller_prev_error": {
+      "type": "array",
+      "dtype": "double",
+      "value": null,
+      "size": 3
+    },
+    "kr_bl_orientation_pid_controller_signal": {
+      "type": "array",
+      "dtype": "double",
+      "value": null,
+      "size": 3
+    },
+    "kr_bl_orientation_pid_controller_error": {
+      "type": "array",
+      "dtype": "double",
+      "value": null,
+      "size": 3
+    },
+    "kr_bl_orientation_embed_map_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "kr_elbow_base_base_distance_z_impedance_controller_signal": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_elbow_base_base_distance_z_impedance_controller_stiffness_diag_mat": {
+      "type": "array",
+      "size": 1,
+      "dtype": "double",
+      "value": [
+        100.0
+      ]
+    },
+    "kr_elbow_base_z_distance_reference_value": {
+      "type": null,
+      "dtype": "double",
+      "value": "0.9"
+    },
+    "kr_elbow_base_distance_coord_lin_z_axis": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0,
+        0,
+        1
+      ]
+    },
+    "kr_elbow_base_distance_coord_lin_z": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kinova_right_half_arm_2_link_origin_point": {
+      "type": null,
+      "dtype": "string",
+      "value": "kinova_right_half_arm_2_link"
+    },
+    "kr_elbow_base_base_distance_z_embed_map_vector": {
+      "type": "array",
+      "size": 3,
+      "dtype": "double",
+      "value": [
+        0.0,
+        0.0,
+        1.0
+      ]
+    },
+    "kr_half_arm_2_link": {
+      "type": null,
+      "dtype": "string",
+      "value": "kr_half_arm_2_link"
+    },
+    "kl_bl_position_coord_lin_y_initial": {
+      "type": null,
+      "size": 1,
+      "dtype": "double",
+      "value": null
+    },
+    "kinova_left_bracelet_link_origin_point": {
+      "type": null,
+      "dtype": "string",
+      "value": "kinova_left_bracelet_link"
+    },
+    "kl_bl_position_coord_lin_y_initial_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "kl_bl_position_coord_lin_y": {
+      "type": null,
+      "size": 1,
+      "dtype": "double",
+      "value": null
+    },
+    "kl_bl_position_coord_lin_y_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "kl_bl_position_lin_y_pid_controller_time_step": {
+      "type": null,
+      "dtype": "double",
+      "value": "*control_loop_dt"
+    },
+    "kl_bl_position_lin_y_pid_controller_kp": {
+      "type": null,
+      "dtype": "double",
+      "value": "10.0"
+    },
+    "kl_bl_position_lin_y_pid_controller_ki": {
+      "type": null,
+      "dtype": "double",
+      "value": "0.9"
+    },
+    "kl_bl_position_lin_y_pid_controller_kd": {
+      "type": null,
+      "dtype": "double",
+      "value": "1.5"
+    },
+    "kl_bl_position_lin_y_pid_controller_error_sum": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kl_bl_position_lin_y_pid_controller_prev_error": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kl_bl_position_lin_y_pid_controller_signal": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kl_bl_position_lin_y_pid_controller_error": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kl_bl_position_lin_y_embed_map_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "kl_bl_position_coord_lin_z_initial": {
+      "type": null,
+      "size": 1,
+      "dtype": "double",
+      "value": null
+    },
+    "kl_bl_position_coord_lin_z_initial_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    "kl_bl_position_coord_lin_z": {
+      "type": null,
+      "size": 1,
+      "dtype": "double",
+      "value": null
+    },
+    "kl_bl_position_coord_lin_z_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    "kl_bl_position_lin_z_pid_controller_time_step": {
+      "type": null,
+      "dtype": "double",
+      "value": "*control_loop_dt"
+    },
+    "kl_bl_position_lin_z_pid_controller_kp": {
+      "type": null,
+      "dtype": "double",
+      "value": "10.0"
+    },
+    "kl_bl_position_lin_z_pid_controller_ki": {
+      "type": null,
+      "dtype": "double",
+      "value": "0.9"
+    },
+    "kl_bl_position_lin_z_pid_controller_kd": {
+      "type": null,
+      "dtype": "double",
+      "value": "1.5"
+    },
+    "kl_bl_position_lin_z_pid_controller_error_sum": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kl_bl_position_lin_z_pid_controller_prev_error": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kl_bl_position_lin_z_pid_controller_signal": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kl_bl_position_lin_z_pid_controller_error": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kl_bl_position_lin_z_embed_map_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "kl_bl_orientation_coord_initial": {
+      "type": "array",
+      "size": 4,
+      "dtype": "double",
+      "value": null
+    },
+    "kl_bl_orientation": {
+      "type": null,
+      "size": 1,
+      "dtype": "double",
+      "value": null
+    },
+    "kl_bl_orientation_coord_initial_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0,
+        0,
+        0,
+        1,
+        1,
+        1
+      ]
+    },
+    "kl_bl_orientation_coord": {
+      "type": "array",
+      "size": 4,
+      "dtype": "double",
+      "value": null
+    },
+    "kl_bl_orientation_coord_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0,
+        0,
+        0,
+        1,
+        1,
+        1
+      ]
+    },
+    "kl_bl_orientation_pid_controller_time_step": {
+      "type": null,
+      "dtype": "double",
+      "value": "*control_loop_dt"
+    },
+    "kl_bl_orientation_pid_controller_kp": {
+      "type": null,
+      "dtype": "double",
+      "value": "20.0"
+    },
+    "kl_bl_orientation_pid_controller_ki": {
+      "type": null,
+      "dtype": "double",
+      "value": "0.9"
+    },
+    "kl_bl_orientation_pid_controller_kd": {
+      "type": null,
+      "dtype": "double",
+      "value": "2.5"
+    },
+    "kl_bl_orientation_pid_controller_error_sum": {
+      "type": "array",
+      "dtype": "double",
+      "value": null,
+      "size": 3
+    },
+    "kl_bl_orientation_pid_controller_prev_error": {
+      "type": "array",
+      "dtype": "double",
+      "value": null,
+      "size": 3
+    },
+    "kl_bl_orientation_pid_controller_signal": {
+      "type": "array",
+      "dtype": "double",
+      "value": null,
+      "size": 3
+    },
+    "kl_bl_orientation_pid_controller_error": {
+      "type": "array",
+      "dtype": "double",
+      "value": null,
+      "size": 3
+    },
+    "kl_bl_orientation_embed_map_vector": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "kl_elbow_base_base_distance_z_impedance_controller_signal": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kl_elbow_base_base_distance_z_impedance_controller_stiffness_diag_mat": {
+      "type": "array",
+      "size": 1,
+      "dtype": "double",
+      "value": [
+        100.0
+      ]
+    },
+    "kl_elbow_base_z_distance_reference_value": {
+      "type": null,
+      "dtype": "double",
+      "value": "0.9"
+    },
+    "kl_elbow_base_distance_coord_lin_z_axis": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0,
+        0,
+        1
+      ]
+    },
+    "kl_elbow_base_distance_coord_lin_z": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kinova_left_half_arm_2_link_origin_point": {
+      "type": null,
+      "dtype": "string",
+      "value": "kinova_left_half_arm_2_link"
+    },
+    "kl_elbow_base_base_distance_z_embed_map_vector": {
+      "type": "array",
+      "size": 3,
+      "dtype": "double",
+      "value": [
+        0.0,
+        0.0,
+        1.0
+      ]
+    },
+    "kl_half_arm_2_link": {
+      "type": null,
+      "dtype": "string",
+      "value": "kl_half_arm_2_link"
+    },
+    "kl_bracelet_base_distance_impedance_controller_signal": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kl_bracelet_base_distance_impedance_controller_stiffness_diag_mat": {
+      "type": "array",
+      "size": 1,
+      "dtype": "double",
+      "value": [
+        1.0
+      ]
+    },
+    "arms_distance_reference_value": {
+      "type": null,
+      "dtype": "double",
+      "value": "0.5"
+    },
+    "kl_bracelet_base_distance_coord": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kl_base_link": {
+      "type": null,
+      "dtype": "string",
+      "value": "kl_base_link"
+    },
+    "kl_bracelet_base_distance_embed_map_vector": {
+      "type": "array",
+      "size": 3,
+      "dtype": "double",
+      "value": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "kr_bracelet_base_distance_impedance_controller_signal": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bracelet_base_distance_impedance_controller_stiffness_diag_mat": {
+      "type": "array",
+      "size": 1,
+      "dtype": "double",
+      "value": [
+        1.0
+      ]
+    },
+    "kr_bracelet_base_distance_coord": {
+      "type": null,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_base_link": {
+      "type": null,
+      "dtype": "string",
+      "value": "kr_base_link"
+    },
+    "kr_bracelet_base_distance_embed_map_vector": {
+      "type": "array",
+      "size": 3,
+      "dtype": "double",
+      "value": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "kr_achd_solver_root_acceleration": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        -9.685,
+        -1.033,
+        1.324,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "kinova_right_base_link": {
+      "type": null,
+      "dtype": "string",
+      "value": "kinova_right_base_link"
+    },
+    "kinova_right_bracelet_link": {
+      "type": null,
+      "dtype": "string",
+      "value": "kinova_right_bracelet_link"
+    },
+    "kr_bl_position_lin_y_embed_map_kr_achd_solver_output_acceleration_energy": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_position_lin_z_embed_map_kr_achd_solver_output_acceleration_energy": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bl_orientation_embed_map_kr_achd_solver_output_acceleration_energy": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_achd_solver_nc": {
+      "type": null,
+      "dtype": "int",
+      "value": 5
+    },
+    "kr_achd_solver_nj": {
+      "type": null,
+      "dtype": "int",
+      "value": 7
+    },
+    "kr_achd_solver_alpha": {
+      "type": "array_2d",
+      "rows": 6,
+      "cols": 5,
+      "dtype": "double",
+      "value": [
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    "kr_achd_solver_feed_forward_torques": {
+      "type": "array",
+      "size": 7,
+      "dim": 1,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_achd_solver_predicted_accelerations": {
+      "type": "array",
+      "size": 7,
+      "dim": 1,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_achd_solver_output_torques": {
+      "type": "array",
+      "size": 7,
+      "dim": 1,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bracelet_table_contact_force_embed_map_kr_achd_solver_fext_output_external_wrench": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_elbow_base_base_distance_z_embed_map_kr_achd_solver_fext_output_external_wrench": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_achd_solver_fext_nj": {
+      "type": null,
+      "dtype": "int",
+      "value": 7
+    },
+    "kr_achd_solver_fext_output_torques": {
+      "type": "array",
+      "size": 7,
+      "dim": 1,
+      "dtype": "double",
+      "value": null
+    },
+    "kl_achd_solver_root_acceleration": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        -9.6,
+        0.99,
+        1.4,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "kinova_left_base_link": {
+      "type": null,
+      "dtype": "string",
+      "value": "kinova_left_base_link"
+    },
+    "kinova_left_bracelet_link": {
+      "type": null,
+      "dtype": "string",
+      "value": "kinova_left_bracelet_link"
+    },
+    "kl_bl_position_lin_y_embed_map_kl_achd_solver_output_acceleration_energy": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": null
+    },
+    "kl_bl_position_lin_z_embed_map_kl_achd_solver_output_acceleration_energy": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": null
+    },
+    "kl_bl_orientation_embed_map_kl_achd_solver_output_acceleration_energy": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": null
+    },
+    "kl_achd_solver_nc": {
+      "type": null,
+      "dtype": "int",
+      "value": 5
+    },
+    "kl_achd_solver_nj": {
+      "type": null,
+      "dtype": "int",
+      "value": 7
+    },
+    "kl_achd_solver_alpha": {
+      "type": "array_2d",
+      "rows": 6,
+      "cols": 5,
+      "dtype": "double",
+      "value": [
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    "kl_achd_solver_feed_forward_torques": {
+      "type": "array",
+      "size": 7,
+      "dim": 1,
+      "dtype": "double",
+      "value": null
+    },
+    "kl_achd_solver_predicted_accelerations": {
+      "type": "array",
+      "size": 7,
+      "dim": 1,
+      "dtype": "double",
+      "value": null
+    },
+    "kl_achd_solver_output_torques": {
+      "type": "array",
+      "size": 7,
+      "dim": 1,
+      "dtype": "double",
+      "value": null
+    },
+    "kl_bracelet_table_contact_force_embed_map_kl_achd_solver_fext_output_external_wrench": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": null
+    },
+    "kl_elbow_base_base_distance_z_embed_map_kl_achd_solver_fext_output_external_wrench": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": null
+    },
+    "kl_achd_solver_fext_nj": {
+      "type": null,
+      "dtype": "int",
+      "value": 7
+    },
+    "kl_achd_solver_fext_output_torques": {
+      "type": "array",
+      "size": 7,
+      "dim": 1,
+      "dtype": "double",
+      "value": null
+    },
+    "fd_solver_robile_root_acceleration": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": [
+        0.0,
+        0.0,
+        9.81,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "kl_bracelet_base_distance_embed_map_fd_solver_robile_output_external_wrench": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": null
+    },
+    "kr_bracelet_base_distance_embed_map_fd_solver_robile_output_external_wrench": {
+      "type": "array",
+      "size": 6,
+      "dtype": "double",
+      "value": null
+    },
+    "fd_solver_robile_output_torques": {
+      "type": "array",
+      "size": 8,
+      "dim": 1,
+      "dtype": "double",
+      "value": null
+    }
+  },
+  "initial_compute_variables": {
+    "kr_bl_position_coord_lin_y_initial": {
+      "measured": {
+        "of": {
+          "id": "kr_bl_position_coord_lin_y_initial",
+          "entity": "kinova_right_bracelet_link_origin_point",
+          "type": "position",
+          "vector": "kr_bl_position_coord_lin_y_initial_vector"
+        },
+        "asb": "base_link",
+        "wrt": "base_link_origin_point"
+      },
+      "measure_variable": "computePosition"
+    },
+    "kr_bl_position_coord_lin_z_initial": {
+      "measured": {
+        "of": {
+          "id": "kr_bl_position_coord_lin_z_initial",
+          "entity": "kinova_right_bracelet_link_origin_point",
+          "type": "position",
+          "vector": "kr_bl_position_coord_lin_z_initial_vector"
+        },
+        "asb": "base_link",
+        "wrt": "base_link_origin_point"
+      },
+      "measure_variable": "computePosition"
+    },
+    "kr_bl_orientation_coord_initial": {
+      "measured": {
+        "of": {
+          "id": "kr_bl_orientation_coord_initial",
+          "entity": "kinova_right_bracelet_link_origin_point",
+          "type": "Quaternion",
+          "vector": "kr_bl_orientation_coord_initial_vector"
+        },
+        "asb": "base_link",
+        "wrt": "base_link_origin_point"
+      },
+      "measure_variable": "computeQuaternion"
+    },
+    "kl_bl_position_coord_lin_y_initial": {
+      "measured": {
+        "of": {
+          "id": "kl_bl_position_coord_lin_y_initial",
+          "entity": "kinova_left_bracelet_link_origin_point",
+          "type": "position",
+          "vector": "kl_bl_position_coord_lin_y_initial_vector"
+        },
+        "asb": "base_link",
+        "wrt": "base_link_origin_point"
+      },
+      "measure_variable": "computePosition"
+    },
+    "kl_bl_position_coord_lin_z_initial": {
+      "measured": {
+        "of": {
+          "id": "kl_bl_position_coord_lin_z_initial",
+          "entity": "kinova_left_bracelet_link_origin_point",
+          "type": "position",
+          "vector": "kl_bl_position_coord_lin_z_initial_vector"
+        },
+        "asb": "base_link",
+        "wrt": "base_link_origin_point"
+      },
+      "measure_variable": "computePosition"
+    },
+    "kl_bl_orientation_coord_initial": {
+      "measured": {
+        "of": {
+          "id": "kl_bl_orientation_coord_initial",
+          "entity": "kinova_left_bracelet_link_origin_point",
+          "type": "Quaternion",
+          "vector": "kl_bl_orientation_coord_initial_vector"
+        },
+        "asb": "base_link",
+        "wrt": "base_link_origin_point"
+      },
+      "measure_variable": "computeQuaternion"
+    }
+  },
+  "d": {
+    "monitors": {
+      "pre": {},
+      "post": {}
+    },
+    "compute_variables": {
+      "kl_bracelet_table_contact_force_lin_z": {
+        "measured": {
+          "of": {
+            "id": "kl_bracelet_table_contact_force_lin_z",
+            "applied_by_entity": "kl_bracelet_link",
+            "applied_to_entity": "table",
+            "type": "force",
+            "vector": "kl_bracelet_table_contact_force_lin_z_vector_lin_z"
+          },
+          "asb": "kl_bracelet_link"
+        },
+        "measure_variable": "computeForce"
+      },
+      "kr_bracelet_table_contact_force_lin_z": {
+        "measured": {
+          "of": {
+            "id": "kr_bracelet_table_contact_force_lin_z",
+            "applied_by_entity": "kr_bracelet_link",
+            "applied_to_entity": "table",
+            "type": "force",
+            "vector": "kr_bracelet_table_contact_force_lin_z_vector_lin_z"
+          },
+          "asb": "kr_bracelet_link"
+        },
+        "measure_variable": "computeForce"
+      },
+      "kr_bl_position_coord_lin_y": {
+        "measured": {
+          "of": {
+            "id": "kr_bl_position_coord_lin_y",
+            "entity": "kinova_right_bracelet_link_origin_point",
+            "type": "position",
+            "vector": "kr_bl_position_coord_lin_y_vector"
+          },
+          "asb": "base_link",
+          "wrt": "base_link_origin_point"
+        },
+        "measure_variable": "computePosition"
+      },
+      "kr_bl_position_coord_lin_z": {
+        "measured": {
+          "of": {
+            "id": "kr_bl_position_coord_lin_z",
+            "entity": "kinova_right_bracelet_link_origin_point",
+            "type": "position",
+            "vector": "kr_bl_position_coord_lin_z_vector"
+          },
+          "asb": "base_link",
+          "wrt": "base_link_origin_point"
+        },
+        "measure_variable": "computePosition"
+      },
+      "kr_bl_orientation_coord": {
+        "measured": {
+          "of": {
+            "id": "kr_bl_orientation_coord",
+            "entity": "kinova_right_bracelet_link_origin_point",
+            "type": "Quaternion",
+            "vector": "kr_bl_orientation_coord_vector"
+          },
+          "asb": "base_link",
+          "wrt": "base_link_origin_point"
+        },
+        "measure_variable": "computeQuaternion"
+      },
+      "kr_elbow_base_distance_coord_lin_z": {
+        "measured": {
+          "of": {
+            "id": "kr_elbow_base_distance_coord_lin_z",
+            "entities": [
+              "kinova_right_half_arm_2_link_origin_point",
+              "base_link_origin_point"
+            ],
+            "axis": "kr_elbow_base_distance_coord_lin_z_axis"
+          },
+          "asb": "base_link"
+        },
+        "measure_variable": "computeDistance1D"
+      },
+      "kl_bl_position_coord_lin_y": {
+        "measured": {
+          "of": {
+            "id": "kl_bl_position_coord_lin_y",
+            "entity": "kinova_left_bracelet_link_origin_point",
+            "type": "position",
+            "vector": "kl_bl_position_coord_lin_y_vector"
+          },
+          "asb": "base_link",
+          "wrt": "base_link_origin_point"
+        },
+        "measure_variable": "computePosition"
+      },
+      "kl_bl_position_coord_lin_z": {
+        "measured": {
+          "of": {
+            "id": "kl_bl_position_coord_lin_z",
+            "entity": "kinova_left_bracelet_link_origin_point",
+            "type": "position",
+            "vector": "kl_bl_position_coord_lin_z_vector"
+          },
+          "asb": "base_link",
+          "wrt": "base_link_origin_point"
+        },
+        "measure_variable": "computePosition"
+      },
+      "kl_bl_orientation_coord": {
+        "measured": {
+          "of": {
+            "id": "kl_bl_orientation_coord",
+            "entity": "kinova_left_bracelet_link_origin_point",
+            "type": "Quaternion",
+            "vector": "kl_bl_orientation_coord_vector"
+          },
+          "asb": "base_link",
+          "wrt": "base_link_origin_point"
+        },
+        "measure_variable": "computeQuaternion"
+      },
+      "kl_elbow_base_distance_coord_lin_z": {
+        "measured": {
+          "of": {
+            "id": "kl_elbow_base_distance_coord_lin_z",
+            "entities": [
+              "kinova_left_half_arm_2_link_origin_point",
+              "base_link_origin_point"
+            ],
+            "axis": "kl_elbow_base_distance_coord_lin_z_axis"
+          },
+          "asb": "base_link"
+        },
+        "measure_variable": "computeDistance1D"
+      },
+      "kl_bracelet_base_distance_coord": {
+        "measured": {
+          "of": {
+            "id": "kl_bracelet_base_distance_coord",
+            "entities": [
+              "kl_bracelet_link",
+              "kl_base_link"
+            ]
+          },
+          "asb": "kl_bracelet_link"
+        },
+        "measure_variable": "computeDistance"
+      },
+      "kr_bracelet_base_distance_coord": {
+        "measured": {
+          "of": {
+            "id": "kr_bracelet_base_distance_coord",
+            "entities": [
+              "kr_bracelet_link",
+              "kr_base_link"
+            ]
+          },
+          "asb": "kr_bracelet_link"
+        },
+        "measure_variable": "computeDistance"
+      }
+    },
+    "controllers": {
+      "kl_bracelet_table_contact_force_pid_controller": {
+        "measured": {
+          "of": {
+            "id": "kl_bracelet_table_contact_force_lin_z",
+            "applied_by_entity": "kl_bracelet_link",
+            "applied_to_entity": "table",
+            "type": "force",
+            "vector": "kl_bracelet_table_contact_force_lin_z_vector_lin_z"
+          },
+          "asb": "kl_bracelet_link"
+        },
+        "operator": "Equal",
+        "reference_value": "arm_table_contact_force_reference_value",
+        "size": null,
+        "name": "pid_controller",
+        "error": "kl_bracelet_table_contact_force_pid_controller_error",
+        "dt": "kl_bracelet_table_contact_force_pid_controller_time_step",
+        "gains": {
+          "kp": "kl_bracelet_table_contact_force_pid_controller_kp",
+          "ki": "kl_bracelet_table_contact_force_pid_controller_ki",
+          "kd": "kl_bracelet_table_contact_force_pid_controller_kd"
+        },
+        "signal": "kl_bracelet_table_contact_force_pid_controller_signal",
+        "vector": "kl_bracelet_table_contact_force_embed_map_vector",
+        "error_sum": "kl_bracelet_table_contact_force_pid_controller_error_sum",
+        "last_error": "kl_bracelet_table_contact_force_pid_controller_prev_error"
+      },
+      "kr_bracelet_table_contact_force_pid_controller": {
+        "measured": {
+          "of": {
+            "id": "kr_bracelet_table_contact_force_lin_z",
+            "applied_by_entity": "kr_bracelet_link",
+            "applied_to_entity": "table",
+            "type": "force",
+            "vector": "kr_bracelet_table_contact_force_lin_z_vector_lin_z"
+          },
+          "asb": "kr_bracelet_link"
+        },
+        "operator": "Equal",
+        "reference_value": "arm_table_contact_force_reference_value",
+        "size": null,
+        "name": "pid_controller",
+        "error": "kr_bracelet_table_contact_force_pid_controller_error",
+        "dt": "kr_bracelet_table_contact_force_pid_controller_time_step",
+        "gains": {
+          "kp": "kr_bracelet_table_contact_force_pid_controller_kp",
+          "ki": "kr_bracelet_table_contact_force_pid_controller_ki",
+          "kd": "kr_bracelet_table_contact_force_pid_controller_kd"
+        },
+        "signal": "kr_bracelet_table_contact_force_pid_controller_signal",
+        "vector": "kr_bracelet_table_contact_force_embed_map_vector",
+        "error_sum": "kr_bracelet_table_contact_force_pid_controller_error_sum",
+        "last_error": "kr_bracelet_table_contact_force_pid_controller_prev_error"
+      },
+      "kr_bl_position_lin_y_pid_controller": {
+        "measured": {
+          "of": {
+            "id": "kr_bl_position_coord_lin_y",
+            "entity": "kinova_right_bracelet_link_origin_point",
+            "type": "position",
+            "vector": "kr_bl_position_coord_lin_y_vector"
+          },
+          "asb": "base_link"
+        },
+        "operator": "Equal",
+        "reference_value": "kr_bl_position_coord_lin_y_initial",
+        "size": null,
+        "name": "pid_controller",
+        "error": "kr_bl_position_lin_y_pid_controller_error",
+        "dt": "kr_bl_position_lin_y_pid_controller_time_step",
+        "gains": {
+          "kp": "kr_bl_position_lin_y_pid_controller_kp",
+          "ki": "kr_bl_position_lin_y_pid_controller_ki",
+          "kd": "kr_bl_position_lin_y_pid_controller_kd"
+        },
+        "signal": "kr_bl_position_lin_y_pid_controller_signal",
+        "vector": "kr_bl_position_lin_y_embed_map_vector",
+        "error_sum": "kr_bl_position_lin_y_pid_controller_error_sum",
+        "last_error": "kr_bl_position_lin_y_pid_controller_prev_error"
+      },
+      "kr_bl_position_lin_z_pid_controller": {
+        "measured": {
+          "of": {
+            "id": "kr_bl_position_coord_lin_z",
+            "entity": "kinova_right_bracelet_link_origin_point",
+            "type": "position",
+            "vector": "kr_bl_position_coord_lin_z_vector"
+          },
+          "asb": "base_link"
+        },
+        "operator": "Equal",
+        "reference_value": "kr_bl_position_coord_lin_z_initial",
+        "size": null,
+        "name": "pid_controller",
+        "error": "kr_bl_position_lin_z_pid_controller_error",
+        "dt": "kr_bl_position_lin_z_pid_controller_time_step",
+        "gains": {
+          "kp": "kr_bl_position_lin_z_pid_controller_kp",
+          "ki": "kr_bl_position_lin_z_pid_controller_ki",
+          "kd": "kr_bl_position_lin_z_pid_controller_kd"
+        },
+        "signal": "kr_bl_position_lin_z_pid_controller_signal",
+        "vector": "kr_bl_position_lin_z_embed_map_vector",
+        "error_sum": "kr_bl_position_lin_z_pid_controller_error_sum",
+        "last_error": "kr_bl_position_lin_z_pid_controller_prev_error"
+      },
+      "kr_bl_orientation_pid_controller": {
+        "measured": {
+          "of": {
+            "id": "kr_bl_orientation_coord",
+            "entity": "kinova_right_bracelet_link_origin_point",
+            "type": "Quaternion",
+            "vector": "kr_bl_orientation_coord_vector"
+          },
+          "asb": "base_link"
+        },
+        "operator": "QuaternionEqual",
+        "reference_value": "kr_bl_orientation_coord_initial",
+        "size": 3,
+        "name": "pid_controller",
+        "error": "kr_bl_orientation_pid_controller_error",
+        "dt": "kr_bl_orientation_pid_controller_time_step",
+        "gains": {
+          "kp": "kr_bl_orientation_pid_controller_kp",
+          "ki": "kr_bl_orientation_pid_controller_ki",
+          "kd": "kr_bl_orientation_pid_controller_kd"
+        },
+        "signal": "kr_bl_orientation_pid_controller_signal",
+        "vector": "kr_bl_orientation_embed_map_vector",
+        "error_sum": "kr_bl_orientation_pid_controller_error_sum",
+        "last_error": "kr_bl_orientation_pid_controller_prev_error"
+      },
+      "kr_elbow_base_base_distance_z_impedance_controller": {
+        "operator": "Equal",
+        "stiffness": {
+          "error": "kr_elbow_base_base_distance_z_impedance_controller_stiffness_error",
+          "reference_value": "kr_elbow_base_z_distance_reference_value",
+          "measure_variable": "computeDistance1D",
+          "diag_mat": "kr_elbow_base_base_distance_z_impedance_controller_stiffness_diag_mat",
+          "measured": {
+            "of": {
+              "id": "kr_elbow_base_distance_coord_lin_z",
+              "entities": [
+                "kinova_right_half_arm_2_link_origin_point",
+                "base_link_origin_point"
+              ],
+              "axis": "kr_elbow_base_distance_coord_lin_z_axis"
+            },
+            "asb": "base_link"
+          }
+        },
+        "force": {
+          "id": "kr_elbow_force_z",
+          "applied_to": "kr_half_arm_2_link"
+        },
+        "name": "impedance_controller",
+        "damping": null,
+        "signal": "kr_elbow_base_base_distance_z_impedance_controller_signal",
+        "vector": "kr_elbow_base_base_distance_z_embed_map_vector"
+      },
+      "kl_bl_position_lin_y_pid_controller": {
+        "measured": {
+          "of": {
+            "id": "kl_bl_position_coord_lin_y",
+            "entity": "kinova_left_bracelet_link_origin_point",
+            "type": "position",
+            "vector": "kl_bl_position_coord_lin_y_vector"
+          },
+          "asb": "base_link"
+        },
+        "operator": "Equal",
+        "reference_value": "kl_bl_position_coord_lin_y_initial",
+        "size": null,
+        "name": "pid_controller",
+        "error": "kl_bl_position_lin_y_pid_controller_error",
+        "dt": "kl_bl_position_lin_y_pid_controller_time_step",
+        "gains": {
+          "kp": "kl_bl_position_lin_y_pid_controller_kp",
+          "ki": "kl_bl_position_lin_y_pid_controller_ki",
+          "kd": "kl_bl_position_lin_y_pid_controller_kd"
+        },
+        "signal": "kl_bl_position_lin_y_pid_controller_signal",
+        "vector": "kl_bl_position_lin_y_embed_map_vector",
+        "error_sum": "kl_bl_position_lin_y_pid_controller_error_sum",
+        "last_error": "kl_bl_position_lin_y_pid_controller_prev_error"
+      },
+      "kl_bl_position_lin_z_pid_controller": {
+        "measured": {
+          "of": {
+            "id": "kl_bl_position_coord_lin_z",
+            "entity": "kinova_left_bracelet_link_origin_point",
+            "type": "position",
+            "vector": "kl_bl_position_coord_lin_z_vector"
+          },
+          "asb": "base_link"
+        },
+        "operator": "Equal",
+        "reference_value": "kl_bl_position_coord_lin_z_initial",
+        "size": null,
+        "name": "pid_controller",
+        "error": "kl_bl_position_lin_z_pid_controller_error",
+        "dt": "kl_bl_position_lin_z_pid_controller_time_step",
+        "gains": {
+          "kp": "kl_bl_position_lin_z_pid_controller_kp",
+          "ki": "kl_bl_position_lin_z_pid_controller_ki",
+          "kd": "kl_bl_position_lin_z_pid_controller_kd"
+        },
+        "signal": "kl_bl_position_lin_z_pid_controller_signal",
+        "vector": "kl_bl_position_lin_z_embed_map_vector",
+        "error_sum": "kl_bl_position_lin_z_pid_controller_error_sum",
+        "last_error": "kl_bl_position_lin_z_pid_controller_prev_error"
+      },
+      "kl_bl_orientation_pid_controller": {
+        "measured": {
+          "of": {
+            "id": "kl_bl_orientation_coord",
+            "entity": "kinova_left_bracelet_link_origin_point",
+            "type": "Quaternion",
+            "vector": "kl_bl_orientation_coord_vector"
+          },
+          "asb": "base_link"
+        },
+        "operator": "QuaternionEqual",
+        "reference_value": "kl_bl_orientation_coord_initial",
+        "size": 3,
+        "name": "pid_controller",
+        "error": "kl_bl_orientation_pid_controller_error",
+        "dt": "kl_bl_orientation_pid_controller_time_step",
+        "gains": {
+          "kp": "kl_bl_orientation_pid_controller_kp",
+          "ki": "kl_bl_orientation_pid_controller_ki",
+          "kd": "kl_bl_orientation_pid_controller_kd"
+        },
+        "signal": "kl_bl_orientation_pid_controller_signal",
+        "vector": "kl_bl_orientation_embed_map_vector",
+        "error_sum": "kl_bl_orientation_pid_controller_error_sum",
+        "last_error": "kl_bl_orientation_pid_controller_prev_error"
+      },
+      "kl_elbow_base_base_distance_z_impedance_controller": {
+        "operator": "Equal",
+        "stiffness": {
+          "error": "kl_elbow_base_base_distance_z_impedance_controller_stiffness_error",
+          "reference_value": "kl_elbow_base_z_distance_reference_value",
+          "measure_variable": "computeDistance1D",
+          "diag_mat": "kl_elbow_base_base_distance_z_impedance_controller_stiffness_diag_mat",
+          "measured": {
+            "of": {
+              "id": "kl_elbow_base_distance_coord_lin_z",
+              "entities": [
+                "kinova_left_half_arm_2_link_origin_point",
+                "base_link_origin_point"
+              ],
+              "axis": "kl_elbow_base_distance_coord_lin_z_axis"
+            },
+            "asb": "base_link"
+          }
+        },
+        "force": {
+          "id": "kl_elbow_force_z",
+          "applied_to": "kl_half_arm_2_link"
+        },
+        "name": "impedance_controller",
+        "damping": null,
+        "signal": "kl_elbow_base_base_distance_z_impedance_controller_signal",
+        "vector": "kl_elbow_base_base_distance_z_embed_map_vector"
+      },
+      "kl_bracelet_base_distance_impedance_controller": {
+        "operator": "Equal",
+        "stiffness": {
+          "error": "kl_bracelet_base_distance_impedance_controller_stiffness_error",
+          "reference_value": "arms_distance_reference_value",
+          "measure_variable": "computeDistance",
+          "diag_mat": "kl_bracelet_base_distance_impedance_controller_stiffness_diag_mat",
+          "measured": {
+            "of": {
+              "id": "kl_bracelet_base_distance_coord",
+              "entities": [
+                "kl_bracelet_link",
+                "kl_base_link"
+              ]
+            },
+            "asb": "kl_bracelet_link"
+          }
+        },
+        "name": "impedance_controller",
+        "damping": null,
+        "signal": "kl_bracelet_base_distance_impedance_controller_signal",
+        "vector": "kl_bracelet_base_distance_embed_map_vector"
+      },
+      "kr_bracelet_base_distance_impedance_controller": {
+        "operator": "Equal",
+        "stiffness": {
+          "error": "kr_bracelet_base_distance_impedance_controller_stiffness_error",
+          "reference_value": "arms_distance_reference_value",
+          "measure_variable": "computeDistance",
+          "diag_mat": "kr_bracelet_base_distance_impedance_controller_stiffness_diag_mat",
+          "measured": {
+            "of": {
+              "id": "kr_bracelet_base_distance_coord",
+              "entities": [
+                "kr_bracelet_link",
+                "kr_base_link"
+              ]
+            },
+            "asb": "kr_bracelet_link"
+          }
+        },
+        "name": "impedance_controller",
+        "damping": null,
+        "signal": "kr_bracelet_base_distance_impedance_controller_signal",
+        "vector": "kr_bracelet_base_distance_embed_map_vector"
+      }
+    },
+    "embed_maps": {
+      "kl_achd_solver_fext": [
+        {
+          "asb": "kl_bracelet_link",
+          "output_wrench_applied_by": "kl_bracelet_link",
+          "name": "embed_map",
+          "input": "kl_bracelet_table_contact_force_pid_controller_signal",
+          "output": "kl_bracelet_table_contact_force_embed_map_kl_achd_solver_fext_output_external_wrench",
+          "output_type": "external-wrench",
+          "vector": "kl_bracelet_table_contact_force_embed_map_vector",
+          "vector_info": null,
+          "return": null
+        },
+        {
+          "asb": "base_link",
+          "output_wrench_applied_to": "kl_half_arm_2_link",
+          "name": "embed_map",
+          "input": "kl_elbow_base_base_distance_z_impedance_controller_signal",
+          "output": "kl_elbow_base_base_distance_z_embed_map_kl_achd_solver_fext_output_external_wrench",
+          "output_type": "external-wrench",
+          "vector": "kl_elbow_base_base_distance_z_embed_map_vector",
+          "vector_info": null,
+          "return": null
+        }
+      ],
+      "kr_achd_solver_fext": [
+        {
+          "asb": "kr_bracelet_link",
+          "output_wrench_applied_by": "kr_bracelet_link",
+          "name": "embed_map",
+          "input": "kr_bracelet_table_contact_force_pid_controller_signal",
+          "output": "kr_bracelet_table_contact_force_embed_map_kr_achd_solver_fext_output_external_wrench",
+          "output_type": "external-wrench",
+          "vector": "kr_bracelet_table_contact_force_embed_map_vector",
+          "vector_info": null,
+          "return": null
+        },
+        {
+          "asb": "base_link",
+          "output_wrench_applied_to": "kr_half_arm_2_link",
+          "name": "embed_map",
+          "input": "kr_elbow_base_base_distance_z_impedance_controller_signal",
+          "output": "kr_elbow_base_base_distance_z_embed_map_kr_achd_solver_fext_output_external_wrench",
+          "output_type": "external-wrench",
+          "vector": "kr_elbow_base_base_distance_z_embed_map_vector",
+          "vector_info": null,
+          "return": null
+        }
+      ],
+      "kr_achd_solver": [
+        {
+          "name": "embed_map",
+          "input": "kr_bl_position_lin_y_pid_controller_signal",
+          "output": "kr_bl_position_lin_y_embed_map_kr_achd_solver_output_acceleration_energy",
+          "output_type": "acceleration-energy",
+          "vector": "kr_bl_position_lin_y_embed_map_vector",
+          "vector_info": null,
+          "return": null
+        },
+        {
+          "name": "embed_map",
+          "input": "kr_bl_position_lin_z_pid_controller_signal",
+          "output": "kr_bl_position_lin_z_embed_map_kr_achd_solver_output_acceleration_energy",
+          "output_type": "acceleration-energy",
+          "vector": "kr_bl_position_lin_z_embed_map_vector",
+          "vector_info": null,
+          "return": null
+        },
+        {
+          "name": "embed_map",
+          "input": "kr_bl_orientation_pid_controller_signal",
+          "output": "kr_bl_orientation_embed_map_kr_achd_solver_output_acceleration_energy",
+          "output_type": "acceleration-energy",
+          "vector": "kr_bl_orientation_embed_map_vector",
+          "vector_info": null,
+          "return": null
+        }
+      ],
+      "kl_achd_solver": [
+        {
+          "name": "embed_map",
+          "input": "kl_bl_position_lin_y_pid_controller_signal",
+          "output": "kl_bl_position_lin_y_embed_map_kl_achd_solver_output_acceleration_energy",
+          "output_type": "acceleration-energy",
+          "vector": "kl_bl_position_lin_y_embed_map_vector",
+          "vector_info": null,
+          "return": null
+        },
+        {
+          "name": "embed_map",
+          "input": "kl_bl_position_lin_z_pid_controller_signal",
+          "output": "kl_bl_position_lin_z_embed_map_kl_achd_solver_output_acceleration_energy",
+          "output_type": "acceleration-energy",
+          "vector": "kl_bl_position_lin_z_embed_map_vector",
+          "vector_info": null,
+          "return": null
+        },
+        {
+          "name": "embed_map",
+          "input": "kl_bl_orientation_pid_controller_signal",
+          "output": "kl_bl_orientation_embed_map_kl_achd_solver_output_acceleration_energy",
+          "output_type": "acceleration-energy",
+          "vector": "kl_bl_orientation_embed_map_vector",
+          "vector_info": null,
+          "return": null
+        }
+      ],
+      "fd_solver_robile": [
+        {
+          "asb": "kl_bracelet_link",
+          "name": "embed_map",
+          "input": "kl_bracelet_base_distance_impedance_controller_signal",
+          "output": "kl_bracelet_base_distance_embed_map_fd_solver_robile_output_external_wrench",
+          "output_type": "external-wrench",
+          "vector": null,
+          "vector_info": {
+            "from": "kl_bracelet_link",
+            "to": "kl_base_link",
+            "asb": "kl_bracelet_link"
+          },
+          "return": null
+        },
+        {
+          "asb": "kr_bracelet_link",
+          "name": "embed_map",
+          "input": "kr_bracelet_base_distance_impedance_controller_signal",
+          "output": "kr_bracelet_base_distance_embed_map_fd_solver_robile_output_external_wrench",
+          "output_type": "external-wrench",
+          "vector": null,
+          "vector_info": {
+            "from": "kr_bracelet_link",
+            "to": "kr_base_link",
+            "asb": "kr_bracelet_link"
+          },
+          "return": null
+        }
+      ]
+    },
+    "solvers": {
+      "kr_achd_solver": {
+        "name": "achd_solver",
+        "root_acceleration": "kr_achd_solver_root_acceleration",
+        "alpha": "kr_achd_solver_alpha",
+        "beta": [
+          "kr_bl_position_lin_y_embed_map_kr_achd_solver_output_acceleration_energy",
+          "kr_bl_position_lin_z_embed_map_kr_achd_solver_output_acceleration_energy",
+          "kr_bl_orientation_embed_map_kr_achd_solver_output_acceleration_energy"
+        ],
+        "ext_wrench": [],
+        "nc": "kr_achd_solver_nc",
+        "nj": "kr_achd_solver_nj",
+        "ns": "kr_achd_solver_ns",
+        "tau_ff": "kr_achd_solver_feed_forward_torques",
+        "output_torques": "kr_achd_solver_output_torques",
+        "predicted_accelerations": "kr_achd_solver_predicted_accelerations",
+        "root_link": "kinova_right_base_link",
+        "tip_link": "kinova_right_bracelet_link",
+        "return": null
+      },
+      "kr_achd_solver_fext": {
+        "name": "achd_solver_fext",
+        "root_link": "kinova_right_base_link",
+        "tip_link": "kinova_right_bracelet_link",
+        "ext_wrench": [
+          {
+            "link": "kr_bracelet_link",
+            "wrench": "kr_bracelet_table_contact_force_embed_map_kr_achd_solver_fext_output_external_wrench",
+            "asb": "kr_bracelet_link"
+          },
+          {
+            "link": "kr_half_arm_2_link",
+            "wrench": "kr_elbow_base_base_distance_z_embed_map_kr_achd_solver_fext_output_external_wrench",
+            "asb": "base_link"
+          }
+        ],
+        "nj": "kr_achd_solver_fext_nj",
+        "ns": "kr_achd_solver_fext_ns",
+        "output_torques": "kr_achd_solver_fext_output_torques",
+        "predicted_accelerations": null,
+        "return": null
+      },
+      "kl_achd_solver": {
+        "name": "achd_solver",
+        "root_acceleration": "kl_achd_solver_root_acceleration",
+        "alpha": "kl_achd_solver_alpha",
+        "beta": [
+          "kl_bl_position_lin_y_embed_map_kl_achd_solver_output_acceleration_energy",
+          "kl_bl_position_lin_z_embed_map_kl_achd_solver_output_acceleration_energy",
+          "kl_bl_orientation_embed_map_kl_achd_solver_output_acceleration_energy"
+        ],
+        "ext_wrench": [],
+        "nc": "kl_achd_solver_nc",
+        "nj": "kl_achd_solver_nj",
+        "ns": "kl_achd_solver_ns",
+        "tau_ff": "kl_achd_solver_feed_forward_torques",
+        "output_torques": "kl_achd_solver_output_torques",
+        "predicted_accelerations": "kl_achd_solver_predicted_accelerations",
+        "root_link": "kinova_left_base_link",
+        "tip_link": "kinova_left_bracelet_link",
+        "return": null
+      },
+      "kl_achd_solver_fext": {
+        "name": "achd_solver_fext",
+        "root_link": "kinova_left_base_link",
+        "tip_link": "kinova_left_bracelet_link",
+        "ext_wrench": [
+          {
+            "link": "kl_bracelet_link",
+            "wrench": "kl_bracelet_table_contact_force_embed_map_kl_achd_solver_fext_output_external_wrench",
+            "asb": "kl_bracelet_link"
+          },
+          {
+            "link": "kl_half_arm_2_link",
+            "wrench": "kl_elbow_base_base_distance_z_embed_map_kl_achd_solver_fext_output_external_wrench",
+            "asb": "base_link"
+          }
+        ],
+        "nj": "kl_achd_solver_fext_nj",
+        "ns": "kl_achd_solver_fext_ns",
+        "output_torques": "kl_achd_solver_fext_output_torques",
+        "predicted_accelerations": null,
+        "return": null
+      },
+      "fd_solver_robile": {
+        "robot": "freddy_base",
+        "name": "base_fd_solver",
+        "root_acceleration": "fd_solver_robile_root_acceleration",
+        "platform_force": [
+          "kl_bracelet_base_distance_embed_map_fd_solver_robile_output_external_wrench",
+          "kr_bracelet_base_distance_embed_map_fd_solver_robile_output_external_wrench"
+        ],
+        "output_torques": "fd_solver_robile_output_torques",
+        "predicted_accelerations": null,
+        "return": null
+      }
+    },
+    "robots": {
+      "kinova_right": {
+        "type": "Manipulator",
+        "kinematic_chain_start": "kinova_right_base_link",
+        "kinematic_chain_end": "kinova_right_bracelet_link",
+        "input_command_torques": [
+          "kr_achd_solver_output_torques",
+          "kr_achd_solver_fext_output_torques"
+        ]
+      },
+      "kinova_left": {
+        "type": "Manipulator",
+        "kinematic_chain_start": "kinova_left_base_link",
+        "kinematic_chain_end": "kinova_left_bracelet_link",
+        "input_command_torques": [
+          "kl_achd_solver_output_torques",
+          "kl_achd_solver_fext_output_torques"
+        ]
+      },
+      "freddy_base": {
+        "type": "MobileBase",
+        "input_command_torques": [
+          "fd_solver_robile_output_torques"
+        ]
+      }
+    }
+  }
+}
