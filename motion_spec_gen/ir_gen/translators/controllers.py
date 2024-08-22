@@ -22,7 +22,7 @@ from motion_spec_gen.utility.helpers import for_type
 @for_type(PID_CONTROLLER.PIDController)
 class PIDControllerTranslator:
 
-    def translate(self, g: rdflib.Graph, node, verbose=False, **kwargs) -> dict:
+    def translate(self, g: rdflib.Graph, node: rdflib.URIRef, verbose=False, **kwargs) -> dict:
         verbose_padding: int = 0
         # Get the verbose padding from the kwargs
         if "verbose_padding" in kwargs:
