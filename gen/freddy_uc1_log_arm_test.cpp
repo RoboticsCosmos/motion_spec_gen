@@ -216,11 +216,11 @@ int main(int argc, char **argv)
 
   double kr_elbow_base_z_distance_reference_value = 0.7;
   double kl_elbow_base_z_distance_reference_value = 0.7;
-  double kr_elbow_base_base_distance_z_impedance_controller_stiffness_diag_mat[1] = {300.0};
-  double kl_elbow_base_base_distance_z_impedance_controller_stiffness_diag_mat[1] = {300.0};
+  double kr_elbow_base_base_distance_z_impedance_controller_stiffness_diag_mat[1] = {200.0};
+  double kl_elbow_base_base_distance_z_impedance_controller_stiffness_diag_mat[1] = {200.0};
 
-  double kr_arm_table_contact_force_reference_value = -15.0;
-  double kl_arm_table_contact_force_reference_value = -15.0;
+  double kr_arm_table_contact_force_reference_value = -5.0;
+  double kl_arm_table_contact_force_reference_value = -5.0;
 
   double kl_bl_orientation_ang_x_pid_controller_kp = 80.0;
   double kl_bl_orientation_ang_x_pid_controller_ki = 2.9;
@@ -1169,8 +1169,8 @@ int main(int argc, char **argv)
     double kr_achd_solver_beta[6]{};
     add(kr_bl_position_lin_y_twist_embed_map_kr_achd_solver_output_acceleration_energy,
         kr_achd_solver_beta, kr_achd_solver_beta, 6);
-    add(kr_bl_position_lin_z_twist_embed_map_kr_achd_solver_output_acceleration_energy,
-        kr_achd_solver_beta, kr_achd_solver_beta, 6);
+    // add(kr_bl_position_lin_z_twist_embed_map_kr_achd_solver_output_acceleration_energy,
+    //     kr_achd_solver_beta, kr_achd_solver_beta, 6);
     add(kr_bl_orientation_ang_x_twist_embed_map_kr_achd_solver_output_acceleration_energy,
         kr_achd_solver_beta, kr_achd_solver_beta, 6);
     add(kr_bl_orientation_ang_y_twist_embed_map_kr_achd_solver_output_acceleration_energy,
@@ -1209,12 +1209,12 @@ int main(int argc, char **argv)
         kinova_right_bracelet_table_contact_force_embed_map_kr_achd_solver_fext_output_external_wrench_transf);
     getLinkId(&robot, kinova_right_base_link, kinova_right_bracelet_link,
               kinova_right_bracelet_link, link_id);
-    for (size_t i = 0; i < 6; i++)
-    {
-      kr_achd_solver_fext_ext_wrenches[link_id][i] =
-          kinova_right_bracelet_table_contact_force_embed_map_kr_achd_solver_fext_output_external_wrench_transf
-              [i];
-    }
+    // for (size_t i = 0; i < 6; i++)
+    // {
+    //   kr_achd_solver_fext_ext_wrenches[link_id][i] =
+    //       kinova_right_bracelet_table_contact_force_embed_map_kr_achd_solver_fext_output_external_wrench_transf
+    //           [i];
+    // }
 
     double
         kr_elbow_base_base_distance_z_embed_map_kr_achd_solver_fext_output_external_wrench_transf
