@@ -309,6 +309,7 @@ class EMBED_MAP(DefinedNamespace):
     _extras = [
         "output-external-wrench",
         "output-wrench-applied-to",
+        "output-wrench-applied-by",
         "output-acceleration-energy",
         "stiffness-vector",
         "damping-vector",

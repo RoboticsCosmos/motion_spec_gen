@@ -367,7 +367,21 @@ class BaseFDSolverTranslator:
                 "value": None,
             }
 
-            platform_force.append(embed_map["output"])
+            # check transform
+            tf = None
+            if embed_map["vector_info"] is not None:
+                if embed_map["vector_info"]["asb"] != "base_link":
+                    tf = {
+                        "from": embed_map["vector_info"]["asb"],
+                        "to": "base_link",
+                    }
+
+            pf = {
+                "wrench": embed_map["output"],
+                "transform": tf,
+            }
+
+            platform_force.append(pf)
 
         # TODO: get the number of joints from the robot model
         variables[f"{id}_output_torques"] = {

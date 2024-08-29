@@ -2033,8 +2033,20 @@
         "name": "base_fd_solver",
         "root_acceleration": "fd_solver_robile_root_acceleration",
         "platform_force": [
-          "kl_bracelet_base_distance_embed_map_fd_solver_robile_output_external_wrench",
-          "kr_bracelet_base_distance_embed_map_fd_solver_robile_output_external_wrench"
+          {
+            "wrench": "kl_bracelet_base_distance_embed_map_fd_solver_robile_output_external_wrench",
+            "transform": {
+              "from": "kl_bracelet_link",
+              "to": "base_link"
+            }
+          },
+          {
+            "wrench": "kr_bracelet_base_distance_embed_map_fd_solver_robile_output_external_wrench",
+            "transform": {
+              "from": "kr_bracelet_link",
+              "to": "base_link"
+            }
+          }
         ],
         "output_torques": "fd_solver_robile_output_torques",
         "predicted_accelerations": null,

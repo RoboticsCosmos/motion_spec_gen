@@ -91,6 +91,7 @@ get_kelo_base_state(&<robot>_config, &<robot>_ethercat_config, <robot>_state.piv
 
 set_robot_command_torques(robots_data) ::= <<
 // Command the torques to the robots
+
 <robots_data: {robot | <({command_<robots_data.(robot).type>_torques})(robot, robots_data.(robot))>}; separator="\n">
 <robots_data: {robot | <({set_<robots_data.(robot).type>_torques})(robot, robots_data.(robot))>}; separator="\n">
 >>
@@ -100,10 +101,6 @@ double <robot>_cmd_tau[7]{};
 <robot_data.input_command_torques: {ct | add(<ct>, <robot>_cmd_tau, <robot>_cmd_tau, 7);}; separator="\n">
 KDL::JntArray <robot>_cmd_tau_kdl(7);
 cap_and_convert_torques(<robot>_cmd_tau, 7, <robot>_cmd_tau_kdl);
-if (!<robot>_torque_control_mode_set) {
-  robot.<robot>->mediator->set_control_mode(2, <robot>_rne_init_taus);
-  <robot>_torque_control_mode_set = true;
-}
 
 >>
 
@@ -112,15 +109,11 @@ set_manipulator_torques(&robot, <robot_data.kinematic_chain_start>, &<robot>_cmd
 >>
 
 command_MobileBase_torques(robot, robot_data) ::= <<
-<if(!length(robot_data.input_command_torques))>
 double <robot>_cmd_tau[8]{};
 <robot_data.input_command_torques: {ct | add(<ct>, <robot>_cmd_tau, <robot>_cmd_tau, 8);}; separator="\n">
-<endif>
 
 >>
 
 set_MobileBase_torques(robot, robot_data) ::= <<
-<if(!length(robot_data.input_command_torques))>
-set_kelo_base_torques(&<robot>_config, &<robot>_ethercat_config, <robot>_cmd_tau);
-<endif>
+set_kelo_base_torques(&robot, <robot>_cmd_tau);
 >>

@@ -1254,7 +1254,9 @@ int main(int argc, char **argv)
     for (size_t i = 0; i < sizeof(kr_achd_solver_beta) / sizeof(kr_achd_solver_beta[0]); i++)
     {
       if (kr_achd_solver_beta[i] != 0.0 || kr_achd_solver_beta[i] != 0)
-    //                   robot.mobile_base->mediator->ethercat_config);
+      {
+        kr_solver_beta[kr_s_i] = kr_achd_solver_beta[i];
+        kr_s_i++;
       }
     }
     achd_solver(&robot, kinova_right_base_link, kinova_right_bracelet_link, kr_achd_solver_nc,
