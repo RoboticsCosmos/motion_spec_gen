@@ -18,6 +18,7 @@ link_directories(${CMAKE_INSTALL_PREFIX}/lib/)
 find_package(Eigen3 REQUIRED)
 find_package(controllers REQUIRED)
 find_package(motion_spec_utils REQUIRED)
+find_package(kelo_platform REQUIRED)
 find_package(robif2b REQUIRED)
 
 list(APPEND local_INCLUDE_DIRS ${CMAKE_INSTALL_PREFIX}/include/)

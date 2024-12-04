@@ -1,4 +1,3 @@
-#include "kelo_motion_control/mediator.h"
 #include <array>
 #include <string>
 #include <filesystem>
@@ -50,7 +49,7 @@ int main(int argc, char **argv)
   }
   else
   {
-    printf("Usage: ./freddy_uc1_log <run_description>\n");
+    printf("Usage: ./freddy_uc1_log_both_arms_test <run_description>\n");
     exit(1);
   }
 
@@ -208,14 +207,14 @@ int main(int argc, char **argv)
   double kr_bl_position_lin_z_pid_controller_ki = 2.9;
   double kr_bl_position_lin_z_pid_controller_kd = 75.5;
 
-  double kl_bl_position_lin_z_pid_controller_kp = 60.0;
+  double kl_bl_position_lin_z_pid_controller_kp = 150.0;
   double kl_bl_position_lin_z_pid_controller_ki = 2.9;
-  double kl_bl_position_lin_z_pid_controller_kd = 75.5;
+  double kl_bl_position_lin_z_pid_controller_kd = 95.5;
 
   double kr_elbow_base_z_distance_reference_value = 0.7;
   double kl_elbow_base_z_distance_reference_value = 0.7;
-  double kr_elbow_base_base_distance_z_impedance_controller_stiffness_diag_mat[1] = {300.0};
-  double kl_elbow_base_base_distance_z_impedance_controller_stiffness_diag_mat[1] = {300.0};
+  double kr_elbow_base_base_distance_z_impedance_controller_stiffness_diag_mat[1] = {100.0};
+  double kl_elbow_base_base_distance_z_impedance_controller_stiffness_diag_mat[1] = {200.0};
 
   double kr_arm_table_contact_force_reference_value = -10.0;
   double kl_arm_table_contact_force_reference_value = -10.0;
@@ -317,7 +316,7 @@ int main(int argc, char **argv)
   double kr_bl_orientation_coord_ang_z_initial_vector[6] = {0, 0, 0, 0, 0, 1};
 
   // uc1 vars
-  double arms_bl_base_distance_reference_value = 0.6;
+  double arms_bl_base_distance_reference_value = 0.8;
 
   double kr_bl_base_distance = 0.0;
   double kr_bl_base_distance_pid_controller_kp = 400.0;

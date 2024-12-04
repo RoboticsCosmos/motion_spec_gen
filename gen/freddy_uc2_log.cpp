@@ -1,4 +1,3 @@
-#include "kelo_motion_control/mediator.h"
 #include <array>
 #include <string>
 #include <filesystem>

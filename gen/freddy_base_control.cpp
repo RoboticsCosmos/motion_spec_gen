@@ -1,4 +1,3 @@
-#include "kelo_motion_control/mediator.h"
 #include <array>
 #include <string>
 #include <filesystem>
@@ -61,14 +60,14 @@ int main(int argc, char **argv)
   // Initialize the robot structs
   KeloBaseConfig *kelo_base_config = new KeloBaseConfig();
   kelo_base_config->nWheels = 4;
-  int index_to_EtherCAT[4] = {6, 7, 3, 4};
+  int index_to_EtherCAT[4] = {3, 4, 6, 7};
   kelo_base_config->index_to_EtherCAT = index_to_EtherCAT;
   kelo_base_config->radius = 0.115 / 2;
   kelo_base_config->castor_offset = 0.01;
   kelo_base_config->half_wheel_distance = 0.0775 / 2;
-  double wheel_coordinates[8] = {0.188, 0.2075, -0.188, 0.2075, -0.188, -0.2075, 0.188, -0.2075};
+  double wheel_coordinates[8] = {0.195, 0.21, -0.195, 0.21, -0.195, -0.21, 0.195, -0.21};
   kelo_base_config->wheel_coordinates = wheel_coordinates;
-  double pivot_angles_deviation[4] = {5.310, 5.533, 1.563, 1.625};
+  double pivot_angles_deviation[4] = {0.0, 0.0, 0.0, 0.0};
   kelo_base_config->pivot_angles_deviation = pivot_angles_deviation;
 
   EthercatConfig *ethercat_config = new EthercatConfig();
@@ -98,49 +97,33 @@ int main(int argc, char **argv)
   double control_loop_timestep = desired_period.count();                               // s
   double *control_loop_dt = &control_loop_timestep;                                    // s
 
-  // // log structs
-  // std::string log_dir = "../../logs/data/freddy_base_control";
-  // char log_dir_name[100];
-  // get_new_folder_name(log_dir.c_str(), log_dir_name);
-  // std::filesystem::create_directories(log_dir_name);
-  // std::filesystem::permissions(log_dir_name, std::filesystem::perms::all);
-
-  // LogControlDataVector log_w1_lin_ctrl_data("w1_lin_ctrl", "pid", log_dir_name, 1);
-  // LogControlDataVector log_w2_lin_ctrl_data("w2_lin_ctrl", "pid", log_dir_name, 2);
-  // LogControlDataVector log_w3_lin_ctrl_data("w3_lin_ctrl", "pid", log_dir_name, 3);
-  // LogControlDataVector log_w4_lin_ctrl_data("w4_lin_ctrl", "pid", log_dir_name, 4);
-
-  // LogControlDataVector log_w1_ang_ctrl_data("w1_ang_ctrl", "pid", log_dir_name, 5);
-  // LogControlDataVector log_w2_ang_ctrl_data("w2_ang_ctrl", "pid", log_dir_name, 6);
-  // LogControlDataVector log_w3_ang_ctrl_data("w3_ang_ctrl", "pid", log_dir_name, 7);
-  // LogControlDataVector log_w4_ang_ctrl_data("w4_ang_ctrl", "pid", log_dir_name, 8);
-
-  // LogMobileBaseDataVector base_log_data_vec(log_dir_name, 9);
-
   // pid controller variables
-  double Kp = 6.0;
+  double Kp = 3.0;
   double Ki = 0.5;
-  double Kd = 0.0;
+  double Kd = 0.2;
 
-  double w1_lin_prev_error = 0.0;
-  double w1_lin_error_sum = 0.0;
-  double w1_ang_prev_error = 0.0;
-  double w1_ang_error_sum = 0.0;
+  double w_dist_prev_error[4] = {0.0, 0.0, 0.0, 0.0};
+  double w_dist_error_sum[4] = {0.0, 0.0, 0.0, 0.0};
 
-  double w2_lin_prev_error = 0.0;
-  double w2_lin_error_sum = 0.0;
-  double w2_ang_prev_error = 0.0;
-  double w2_ang_error_sum = 0.0;
+  // double w1_lin_prev_error = 0.0;
+  // double w1_lin_error_sum = 0.0;
+  // double w1_ang_prev_error = 0.0;
+  // double w1_ang_error_sum = 0.0;
 
-  double w3_lin_prev_error = 0.0;
-  double w3_lin_error_sum = 0.0;
-  double w3_ang_prev_error = 0.0;
-  double w3_ang_error_sum = 0.0;
+  // double w2_lin_prev_error = 0.0;
+  // double w2_lin_error_sum = 0.0;
+  // double w2_ang_prev_error = 0.0;
+  // double w2_ang_error_sum = 0.0;
 
-  double w4_lin_prev_error = 0.0;
-  double w4_lin_error_sum = 0.0;
-  double w4_ang_prev_error = 0.0;
-  double w4_ang_error_sum = 0.0;
+  // double w3_lin_prev_error = 0.0;
+  // double w3_lin_error_sum = 0.0;
+  // double w3_ang_prev_error = 0.0;
+  // double w3_ang_error_sum = 0.0;
+
+  // double w4_lin_prev_error = 0.0;
+  // double w4_lin_error_sum = 0.0;
+  // double w4_ang_prev_error = 0.0;
+  // double w4_ang_error_sum = 0.0;
 
   double pf_lin_x_vel_prev_error = 0.0;
   double pf_lin_x_vel_error_sum = 0.0;
@@ -148,6 +131,26 @@ int main(int argc, char **argv)
   double pf_lin_y_vel_error_sum = 0.0;
   double pf_ang_z_vel_prev_error = 0.0;
   double pf_ang_z_vel_error_sum = 0.0;
+
+  double plat_vel_setpoint = 0.05;
+  double plat_clip_force = 20.0;
+  double plat_sat_force = 300.0;
+
+  double plat_vel_xy_pid_controller_kp = 200.0;
+  double plat_vel_xy_pid_controller_ki = 0.0;
+  double plat_vel_xy_pid_controller_kd = 0.0;
+
+  double plat_vel_ang_pid_controller_kp = 100.0;
+  double plat_vel_ang_pid_controller_ki = 0.0;
+  double plat_vel_ang_pid_controller_kd = 0.0;
+
+  double plat_vel_x_prev_error = 0.0;
+  double plat_vel_y_prev_error = 0.0;
+  double plat_vel_ang_prev_error = 0.0;
+
+  double plat_vel_x_error_sum = 0.0;
+  double plat_vel_y_error_sum = 0.0;
+  double plat_vel_ang_error_sum = 0.0;
 
   update_base_state(robot.mobile_base->mediator->kelo_base_config,
                     robot.mobile_base->mediator->ethercat_config);
@@ -161,144 +164,203 @@ int main(int argc, char **argv)
 
     if (flag)
     {
-      // log_w1_lin_ctrl_data.writeToOpenFile();
-      // log_w2_lin_ctrl_data.writeToOpenFile();
-      // log_w3_lin_ctrl_data.writeToOpenFile();
-      // log_w4_lin_ctrl_data.writeToOpenFile();
-
-      // base_log_data_vec.writeToOpenFile();
-
       printf("Exiting somewhat cleanly...\n");
       free_robot_data(&robot);
       exit(0);
     }
 
     count++;
-    // printf("\n");
     printf("count: %d\n", count);
 
-    // update_base_state(robot.mobile_base->mediator->kelo_base_config,
-    //                   robot.mobile_base->mediator->ethercat_config);
     get_robot_data(&robot, *control_loop_dt);
 
-    printf("odometry: ");
-    print_array(robot.mobile_base->state->x_platform, 3);
-
-    // printf("encoder: ");
-    // print_array(robot.mobile_base->state->wheel_encoder_values, 8);
+    // printf("odometry: ");
+    // print_array(robot.mobile_base->state->x_platform, 3);
 
     // solver
-    double platform_force[3] = {pf[0], pf[1], pf[2]};  // [N], [N], [Nm]
+    double plat_force[3] = {pf[0], pf[1], pf[2]};  // [N], [N], [Nm]
 
     // damping controller on the platform velocity
-    double stiffness = 300.0;
-    double inertia = 50.0;
-    double damping = 0.0;
-    double velocity_sp = 0.1;
-    double damping_force[3] = {0.0, 0.0, 0.0};
+    double plat_vel_damping_force[3] = {0.0, 0.0, 0.0};
+    double plat_vel_damping_tube = 0.001;
+    double plat_vel_error[3] = {0.0, 0.0, 0.0};
     
-    double vel_error[3]{};
-    computeEqualityError(robot.mobile_base->state->xd_platform[0], velocity_sp, vel_error[0]);
-    computeEqualityError(robot.mobile_base->state->xd_platform[1], velocity_sp, vel_error[1]);
-    computeEqualityError(robot.mobile_base->state->xd_platform[2], velocity_sp, vel_error[2]);
+    // check if platform velocity is greater than the setpoint
+    if (robot.mobile_base->state->xd_platform[0] > 0 &&
+        robot.mobile_base->state->xd_platform[0] > plat_vel_setpoint)
+      computeEqualityError(robot.mobile_base->state->xd_platform[0], plat_vel_setpoint,
+                           plat_vel_error[0]);
+    else if (robot.mobile_base->state->xd_platform[0] < 0 &&
+             robot.mobile_base->state->xd_platform[0] < -plat_vel_setpoint)
+      computeEqualityError(robot.mobile_base->state->xd_platform[0], -plat_vel_setpoint,
+                           plat_vel_error[0]);
+    else
+      plat_vel_error[0] = 0.0;
 
-    pidController(vel_error[0], stiffness, inertia, damping, control_loop_timestep,
-                  pf_lin_x_vel_error_sum, 5.0, pf_lin_x_vel_prev_error, damping_force[0]);
-    printf("damping force: %f\n", damping_force[0]);
-    pidController(vel_error[1], stiffness, inertia, damping, control_loop_timestep,
-                  pf_lin_y_vel_error_sum, 5.0, pf_lin_y_vel_prev_error, damping_force[1]);
-    pidController(vel_error[2], stiffness, inertia, damping, control_loop_timestep,
-                  pf_ang_z_vel_error_sum, 5.0, pf_ang_z_vel_prev_error, damping_force[2]);
+    if (robot.mobile_base->state->xd_platform[1] > 0 &&
+        robot.mobile_base->state->xd_platform[1] > plat_vel_setpoint)
+      computeEqualityError(robot.mobile_base->state->xd_platform[1], plat_vel_setpoint,
+                           plat_vel_error[1]);
+    else if (robot.mobile_base->state->xd_platform[1] < 0 &&
+             robot.mobile_base->state->xd_platform[1] < -plat_vel_setpoint)
+      computeEqualityError(robot.mobile_base->state->xd_platform[1], -plat_vel_setpoint,
+                           plat_vel_error[1]);
+    else
+      plat_vel_error[1] = 0.0;
+
+    if (robot.mobile_base->state->xd_platform[2] > 0 &&
+        robot.mobile_base->state->xd_platform[2] > plat_vel_setpoint)
+      computeEqualityError(robot.mobile_base->state->xd_platform[2], plat_vel_setpoint,
+                           plat_vel_error[2]);
+    else if (robot.mobile_base->state->xd_platform[2] < 0 &&
+             robot.mobile_base->state->xd_platform[2] < -plat_vel_setpoint)
+      computeEqualityError(robot.mobile_base->state->xd_platform[2], -plat_vel_setpoint,
+                           plat_vel_error[2]);
+    else
+      plat_vel_error[2] = 0.0;
+
+    // check if the velocity is within the tube
+    for (size_t i = 0; i < 3; i++)
+    {
+      if (plat_vel_error[i] < plat_vel_damping_tube && plat_vel_error[i] > -plat_vel_damping_tube)
+      {
+        plat_vel_damping_force[i] = 0.0;
+      }
+    }
+    pidController(plat_vel_error[0], plat_vel_xy_pid_controller_kp, plat_vel_xy_pid_controller_ki,
+                  plat_vel_xy_pid_controller_kd, *control_loop_dt, plat_vel_x_error_sum, 5.0,
+                  plat_vel_x_prev_error, plat_vel_damping_force[0]);
+    pidController(plat_vel_error[1], plat_vel_xy_pid_controller_kp, plat_vel_xy_pid_controller_ki,
+                  plat_vel_xy_pid_controller_kd, *control_loop_dt, plat_vel_y_error_sum, 5.0,
+                  plat_vel_y_prev_error, plat_vel_damping_force[1]);
+    pidController(plat_vel_error[2], plat_vel_ang_pid_controller_kp,
+                  plat_vel_ang_pid_controller_ki, plat_vel_ang_pid_controller_kd, *control_loop_dt,
+                  plat_vel_ang_error_sum, 5.0, plat_vel_ang_prev_error, plat_vel_damping_force[2]);
+
 
     for (size_t i = 0; i < 3; i++)
     {
-      if (platform_force[i] > 10 || platform_force[i] < -10)
+      // damping
+      if (plat_force[i] > plat_clip_force || plat_force[i] < -plat_clip_force)
       {
-        platform_force[i] += damping_force[i];
+        plat_force[i] += plat_vel_damping_force[i];
+      }
+      // clipping
+      else
+      {
+        plat_force[i] = 0.0;
       }
     }
 
+    // saturation
+    for (size_t i = 0; i < 3; i++)
+    {
+      if (plat_force[i] > plat_sat_force)
+      {
+        plat_force[i] = plat_sat_force;
+      }
+      else if (plat_force[i] < -plat_sat_force)
+      {
+        plat_force[i] = -plat_sat_force;
+      }
+    } 
+
     printf("platform force: ");
-    print_array(platform_force, 3);
+    print_array(plat_force, 3);
 
-    printf("platform velocity: ");
-    print_array(robot.mobile_base->state->xd_platform, 3);
+    // printf("platform velocity: ");
+    // print_array(robot.mobile_base->state->xd_platform, 3);
 
-    double lin_offsets[robot.mobile_base->mediator->kelo_base_config->nWheels];
-    double ang_offsets[robot.mobile_base->mediator->kelo_base_config->nWheels];
-    get_pivot_alignment_offsets(&robot, platform_force, lin_offsets, ang_offsets);
+    double lin_offsets[4];
+    double ang_offsets[4];
+    get_pivot_alignment_offsets(&robot, plat_force, lin_offsets, ang_offsets);
 
-    Eigen::Vector2d lin_pf = Eigen::Vector2d(platform_force[0], platform_force[1]);
+    // double lin_signal_w1 = 0.0;
+    // double ang_signal_w1 = 0.0;
+    // double lin_signal_w2 = 0.0;
+    // double ang_signal_w2 = 0.0;
+    // double lin_signal_w3 = 0.0;
+    // double ang_signal_w3 = 0.0;
+    // double lin_signal_w4 = 0.0;
+    // double ang_signal_w4 = 0.0;
 
-    double lin_signal_w1 = 0.0;
-    double ang_signal_w1 = 0.0;
-    double lin_signal_w2 = 0.0;
-    double ang_signal_w2 = 0.0;
-    double lin_signal_w3 = 0.0;
-    double ang_signal_w3 = 0.0;
-    double lin_signal_w4 = 0.0;
-    double ang_signal_w4 = 0.0;
+    // double kp[4] = {Kp, Kp, Kp, Kp};
+    // double ki[4] = {Ki, Ki, Ki, Ki};
+    // double kd[4] = {Kd, Kd, Kd, Kd};
 
-    double kp[4] = {Kp, Kp, Kp, Kp};
-    double ki[4] = {Ki, Ki, Ki, Ki};
-    double kd[4] = {Kd, Kd, Kd, Kd};
+    // pidController(lin_offsets[0], kp[0], ki[0], kd[0], control_loop_timestep, w1_lin_error_sum,
+    //               5.0, w1_lin_prev_error, lin_signal_w1);
+    // pidController(ang_offsets[0], kp[0], ki[0], kd[0], control_loop_timestep, w1_ang_error_sum,
+    //               5.0, w1_ang_prev_error, ang_signal_w1);
 
-    pidController(lin_offsets[0], kp[0], ki[0], kd[0], control_loop_timestep, w1_lin_error_sum,
-                  5.0, w1_lin_prev_error, lin_signal_w1);
-    // log_w1_lin_ctrl_data.addControlDataPID(0.0, 0.0, lin_offsets[0], lin_signal_w1, kp[0],
-    // ki[0],
-    //                                        kd[0], w1_lin_error_sum);
-    pidController(ang_offsets[0], kp[0], ki[0], kd[0], control_loop_timestep, w1_ang_error_sum,
-                  5.0, w1_ang_prev_error, ang_signal_w1);
-    // log_w1_ang_ctrl_data.addControlDataPID(0.0, 0.0, ang_offsets[0], ang_signal_w1, kp[0],
-    // ki[0],
-    //                                        kd[0], w1_ang_error_sum);
+    // pidController(lin_offsets[1], kp[1], ki[1], kd[1], control_loop_timestep, w2_lin_error_sum,
+    //               5.0, w2_lin_prev_error, lin_signal_w2);
+    // pidController(ang_offsets[1], kp[1], ki[1], kd[1], control_loop_timestep, w2_ang_error_sum,
+    //               5.0, w2_ang_prev_error, ang_signal_w2);
 
-    pidController(lin_offsets[1], kp[1], ki[1], kd[1], control_loop_timestep, w2_lin_error_sum,
-                  5.0, w2_lin_prev_error, lin_signal_w2);
-    // log_w2_lin_ctrl_data.addControlDataPID(0.0, 0.0, lin_offsets[1], lin_signal_w2, kp[1],
-    // ki[1],
-    //                                        kd[1], w2_lin_error_sum);
-    pidController(ang_offsets[1], kp[1], ki[1], kd[1], control_loop_timestep, w2_ang_error_sum,
-                  5.0, w2_ang_prev_error, ang_signal_w2);
-    // log_w2_ang_ctrl_data.addControlDataPID(0.0, 0.0, ang_offsets[1], ang_signal_w2, kp[1],
-    // ki[1],
-    //                                        kd[1], w2_ang_error_sum);
+    // pidController(lin_offsets[2], kp[2], ki[2], kd[2], control_loop_timestep, w3_lin_error_sum,
+    //               5.0, w3_lin_prev_error, lin_signal_w3);
+    // pidController(ang_offsets[2], kp[2], ki[2], kd[2], control_loop_timestep, w3_ang_error_sum,
+    //               5.0, w3_ang_prev_error, ang_signal_w3);
 
-    pidController(lin_offsets[2], kp[2], ki[2], kd[2], control_loop_timestep, w3_lin_error_sum,
-                  5.0, w3_lin_prev_error, lin_signal_w3);
-    // log_w3_lin_ctrl_data.addControlDataPID(0.0, 0.0, lin_offsets[2], lin_signal_w3, kp[2],
-    // ki[2],
-    //                                        kd[2], w3_lin_error_sum);
-    pidController(ang_offsets[2], kp[2], ki[2], kd[2], control_loop_timestep, w3_ang_error_sum,
-                  5.0, w3_ang_prev_error, ang_signal_w3);
-    // log_w3_ang_ctrl_data.addControlDataPID(0.0, 0.0, ang_offsets[2], ang_signal_w3, kp[2],
-    // ki[2],
-    //                                        kd[2], w3_ang_error_sum);
+    // pidController(lin_offsets[3], kp[3], ki[3], kd[3], control_loop_timestep, w4_lin_error_sum,
+    //               5.0, w4_lin_prev_error, lin_signal_w4);
+    // pidController(ang_offsets[3], kp[3], ki[3], kd[3], control_loop_timestep, w4_ang_error_sum,
+    //               5.0, w4_ang_prev_error, ang_signal_w4);
 
-    pidController(lin_offsets[3], kp[3], ki[3], kd[3], control_loop_timestep, w4_lin_error_sum,
-                  5.0, w4_lin_prev_error, lin_signal_w4);
-    // log_w4_lin_ctrl_data.addControlDataPID(0.0, 0.0, lin_offsets[3], lin_signal_w4, kp[3],
-    // ki[3],
-    //                                        kd[3], w4_lin_error_sum);
-    pidController(ang_offsets[3], kp[3], ki[3], kd[3], control_loop_timestep, w4_ang_error_sum,
-                  5.0, w4_ang_prev_error, ang_signal_w4);
-    // log_w4_ang_ctrl_data.addControlDataPID(0.0, 0.0, ang_offsets[3], ang_signal_w4, kp[3],
-    // ki[3],
-    //                                        kd[3], w4_ang_error_sum);
+    // double lin_signals[4] = {lin_signal_w1, lin_signal_w2, lin_signal_w3, lin_signal_w4};
+    // double ang_signals[4] = {ang_signal_w1, ang_signal_w2, ang_signal_w3, ang_signal_w4};
 
-    double lin_signals[4] = {lin_signal_w1, lin_signal_w2, lin_signal_w3, lin_signal_w4};
-    double ang_signals[4] = {ang_signal_w1, ang_signal_w2, ang_signal_w3, ang_signal_w4};
+    // transform the platform force by 90 degrees ccw
+    Eigen::Rotation2Dd pf_correction_rot(M_PI / 2);
+    Eigen::Vector2d lin_pf = Eigen::Vector2d(plat_force[0], plat_force[1]);
+
+    // compute the weights for the platform force
+    double platform_weights[2];
+    platform_weights[0] = abs(plat_force[2]) < 1e-6
+                              ? 1.0
+                              : sqrt(pow(plat_force[0], 2) + pow(plat_force[1], 2)) /
+                                    (sqrt(pow(plat_force[0], 2) + pow(plat_force[1], 2) +
+                                          pow(plat_force[2], 2)));
+
+    platform_weights[1] = 1.0 - platform_weights[0];
+
+    double lin_force_weight = lin_pf.norm() == 0.0 ? 0.0 : platform_weights[0];
+    double moment_weight = plat_force[2] == 0.0 ? 0.0 : platform_weights[1];
+
+    double tau_align[4]{};
+    double dist_align[4]{};
+
+    for (size_t i = 0; i < robot.mobile_base->mediator->kelo_base_config->nWheels; i++)
+    {
+      dist_align[i] = lin_offsets[i] * lin_force_weight + ang_offsets[i] * moment_weight;
+    }
+
+    double dist_align_errors[4]{};
+
+    for (size_t i = 0; i < robot.mobile_base->mediator->kelo_base_config->nWheels; i++)
+    {
+      computeEqualityError(dist_align[i], 0.0, dist_align_errors[i]);
+      pidController(dist_align_errors[i], Kp, Ki, Kd, control_loop_timestep, w_dist_error_sum[i], 20.0,
+                    w_dist_prev_error[i], tau_align[i]);
+    }
 
     printf("pivot angles: ");
     print_array(robot.mobile_base->state->pivot_angles, 4);
 
+    printf("distances: ");
+    print_array(dist_align, 4);
+
+    printf("alignment torques: ");
+    print_array(tau_align, 4);
+
     // base solver
     double tau_wheel_c[8]{};
-    base_fd_solver_with_alignment(&robot, platform_force, lin_signals, ang_signals, tau_wheel_c);
+    // base_fd_solver_with_alignment(&robot, plat_force, lin_offsets, ang_offsets, tau_wheel_c);
+    base_fd_solver_cgls(&robot, plat_force, tau_align, tau_wheel_c);
 
-    // set torques
-    double tau_limit = 4.0;
+    // saturate torques
+    double tau_limit = 10.0;
     for (size_t i = 0; i < 8; i++)
     {
       if (tau_wheel_c[i] > tau_limit)
@@ -323,14 +385,12 @@ int main(int argc, char **argv)
 
     printf("\n");
 
-    // base_log_data_vec.addMobileBaseData(robot.mobile_base, robot.mobile_base->state->x_platform,
-    //                                     robot.mobile_base->state->xd_platform, platform_force,
-    //                                     tau_wheel_c);
-
     if (count > 2)
     {
       // raise(SIGINT);
       set_mobile_base_torques(&robot, wtau);
+      update_base_state(robot.mobile_base->mediator->kelo_base_config,
+                        robot.mobile_base->mediator->ethercat_config);
     }
 
     auto end_time = std::chrono::high_resolution_clock::now();
