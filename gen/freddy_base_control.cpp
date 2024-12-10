@@ -26,6 +26,8 @@ void handle_signal(int sig)
   }
 }
 
+// void ramp(double current_vel, double max_vel,
+
 int main(int argc, char **argv)
 {
   // handle signals
@@ -98,32 +100,12 @@ int main(int argc, char **argv)
   double *control_loop_dt = &control_loop_timestep;                                    // s
 
   // pid controller variables
-  double Kp = 3.0;
-  double Ki = 0.5;
-  double Kd = 0.2;
+  double Kp = 1.5;
+  double Ki = 0.1;
+  double Kd = 0.0;
 
   double w_dist_prev_error[4] = {0.0, 0.0, 0.0, 0.0};
   double w_dist_error_sum[4] = {0.0, 0.0, 0.0, 0.0};
-
-  // double w1_lin_prev_error = 0.0;
-  // double w1_lin_error_sum = 0.0;
-  // double w1_ang_prev_error = 0.0;
-  // double w1_ang_error_sum = 0.0;
-
-  // double w2_lin_prev_error = 0.0;
-  // double w2_lin_error_sum = 0.0;
-  // double w2_ang_prev_error = 0.0;
-  // double w2_ang_error_sum = 0.0;
-
-  // double w3_lin_prev_error = 0.0;
-  // double w3_lin_error_sum = 0.0;
-  // double w3_ang_prev_error = 0.0;
-  // double w3_ang_error_sum = 0.0;
-
-  // double w4_lin_prev_error = 0.0;
-  // double w4_lin_error_sum = 0.0;
-  // double w4_ang_prev_error = 0.0;
-  // double w4_ang_error_sum = 0.0;
 
   double pf_lin_x_vel_prev_error = 0.0;
   double pf_lin_x_vel_error_sum = 0.0;
@@ -132,9 +114,18 @@ int main(int argc, char **argv)
   double pf_ang_z_vel_prev_error = 0.0;
   double pf_ang_z_vel_error_sum = 0.0;
 
-  double plat_vel_setpoint = 0.05;
+  double plat_vel_setpoint[3] = {0.1, 0.1, 0.5};
   double plat_clip_force = 20.0;
   double plat_sat_force = 300.0;
+
+  double pivot_vel_zero_threshold = 4.5;
+  double pivot_vel_ramp_factor = 0.1;
+  double ff_tau_c = 5.0;
+  double current_ff_tau_c[4] = {0.0, 0.0, 0.0, 0.0};
+  double plat_vel_damping_tube = 0.001;
+  double plat_vel_damping_factor = 0.1;
+  double plat_vel_attenuation_factor = 0.2;
+  double pivot_align_error_margin = 0.25;
 
   double plat_vel_xy_pid_controller_kp = 200.0;
   double plat_vel_xy_pid_controller_ki = 0.0;
@@ -177,56 +168,28 @@ int main(int argc, char **argv)
     // printf("odometry: ");
     // print_array(robot.mobile_base->state->x_platform, 3);
 
-    // solver
     double plat_force[3] = {pf[0], pf[1], pf[2]};  // [N], [N], [Nm]
 
-    // damping controller on the platform velocity
+    // damping controller to regulate the platform velocity
     double plat_vel_damping_force[3] = {0.0, 0.0, 0.0};
-    double plat_vel_damping_tube = 0.001;
     double plat_vel_error[3] = {0.0, 0.0, 0.0};
-    
+
     // check if platform velocity is greater than the setpoint
-    if (robot.mobile_base->state->xd_platform[0] > 0 &&
-        robot.mobile_base->state->xd_platform[0] > plat_vel_setpoint)
-      computeEqualityError(robot.mobile_base->state->xd_platform[0], plat_vel_setpoint,
-                           plat_vel_error[0]);
-    else if (robot.mobile_base->state->xd_platform[0] < 0 &&
-             robot.mobile_base->state->xd_platform[0] < -plat_vel_setpoint)
-      computeEqualityError(robot.mobile_base->state->xd_platform[0], -plat_vel_setpoint,
-                           plat_vel_error[0]);
-    else
-      plat_vel_error[0] = 0.0;
-
-    if (robot.mobile_base->state->xd_platform[1] > 0 &&
-        robot.mobile_base->state->xd_platform[1] > plat_vel_setpoint)
-      computeEqualityError(robot.mobile_base->state->xd_platform[1], plat_vel_setpoint,
-                           plat_vel_error[1]);
-    else if (robot.mobile_base->state->xd_platform[1] < 0 &&
-             robot.mobile_base->state->xd_platform[1] < -plat_vel_setpoint)
-      computeEqualityError(robot.mobile_base->state->xd_platform[1], -plat_vel_setpoint,
-                           plat_vel_error[1]);
-    else
-      plat_vel_error[1] = 0.0;
-
-    if (robot.mobile_base->state->xd_platform[2] > 0 &&
-        robot.mobile_base->state->xd_platform[2] > plat_vel_setpoint)
-      computeEqualityError(robot.mobile_base->state->xd_platform[2], plat_vel_setpoint,
-                           plat_vel_error[2]);
-    else if (robot.mobile_base->state->xd_platform[2] < 0 &&
-             robot.mobile_base->state->xd_platform[2] < -plat_vel_setpoint)
-      computeEqualityError(robot.mobile_base->state->xd_platform[2], -plat_vel_setpoint,
-                           plat_vel_error[2]);
-    else
-      plat_vel_error[2] = 0.0;
-
-    // check if the velocity is within the tube
-    for (size_t i = 0; i < 3; i++)
+    for (int i = 0; i < 3; ++i)
     {
-      if (plat_vel_error[i] < plat_vel_damping_tube && plat_vel_error[i] > -plat_vel_damping_tube)
-      {
-        plat_vel_damping_force[i] = 0.0;
-      }
+      if (plat_force[i] > plat_clip_force &&
+          robot.mobile_base->state->xd_platform[i] > plat_vel_setpoint[i])
+        computeEqualityError(robot.mobile_base->state->xd_platform[i], plat_vel_setpoint[i],
+                             plat_vel_error[i]);
+      else if (plat_force[i] < -plat_clip_force &&
+               robot.mobile_base->state->xd_platform[i] < -plat_vel_setpoint[i])
+        computeEqualityError(robot.mobile_base->state->xd_platform[i], -plat_vel_setpoint[i],
+                             plat_vel_error[i]);
+      else
+        plat_vel_error[i] = 0.0;
     }
+
+    // PID controller for regulating the platform velocity
     pidController(plat_vel_error[0], plat_vel_xy_pid_controller_kp, plat_vel_xy_pid_controller_ki,
                   plat_vel_xy_pid_controller_kd, *control_loop_dt, plat_vel_x_error_sum, 5.0,
                   plat_vel_x_prev_error, plat_vel_damping_force[0]);
@@ -237,18 +200,24 @@ int main(int argc, char **argv)
                   plat_vel_ang_pid_controller_ki, plat_vel_ang_pid_controller_kd, *control_loop_dt,
                   plat_vel_ang_error_sum, 5.0, plat_vel_ang_prev_error, plat_vel_damping_force[2]);
 
-
+    // adjust the platform force based on the damping controller
     for (size_t i = 0; i < 3; i++)
     {
-      // damping
-      if (plat_force[i] > plat_clip_force || plat_force[i] < -plat_clip_force)
+      if (fabs(plat_vel_error[i]) > plat_vel_damping_tube)
       {
         plat_force[i] += plat_vel_damping_force[i];
+
+        // Dynamically reduce force to prevent overshooting
+        if ((plat_force[i] > 0.0 && plat_vel_error[i] < 0.0) ||
+            (plat_force[i] < 0.0 && plat_vel_error[i] > 0.0))
+        {
+          plat_force[i] *= 1.0 - fabs(plat_vel_error[i]) * plat_vel_damping_factor;
+        }
       }
-      // clipping
-      else
+      else if (plat_force[i] < plat_clip_force && plat_force[i] > -plat_clip_force)
       {
-        plat_force[i] = 0.0;
+        // Smooth clipping adjustment
+        plat_force[i] *= (1.0 - plat_vel_attenuation_factor);
       }
     }
 
@@ -263,53 +232,17 @@ int main(int argc, char **argv)
       {
         plat_force[i] = -plat_sat_force;
       }
-    } 
+    }
 
     printf("platform force: ");
     print_array(plat_force, 3);
 
-    // printf("platform velocity: ");
-    // print_array(robot.mobile_base->state->xd_platform, 3);
+    printf("platform velocity: ");
+    print_array(robot.mobile_base->state->xd_platform, 3);
 
     double lin_offsets[4];
     double ang_offsets[4];
     get_pivot_alignment_offsets(&robot, plat_force, lin_offsets, ang_offsets);
-
-    // double lin_signal_w1 = 0.0;
-    // double ang_signal_w1 = 0.0;
-    // double lin_signal_w2 = 0.0;
-    // double ang_signal_w2 = 0.0;
-    // double lin_signal_w3 = 0.0;
-    // double ang_signal_w3 = 0.0;
-    // double lin_signal_w4 = 0.0;
-    // double ang_signal_w4 = 0.0;
-
-    // double kp[4] = {Kp, Kp, Kp, Kp};
-    // double ki[4] = {Ki, Ki, Ki, Ki};
-    // double kd[4] = {Kd, Kd, Kd, Kd};
-
-    // pidController(lin_offsets[0], kp[0], ki[0], kd[0], control_loop_timestep, w1_lin_error_sum,
-    //               5.0, w1_lin_prev_error, lin_signal_w1);
-    // pidController(ang_offsets[0], kp[0], ki[0], kd[0], control_loop_timestep, w1_ang_error_sum,
-    //               5.0, w1_ang_prev_error, ang_signal_w1);
-
-    // pidController(lin_offsets[1], kp[1], ki[1], kd[1], control_loop_timestep, w2_lin_error_sum,
-    //               5.0, w2_lin_prev_error, lin_signal_w2);
-    // pidController(ang_offsets[1], kp[1], ki[1], kd[1], control_loop_timestep, w2_ang_error_sum,
-    //               5.0, w2_ang_prev_error, ang_signal_w2);
-
-    // pidController(lin_offsets[2], kp[2], ki[2], kd[2], control_loop_timestep, w3_lin_error_sum,
-    //               5.0, w3_lin_prev_error, lin_signal_w3);
-    // pidController(ang_offsets[2], kp[2], ki[2], kd[2], control_loop_timestep, w3_ang_error_sum,
-    //               5.0, w3_ang_prev_error, ang_signal_w3);
-
-    // pidController(lin_offsets[3], kp[3], ki[3], kd[3], control_loop_timestep, w4_lin_error_sum,
-    //               5.0, w4_lin_prev_error, lin_signal_w4);
-    // pidController(ang_offsets[3], kp[3], ki[3], kd[3], control_loop_timestep, w4_ang_error_sum,
-    //               5.0, w4_ang_prev_error, ang_signal_w4);
-
-    // double lin_signals[4] = {lin_signal_w1, lin_signal_w2, lin_signal_w3, lin_signal_w4};
-    // double ang_signals[4] = {ang_signal_w1, ang_signal_w2, ang_signal_w3, ang_signal_w4};
 
     // transform the platform force by 90 degrees ccw
     Eigen::Rotation2Dd pf_correction_rot(M_PI / 2);
@@ -317,11 +250,11 @@ int main(int argc, char **argv)
 
     // compute the weights for the platform force
     double platform_weights[2];
-    platform_weights[0] = abs(plat_force[2]) < 1e-6
-                              ? 1.0
-                              : sqrt(pow(plat_force[0], 2) + pow(plat_force[1], 2)) /
-                                    (sqrt(pow(plat_force[0], 2) + pow(plat_force[1], 2) +
-                                          pow(plat_force[2], 2)));
+    platform_weights[0] =
+        abs(plat_force[2]) < 1e-6
+            ? 1.0
+            : sqrt(pow(plat_force[0], 2) + pow(plat_force[1], 2)) /
+                  (sqrt(pow(plat_force[0], 2) + pow(plat_force[1], 2) + pow(plat_force[2], 2)));
 
     platform_weights[1] = 1.0 - platform_weights[0];
 
@@ -341,23 +274,46 @@ int main(int argc, char **argv)
     for (size_t i = 0; i < robot.mobile_base->mediator->kelo_base_config->nWheels; i++)
     {
       computeEqualityError(dist_align[i], 0.0, dist_align_errors[i]);
-      pidController(dist_align_errors[i], Kp, Ki, Kd, control_loop_timestep, w_dist_error_sum[i], 20.0,
-                    w_dist_prev_error[i], tau_align[i]);
+      if (abs(dist_align_errors[i]) > pivot_align_error_margin)
+        pidController(dist_align_errors[i], Kp, Ki, Kd, control_loop_timestep, w_dist_error_sum[i],
+                      20.0, w_dist_prev_error[i], tau_align[i]);
     }
-
-    printf("pivot angles: ");
-    print_array(robot.mobile_base->state->pivot_angles, 4);
-
-    printf("distances: ");
-    print_array(dist_align, 4);
-
-    printf("alignment torques: ");
-    print_array(tau_align, 4);
 
     // base solver
     double tau_wheel_c[8]{};
     // base_fd_solver_with_alignment(&robot, plat_force, lin_offsets, ang_offsets, tau_wheel_c);
     base_fd_solver_cgls(&robot, plat_force, tau_align, tau_wheel_c);
+
+    // ramp the ff torques based on the pivot velocities
+    for (size_t i = 0; i < 4; i++)
+    {
+      if (abs(robot.mobile_base->state->pivot_velocities[i]) < pivot_vel_zero_threshold &&
+          abs(tau_align[i]) > 0.0)
+      {
+        // Ramp the ff_tau_c value up
+        if (current_ff_tau_c[i] < ff_tau_c)
+        {
+          current_ff_tau_c[i] += pivot_vel_ramp_factor;
+          if (current_ff_tau_c[i] > ff_tau_c)
+            current_ff_tau_c[i] = ff_tau_c;
+        }
+      }
+      else
+      {
+        // Ramp the ff_tau_c value down
+        if (current_ff_tau_c[i] > 0.0)
+        {
+          current_ff_tau_c[i] -= pivot_vel_ramp_factor;
+          if (current_ff_tau_c[i] < 0.0)
+            current_ff_tau_c[i] = 0.0;
+        }
+      }
+
+      tau_wheel_c[2 * i] +=
+          dist_align_errors[i] < 0.0 ? -current_ff_tau_c[i] : current_ff_tau_c[i];
+      tau_wheel_c[2 * i + 1] +=
+          dist_align_errors[i] < 0.0 ? -current_ff_tau_c[i] : current_ff_tau_c[i];
+    }
 
     // saturate torques
     double tau_limit = 10.0;
@@ -380,8 +336,8 @@ int main(int argc, char **argv)
       wtau[2 * i + 1] = tau_wheel_c[2 * i + 1];
     }
 
-    printf("torques: ");
-    print_array(wtau, 8);
+    // printf("wheel taus:  ");
+    // print_array(wtau, 8);
 
     printf("\n");
 
