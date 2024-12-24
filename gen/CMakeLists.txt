@@ -20,11 +20,16 @@ find_package(controllers REQUIRED)
 find_package(motion_spec_utils REQUIRED)
 find_package(kelo_platform REQUIRED)
 find_package(robif2b REQUIRED)
+find_package(hddc2b REQUIRED)
+find_package(lapacke REQUIRED)
+find_package(cblas REQUIRED)
 
 list(APPEND local_INCLUDE_DIRS ${CMAKE_INSTALL_PREFIX}/include/)
 
 # include directories
 include_directories(
+  ${CMAKE_CURRENT_SOURCE_DIR}
+
   ${motion_spec_utils_INCLUDE_DIRS}
   ${local_INCLUDE_DIRS}
 
@@ -33,7 +38,7 @@ include_directories(
   ${CMAKE_INSTALL_PREFIX}/include/kinova_api/common
   ${CMAKE_INSTALL_PREFIX}/include/kinova_api/messages
   ${CMAKE_INSTALL_PREFIX}/include/kinova_api/client_stubs
-  ${CMAKE_INSTALL_PREFIX}/include/kinova_api/google   
+  ${CMAKE_INSTALL_PREFIX}/include/kinova_api/google
 )
 
 # add all cpp files in the folder
@@ -42,7 +47,10 @@ file(GLOB SOURCES "*.cpp")
 # make executables
 foreach(source ${SOURCES})
   get_filename_component(name ${source} NAME_WE)
-  add_executable(${name} ${source})
+  add_executable(${name} 
+    ${source}
+    solver.c
+  )
   target_link_libraries(${name}
     Eigen3::Eigen 
     motion_spec_utils::math_utils 
@@ -55,6 +63,9 @@ foreach(source ${SOURCES})
 	  gslcblas
     robif2b::ethercat
     robif2b::kelo
+    hddc2b
+    cblas
+    lapacke
   )
 
   # set runtime path
