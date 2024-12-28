@@ -119,7 +119,7 @@ int main(int argc, char **argv)
   int index_to_EtherCAT[4] = {3, 4, 6, 7};
   kelo_base_config->index_to_EtherCAT = index_to_EtherCAT;
   kelo_base_config->radius = 0.115 / 2;
-  kelo_base_config->castor_offset = 0.01;
+  kelo_base_config->castor_offset = 0.1;
   kelo_base_config->half_wheel_distance = 0.0775 / 2;
   double wheel_coordinates[8] = {0.195, 0.21, -0.195, 0.21, -0.195, -0.21, 0.195, -0.21};
   kelo_base_config->wheel_coordinates = wheel_coordinates;
@@ -146,7 +146,7 @@ int main(int argc, char **argv)
   // Distance of the axle from the pivot joint's axis
   double castor_offset[NUM_DRV] = {
       // [m]
-      0.01, 0.01, 0.01, 0.01  // fl, rl, rr, fr
+      0.1, 0.1, 0.1, 0.1  // fl, rl, rr, fr
   };
 
   // For _singular_ platforms the relative weight between the platform-level
@@ -172,20 +172,20 @@ int main(int argc, char **argv)
   // Weight of the angular and linear alignment distance, respectively.
   // The weight for the front-right drive unit means that it will always have
   // a "zero" alignment distance.
-  // double w_align[NUM_DRV * 2] = {
-  //     //
-  //     1.0, 1.0,  // fl-ang, fl-lin
-  //     1.0, 1.0,  // rl-ang, rl-lin
-  //     1.0, 1.0,  // rr-ang, rr-lin
-  //     1.0, 1.0   // fr-ang, fr-lin
-  // };
   double w_align[NUM_DRV * 2] = {
       //
-      4.5, 4.5,  // fl-ang, fl-lin
-      4.5, 4.5,  // rl-ang, rl-lin
-      4.5, 4.5,  // rr-ang, rr-lin
-      4.5, 4.5   // fr-ang, fr-lin
+      1.0, 1.0,  // fl-ang, fl-lin
+      1.0, 1.0,  // rl-ang, rl-lin
+      1.0, 1.0,  // rr-ang, rr-lin
+      1.0, 1.0   // fr-ang, fr-lin
   };
+  // double w_align[NUM_DRV * 2] = {
+  //     //
+  //     0.1, 0.1,  // fl-ang, fl-lin
+  //     0.1, 0.1,  // rl-ang, rl-lin
+  //     0.1, 0.1,  // rr-ang, rr-lin
+  //     0.1, 0.1   // fr-ang, fr-lin
+  // };
 
   EthercatConfig *ethercat_config = new EthercatConfig();
 
@@ -370,25 +370,33 @@ int main(int argc, char **argv)
     printf("\ntau_wheel:\n");
     print_matrix(NUM_WHL_COORD, NUM_DRV, tau_wheel);
 
-    // saturate torques
     double tau_limit = 10.0;
-    for (size_t i = 0; i < 8; i++)
+    // if any of the wheel torques exceed the limit, scale them down uniformly
+    double tau_scale_factor = 1.0;
+    for (size_t i = 0; i < NUM_DRV * 2; i++)
     {
-      if (tau_wheel[i] > tau_limit)
+      if (fabs(tau_wheel[i]) > tau_limit)
       {
-        tau_wheel[i] = tau_limit;
-      }
-      else if (tau_wheel[i] < -tau_limit)
-      {
-        tau_wheel[i] = -tau_limit;
+        double factor = tau_limit / fabs(tau_wheel[i]);
+        if (factor < tau_scale_factor)
+          tau_scale_factor = factor;
       }
     }
+
+    double tau_wheel_scaled[NUM_DRV * NUM_WHL_COORD];
+    for (size_t i = 0; i < NUM_DRV * 2; i++)
+    {
+      tau_wheel_scaled[i] = tau_wheel[i] * tau_scale_factor;
+    }
+
+    printf("\ntau_wheel scaled:\n");
+    print_matrix(NUM_WHL_COORD, NUM_DRV, tau_wheel);
 
     printf("\n");
 
     // log data
     wheel_align_log_data_vec.addWheelAlignData(robot.mobile_base->state->pivot_angles, plat_force,
-                                               tau_wheel, f_drive_ref, f_krnl, f_null, f_scale_factor,
+                                               tau_wheel, tau_wheel_scaled, f_drive_ref, f_krnl, f_null, f_scale_factor,
                                                f_null_scaled, f_drv, f_wheel);
 
     if (count > 2)
