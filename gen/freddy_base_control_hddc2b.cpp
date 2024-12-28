@@ -181,10 +181,10 @@ int main(int argc, char **argv)
   // };
   double w_align[NUM_DRV * 2] = {
       //
-      0.5, 0.5,  // fl-ang, fl-lin
-      0.5, 0.5,  // rl-ang, rl-lin
-      0.5, 0.5,  // rr-ang, rr-lin
-      0.5, 0.5   // fr-ang, fr-lin
+      4.5, 4.5,  // fl-ang, fl-lin
+      4.5, 4.5,  // rl-ang, rl-lin
+      4.5, 4.5,  // rr-ang, rr-lin
+      4.5, 4.5   // fr-ang, fr-lin
   };
 
   EthercatConfig *ethercat_config = new EthercatConfig();
@@ -293,15 +293,16 @@ int main(int argc, char **argv)
     for (size_t i = 0; i < NUM_DRV; i++)
     {
       f_drive_ref[2 * i] = 0.0;
+      f_drive_ref[2 * i + 1] = drive_align_dsts[2 * i + 1];
 
-      if (fabs(drive_align_dsts[2 * i + 1]) < 40)
-      {
-        f_drive_ref[2 * i + 1] = 0.0;
-      }
-      else
-      {
-        f_drive_ref[2 * i + 1] = drive_align_dsts[2 * i + 1];
-      }
+      // if (fabs(drive_align_dsts[2 * i + 1]) < 40)
+      // {
+      //   f_drive_ref[2 * i + 1] = 0.0;
+      // }
+      // else
+      // {
+      //   f_drive_ref[2 * i + 1] = drive_align_dsts[2 * i + 1];
+      // }
     }
 
     printf("\nf_drive_ref:\n");
@@ -326,21 +327,21 @@ int main(int argc, char **argv)
 
     // take y coordinate ratio of f_null to f_drive_ref
     // select the non-zero greatest value of f_null_ratio as the scaling factor
-    double f_scale_factor = -INFINITY;
+    double f_scale_factor = INFINITY;
     for (int i = 0; i < NUM_DRV; i++)
     {
-      if (fabs(f_null[1 + i * NUM_DRV_COORD]) < 0.1 || fabs(f_null[1 + i * NUM_DRV_COORD]) < EPS)
+      if (fabs(f_null[1 + i * NUM_DRV_COORD]) < 0.2)
       {
         continue;
       }
 
-      double ratio = (f_drive_ref[1 + i * NUM_DRV_COORD] / f_null[1 + i * NUM_DRV_COORD]);
-      if (ratio > f_scale_factor)
+      double ratio = fabs(f_drive_ref[1 + i * NUM_DRV_COORD] / f_null[1 + i * NUM_DRV_COORD]);
+      if (ratio < f_scale_factor)
         f_scale_factor = ratio;
     }
 
     // check if still infinity, then set to 1.0
-    if (f_scale_factor == -INFINITY)
+    if (f_scale_factor == INFINITY)
       f_scale_factor = 1.0;
 
     f_scale_factor = fabs(f_scale_factor);
@@ -350,6 +351,7 @@ int main(int argc, char **argv)
     double f_null_scaled[NUM_DRV * NUM_DRV_COORD];  // [N]
     for (size_t i = 0; i < NUM_DRV; i++)
     {
+      f_null_scaled[2 * i] = f_null[2 * i] * f_scale_factor;
       f_null_scaled[2 * i + 1] = f_null[2 * i + 1] * f_scale_factor;
     }
     printf("\nf_null scaled:\n");
