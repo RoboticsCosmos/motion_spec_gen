@@ -19,6 +19,8 @@
 #include <hddc2b/functions/wheel.h>
 #include <solver.h>
 
+#include "motion_spec_utils/log_structs.hpp"
+
 volatile sig_atomic_t flag = 0;
 
 void handle_signal(int sig)
@@ -100,6 +102,17 @@ int main(int argc, char **argv)
 
   printf("count_limit: %d\n", count_limit);
 
+  // log structs
+  std::string log_dir = "../../logs/data/wheel_align_log";
+  char log_dir_name[100];
+  get_new_folder_name(log_dir.c_str(), log_dir_name);
+  std::string run_id = log_dir_name;
+  run_id = run_id.substr(run_id.find_last_of("/") + 1);
+  std::filesystem::create_directories(log_dir_name);
+  std::filesystem::permissions(log_dir_name, std::filesystem::perms::all);
+
+  LogWheelAlignDataVector wheel_align_log_data_vec(log_dir_name, 1);
+
   // Initialize the robot structs
   KeloBaseConfig *kelo_base_config = new KeloBaseConfig();
   kelo_base_config->nWheels = 4;
@@ -159,12 +172,19 @@ int main(int argc, char **argv)
   // Weight of the angular and linear alignment distance, respectively.
   // The weight for the front-right drive unit means that it will always have
   // a "zero" alignment distance.
+  // double w_align[NUM_DRV * 2] = {
+  //     //
+  //     1.0, 1.0,  // fl-ang, fl-lin
+  //     1.0, 1.0,  // rl-ang, rl-lin
+  //     1.0, 1.0,  // rr-ang, rr-lin
+  //     1.0, 1.0   // fr-ang, fr-lin
+  // };
   double w_align[NUM_DRV * 2] = {
       //
-      1.0, 1.0,  // fl-ang, fl-lin
-      1.0, 1.0,  // rl-ang, rl-lin
-      1.0, 1.0,  // rr-ang, rr-lin
-      1.0, 1.0   // fr-ang, fr-lin
+      0.5, 0.5,  // fl-ang, fl-lin
+      0.5, 0.5,  // rl-ang, rl-lin
+      0.5, 0.5,  // rr-ang, rr-lin
+      0.5, 0.5   // fr-ang, fr-lin
   };
 
   EthercatConfig *ethercat_config = new EthercatConfig();
@@ -194,28 +214,8 @@ int main(int argc, char **argv)
   double control_loop_timestep = desired_period.count();                               // s
   double *control_loop_dt = &control_loop_timestep;                                    // s
 
-  // pid controller variables
-  double Kp = 10.5;
-  double Ki = 0.1;
-  double Kd = 0.0;
-
-  double w_dist_prev_error[4] = {0.0, 0.0, 0.0, 0.0};
-  double w_dist_error_sum[4] = {0.0, 0.0, 0.0, 0.0};
-
-  double pf_lin_x_vel_prev_error = 0.0;
-  double pf_lin_x_vel_error_sum = 0.0;
-  double pf_lin_y_vel_prev_error = 0.0;
-  double pf_lin_y_vel_error_sum = 0.0;
-  double pf_ang_z_vel_prev_error = 0.0;
-  double pf_ang_z_vel_error_sum = 0.0;
-
-  double plat_vel_setpoint[3] = {0.1, 0.1, 0.5};
   double plat_clip_force = 20.0;
   double plat_sat_force = 300.0;
-
-  double pivot_vel_zero_threshold = 2.5;
-  double pivot_vel_ramp_factor = 0.1;
-  double pivot_align_error_margin = 0.25;
 
   // Force composition matrix (from drive forces to platform force)
   double g[NUM_DRV * NUM_G_COORD];
@@ -243,6 +243,8 @@ int main(int argc, char **argv)
 
     if (flag)
     {
+      wheel_align_log_data_vec.writeToOpenFile();
+
       printf("Exiting somewhat cleanly...\n");
       free_robot_data(&robot);
       exit(0);
@@ -270,9 +272,6 @@ int main(int argc, char **argv)
     printf("platform force: ");
     print_array(plat_force, 3);
 
-    // printf("platform velocity: ");
-    // print_array(robot.mobile_base->state->xd_platform, 3);
-
     printf("pivot angles:     ");
     print_array(robot.mobile_base->state->pivot_angles, 4);
 
@@ -291,15 +290,18 @@ int main(int argc, char **argv)
     print_matrix(NUM_DRV_COORD, NUM_DRV, drive_align_dsts);
 
     double f_drive_ref[NUM_DRV * NUM_DRV_COORD];  // [N]
-
     for (size_t i = 0; i < NUM_DRV; i++)
     {
-      if (abs(drive_align_dsts[2 * i + 1]) < 40.0)
-        f_drive_ref[2 * i + 1] = 0.0;
-      else
-        f_drive_ref[2 * i + 1] = drive_align_dsts[2 * i + 1];
-
       f_drive_ref[2 * i] = 0.0;
+
+      if (fabs(drive_align_dsts[2 * i + 1]) < 40)
+      {
+        f_drive_ref[2 * i + 1] = 0.0;
+      }
+      else
+      {
+        f_drive_ref[2 * i + 1] = drive_align_dsts[2 * i + 1];
+      }
     }
 
     printf("\nf_drive_ref:\n");
@@ -323,56 +325,38 @@ int main(int argc, char **argv)
     print_matrix(NUM_DRV_COORD, NUM_DRV, f_null);
 
     // take y coordinate ratio of f_null to f_drive_ref
-    double f_null_ratio[NUM_DRV];
-    for (int i = 0; i < NUM_DRV; i++)
-    {
-      if (f_null[1 + i * NUM_DRV_COORD] == 0.0 || abs(f_null[1 + i * NUM_DRV_COORD]) < EPS)
-      {
-        f_null_ratio[i] = 0.0;
-        continue;
-      }
-      f_null_ratio[i] = f_drive_ref[1 + i * NUM_DRV_COORD] / f_null[1 + i * NUM_DRV_COORD];
-    }
-    printf("\nf_null_ratio:\n");
-    print_matrix(1, NUM_DRV, f_null_ratio);
-
     // select the non-zero greatest value of f_null_ratio as the scaling factor
     double f_scale_factor = -INFINITY;
     for (int i = 0; i < NUM_DRV; i++)
     {
-      if (f_null_ratio[i] == 0.0)
-        continue;
-      if (f_null_ratio[i] > f_scale_factor)
+      if (fabs(f_null[1 + i * NUM_DRV_COORD]) < 0.1 || fabs(f_null[1 + i * NUM_DRV_COORD]) < EPS)
       {
-        f_scale_factor = f_null_ratio[i];
+        continue;
       }
+
+      double ratio = (f_drive_ref[1 + i * NUM_DRV_COORD] / f_null[1 + i * NUM_DRV_COORD]);
+      if (ratio > f_scale_factor)
+        f_scale_factor = ratio;
     }
+
     // check if still infinity, then set to 1.0
     if (f_scale_factor == -INFINITY)
       f_scale_factor = 1.0;
-    f_scale_factor = abs(f_scale_factor);
+
+    f_scale_factor = fabs(f_scale_factor);
     printf("\nf_scale_factor: %f", f_scale_factor);
 
-    double f_null_max_limit = 1000.0;
-
+    // scale f_null
+    double f_null_scaled[NUM_DRV * NUM_DRV_COORD];  // [N]
     for (size_t i = 0; i < NUM_DRV; i++)
     {
-      if (abs(robot.mobile_base->state->pivot_velocities[i]) < pivot_vel_zero_threshold &&
-          count > 1)
-      {
-        f_null[2 * i + 1] *= f_scale_factor;
-
-        if (f_null[2 * i + 1] > f_null_max_limit)
-          f_null[2 * i + 1] = f_null_max_limit;
-        else if (f_null[2 * i + 1] < -f_null_max_limit)
-          f_null[2 * i + 1] = -f_null_max_limit;
-      }
+      f_null_scaled[2 * i + 1] = f_null[2 * i + 1] * f_scale_factor;
     }
     printf("\nf_null scaled:\n");
-    print_matrix(NUM_DRV_COORD, NUM_DRV, f_null);
+    print_matrix(NUM_DRV_COORD, NUM_DRV, f_null_scaled);
 
     double f_drv[NUM_DRV * NUM_DRV_COORD];  // [N]
-    hddc2b_pltf_frc_redu_ref_fini(NUM_DRV, f_krnl, f_null, f_drv);
+    hddc2b_pltf_frc_redu_ref_fini(NUM_DRV, f_krnl, f_null_scaled, f_drv);
     printf("\nf_drv:\n");
     print_matrix(NUM_DRV_COORD, NUM_DRV, f_drv);
 
@@ -398,22 +382,17 @@ int main(int argc, char **argv)
       }
     }
 
-    double wtau[8];
-    for (size_t i = 0; i < 4; i++)
-    {
-      wtau[2 * i] = tau_wheel[2 * i];
-      wtau[2 * i + 1] = tau_wheel[2 * i + 1];
-    }
-
-    // printf("\nwheel taus:  ");
-    // print_array(wtau, 8);
-
     printf("\n");
+
+    // log data
+    wheel_align_log_data_vec.addWheelAlignData(robot.mobile_base->state->pivot_angles, plat_force,
+                                               tau_wheel, f_drive_ref, f_krnl, f_null, f_scale_factor,
+                                               f_null_scaled, f_drv, f_wheel);
 
     if (count > 2)
     {
       // raise(SIGINT);
-      set_mobile_base_torques(&robot, wtau);
+      set_mobile_base_torques(&robot, tau_wheel);
       update_base_state(robot.mobile_base->mediator->kelo_base_config,
                         robot.mobile_base->mediator->ethercat_config);
     }
