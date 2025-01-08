@@ -19,8 +19,6 @@
 #include <hddc2b/functions/wheel.h>
 #include <solver.h>
 
-#include "motion_spec_utils/log_structs.hpp"
-
 volatile sig_atomic_t flag = 0;
 
 void handle_signal(int sig)
@@ -172,20 +170,20 @@ int main(int argc, char **argv)
   // Weight of the angular and linear alignment distance, respectively.
   // The weight for the front-right drive unit means that it will always have
   // a "zero" alignment distance.
-  double w_align[NUM_DRV * 2] = {
-      //
-      1.0, 1.0,  // fl-ang, fl-lin
-      1.0, 1.0,  // rl-ang, rl-lin
-      1.0, 1.0,  // rr-ang, rr-lin
-      1.0, 1.0   // fr-ang, fr-lin
-  };
   // double w_align[NUM_DRV * 2] = {
   //     //
-  //     0.1, 0.1,  // fl-ang, fl-lin
-  //     0.1, 0.1,  // rl-ang, rl-lin
-  //     0.1, 0.1,  // rr-ang, rr-lin
-  //     0.1, 0.1   // fr-ang, fr-lin
+  //     1.0, 1.0,  // fl-ang, fl-lin
+  //     1.0, 1.0,  // rl-ang, rl-lin
+  //     1.0, 1.0,  // rr-ang, rr-lin
+  //     1.0, 1.0   // fr-ang, fr-lin
   // };
+  double w_align[NUM_DRV * 2] = {
+      //
+      0.1, 0.5,  // fl-ang, fl-lin
+      0.1, 0.5,  // rl-ang, rl-lin
+      0.1, 0.5,  // rr-ang, rr-lin
+      0.1, 0.5   // fr-ang, fr-lin1
+  };
 
   EthercatConfig *ethercat_config = new EthercatConfig();
 
@@ -294,15 +292,6 @@ int main(int argc, char **argv)
     {
       f_drive_ref[2 * i] = 0.0;
       f_drive_ref[2 * i + 1] = drive_align_dsts[2 * i + 1];
-
-      // if (fabs(drive_align_dsts[2 * i + 1]) < 40)
-      // {
-      //   f_drive_ref[2 * i + 1] = 0.0;
-      // }
-      // else
-      // {
-      //   f_drive_ref[2 * i + 1] = drive_align_dsts[2 * i + 1];
-      // }
     }
 
     printf("\nf_drive_ref:\n");
@@ -390,7 +379,7 @@ int main(int argc, char **argv)
     }
 
     printf("\ntau_wheel scaled:\n");
-    print_matrix(NUM_WHL_COORD, NUM_DRV, tau_wheel);
+    print_matrix(NUM_WHL_COORD, NUM_DRV, tau_wheel_scaled);
 
     printf("\n");
 
@@ -402,7 +391,7 @@ int main(int argc, char **argv)
     if (count > 2)
     {
       // raise(SIGINT);
-      set_mobile_base_torques(&robot, tau_wheel);
+      set_mobile_base_torques(&robot, tau_wheel_scaled);
       update_base_state(robot.mobile_base->mediator->kelo_base_config,
                         robot.mobile_base->mediator->ethercat_config);
     }

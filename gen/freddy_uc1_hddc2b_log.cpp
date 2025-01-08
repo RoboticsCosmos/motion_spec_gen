@@ -302,6 +302,7 @@ int main(int argc, char **argv)
 
   double kr_elbow_base_z_distance_reference_value = 0.7;
   double kl_elbow_base_z_distance_reference_value = 0.7;
+
   double kr_elbow_base_base_distance_z_impedance_controller_stiffness_diag_mat[1] = {100.0};
   double kl_elbow_base_base_distance_z_impedance_controller_stiffness_diag_mat[1] = {200.0};
 
@@ -407,16 +408,19 @@ int main(int argc, char **argv)
   // uc1 vars
   double arms_bl_base_distance_reference_value = 0.7;
 
+  double arms_bl_base_distance_upper_limit = 0.725;
+  double arms_bl_base_distance_lower_limit = 0.675;
+
   double kr_bl_base_distance = 0.0;
-  double kr_bl_base_distance_pid_controller_kp = 450.0;
-  double kr_bl_base_distance_pid_controller_ki = 65.5;
+  double kr_bl_base_distance_pid_controller_kp = 550.0;
+  double kr_bl_base_distance_pid_controller_ki = 85.5;
   double kr_bl_base_distance_pid_controller_kd = 80.0;
   double kr_bl_base_distance_pid_error_sum = 0.0;
   double kr_bl_base_distance_pid_controller_signal = 0.0;
 
   double kl_bl_base_distance = 0.0;
-  double kl_bl_base_distance_pid_controller_kp = 450.0;
-  double kl_bl_base_distance_pid_controller_ki = 65.5;
+  double kl_bl_base_distance_pid_controller_kp = 550.0;
+  double kl_bl_base_distance_pid_controller_ki = 85.5;
   double kl_bl_base_distance_pid_controller_kd = 80.0;
   double kl_bl_base_distance_pid_error_sum = 0.0;
   double kl_bl_base_distance_pid_controller_signal = 0.0;
@@ -425,7 +429,7 @@ int main(int argc, char **argv)
   double kl_bl_base_distance_pid_prev_error = 0.0;
 
   // log structs
-  std::string log_dir = "../../logs/data/freddy_uc1_log";
+  std::string log_dir = "../../logs/data/freddy_uc1_hddc2b_log";
   char log_dir_name[100];
   get_new_folder_name(log_dir.c_str(), log_dir_name);
   std::string run_id = log_dir_name;
@@ -446,6 +450,8 @@ int main(int argc, char **argv)
   LogMobileBaseDataVector base_log_data_vec(log_dir_name, 3);
   LogUCDataVector uc_log_data_vec(log_dir_name, 4);
   LogWheelAlignDataVector wheel_align_log_data_vec(log_dir_name, 1);
+  LogControlDataVector kl_control_log_data_vec("kinova_left", log_dir_name, 1);
+  LogControlDataVector kr_control_log_data_vec("kinova_right", log_dir_name, 2);
 
   // explicitly referesh the robot data
   robot.kinova_left->mediator->refresh_feedback();
@@ -540,52 +546,10 @@ int main(int argc, char **argv)
                        kl_bl_base_distance_controller_error);
   kl_bl_base_distance_pid_prev_error = kl_bl_base_distance_controller_error;
 
-  // // base wheels alignment controllers
-  // double base_wheel_alignment_controller_Kp = 5.0;
-  // double base_wheel_alignment_controller_Ki = 3.5;
-  // double base_wheel_alignment_controller_Kd = 0.0;
-
-  // double base_w1_lin_prev_error = 0.0;
-  // double base_w2_lin_prev_error = 0.0;
-  // double base_w3_lin_prev_error = 0.0;
-  // double base_w4_lin_prev_error = 0.0;
-
-  // double base_w1_lin_error_sum = 0.0;
-  // double base_w2_lin_error_sum = 0.0;
-  // double base_w3_lin_error_sum = 0.0;
-  // double base_w4_lin_error_sum = 0.0;
-
-  // double base_w1_ang_prev_error = 0.0;
-  // double base_w2_ang_prev_error = 0.0;
-  // double base_w3_ang_prev_error = 0.0;
-  // double base_w4_ang_prev_error = 0.0;
-
-  // double base_w1_ang_error_sum = 0.0;
-  // double base_w2_ang_error_sum = 0.0;
-  // double base_w3_ang_error_sum = 0.0;
-  // double base_w4_ang_error_sum = 0.0;
-
   double tau_wheel_ref_limit = 10.0;
 
-  // double plat_vel_setpoint = 0.05;
   double plat_clip_force = 10.0;
   double plat_sat_force = 300.0;
-
-  // double plat_vel_xy_pid_controller_kp = 200.0;
-  // double plat_vel_xy_pid_controller_ki = 50.0;
-  // double plat_vel_xy_pid_controller_kd = 0.0;
-
-  // double plat_vel_ang_pid_controller_kp = 100.0;
-  // double plat_vel_ang_pid_controller_ki = 10.0;
-  // double plat_vel_ang_pid_controller_kd = 0.0;
-
-  // double plat_vel_x_prev_error = 0.0;
-  // double plat_vel_y_prev_error = 0.0;
-  // double plat_vel_ang_prev_error = 0.0;
-
-  // double plat_vel_x_error_sum = 0.0;
-  // double plat_vel_y_error_sum = 0.0;
-  // double plat_vel_ang_error_sum = 0.0;
 
   double kr_achd_solver_beta[6]{};
   double kl_achd_solver_beta[6]{};
@@ -607,6 +571,8 @@ int main(int argc, char **argv)
       base_log_data_vec.writeToOpenFile();
       uc_log_data_vec.writeToOpenFile();
       wheel_align_log_data_vec.writeToOpenFile();
+      kr_control_log_data_vec.writeToOpenFile();
+      kl_control_log_data_vec.writeToOpenFile();
 
       free_robot_data(&robot);
 
@@ -619,8 +585,7 @@ int main(int argc, char **argv)
       exit(0);
     }
 
-    count++;
-    printf("count: %d\n", count);
+    printf("\ncount: %d\n", count);
 
     // update_base_state(robot.mobile_base->mediator->kelo_base_config,
     //                   robot.mobile_base->mediator->ethercat_config);
@@ -863,24 +828,22 @@ int main(int argc, char **argv)
 
     // uc1 controllers
     // impedance controller
+    double smoothing_factor = 0.9;  // Smoothing factor for derivative
+    double decay_rate = 0.99;       // Decay rate for integral
+
     double kr_bl_base_distance_pid_controller_signal = 0.0;
     double kr_bl_base_distance_controller_error = 0.0;
     std::string kr_bl_base_distance_entities[2] = {kinova_right_bracelet_link,
                                                    kinova_right_base_link};
     computeDistance(kr_bl_base_distance_entities, kinova_right_bracelet_link, &robot,
                     kr_bl_base_distance);
-    computeEqualityError(arms_bl_base_distance_reference_value, kr_bl_base_distance,
-                         kr_bl_base_distance_controller_error);
-    double error_tube = 0.05;
-    if (abs(kr_bl_base_distance_controller_error) < error_tube)
-    {
-      kr_bl_base_distance_controller_error = 0.0;
-    }
-    // printf("kr_error: %f\n", kr_bl_base_distance_controller_error);
+    computeInBetweenError(kr_bl_base_distance, arms_bl_base_distance_upper_limit,
+                          arms_bl_base_distance_lower_limit, kr_bl_base_distance_controller_error);
     pidController(kr_bl_base_distance_controller_error, kr_bl_base_distance_pid_controller_kp,
                   kr_bl_base_distance_pid_controller_ki, kr_bl_base_distance_pid_controller_kd,
-                  *control_loop_dt, kr_bl_base_distance_pid_error_sum, 5.0,
-                  kr_bl_base_distance_pid_prev_error, kr_bl_base_distance_pid_controller_signal);
+                  *control_loop_dt, kr_bl_base_distance_pid_error_sum, 50.0,
+                  kr_bl_base_distance_pid_prev_error, decay_rate, smoothing_factor,
+                  kr_bl_base_distance_pid_controller_signal, true);
 
     // impedance controller
     double kl_bl_base_distance_pid_controller_signal = 0.0;
@@ -889,29 +852,30 @@ int main(int argc, char **argv)
                                                    kinova_left_base_link};
     computeDistance(kl_bl_base_distance_entities, kinova_left_bracelet_link, &robot,
                     kl_bl_base_distance);
-    computeEqualityError(arms_bl_base_distance_reference_value, kl_bl_base_distance,
-                         kl_bl_base_distance_controller_error);
-    if (abs(kl_bl_base_distance_controller_error) < error_tube)
-    {
-      kl_bl_base_distance_controller_error = 0.0;
-    }
+    computeInBetweenError(kl_bl_base_distance, arms_bl_base_distance_upper_limit,
+                          arms_bl_base_distance_lower_limit, kl_bl_base_distance_controller_error);
     pidController(kl_bl_base_distance_controller_error, kl_bl_base_distance_pid_controller_kp,
                   kl_bl_base_distance_pid_controller_ki, kl_bl_base_distance_pid_controller_kd,
-                  *control_loop_dt, kl_bl_base_distance_pid_error_sum, 5.0,
-                  kl_bl_base_distance_pid_prev_error, kl_bl_base_distance_pid_controller_signal);
+                  *control_loop_dt, kl_bl_base_distance_pid_error_sum, 50.0,
+                  kl_bl_base_distance_pid_prev_error, decay_rate, smoothing_factor,
+                  kl_bl_base_distance_pid_controller_signal, true);
+
+    // log data
+    kl_control_log_data_vec.addControlData(
+        kl_bl_base_distance_pid_controller_kp, kl_bl_base_distance_pid_controller_ki,
+        kl_bl_base_distance_pid_controller_kd, kl_bl_base_distance_controller_error,
+        kl_bl_base_distance_pid_error_sum, kl_bl_base_distance_pid_prev_error,
+        kl_bl_base_distance_pid_controller_signal);
+
+    kr_control_log_data_vec.addControlData(
+        kr_bl_base_distance_pid_controller_kp, kr_bl_base_distance_pid_controller_ki,
+        kr_bl_base_distance_pid_controller_kd, kr_bl_base_distance_controller_error,
+        kr_bl_base_distance_pid_error_sum, kr_bl_base_distance_pid_prev_error,
+        kr_bl_base_distance_pid_controller_signal);
 
     std::cout << "dists: " << kl_bl_base_distance << " " << kr_bl_base_distance << std::endl;
     std::cout << "dist_errs: " << kl_bl_base_distance_controller_error << " "
               << kr_bl_base_distance_controller_error << std::endl;
-    // if errors are zero, make the signals zero
-    if (kl_bl_base_distance_controller_error == 0.0)
-    {
-      kl_bl_base_distance_pid_controller_signal = 0.0;
-    }
-    if (kr_bl_base_distance_controller_error == 0.0)
-    {
-      kr_bl_base_distance_pid_controller_signal = 0.0;
-    }
     std::cout << "sigs: " << kl_bl_base_distance_pid_controller_signal << " "
               << kr_bl_base_distance_pid_controller_signal << std::endl;
 
@@ -1142,85 +1106,11 @@ int main(int argc, char **argv)
 
     for (size_t i = 0; i < 3; i++)
     {
-      if (plat_force[i] < plat_clip_force && plat_force[i] > -plat_clip_force)
-      {
-        plat_force[i] = 0.0;
-      }
-    }
-
-    std::cout << "plat_force: ";
-    print_array(plat_force, 3);
-
-    // double plat_vel_damping_force[3] = {0.0, 0.0, 0.0};
-    // double plat_vel_damping_tube = 0.001;
-    // double plat_vel_error[3] = {0.0, 0.0, 0.0};
-
-    // // check if platform velocity is greater than the setpoint
-    // if (robot.mobile_base->state->xd_platform[0] > 0 &&
-    //     robot.mobile_base->state->xd_platform[0] > plat_vel_setpoint)
-    //   computeEqualityError(robot.mobile_base->state->xd_platform[0], plat_vel_setpoint,
-    //                        plat_vel_error[0]);
-    // else if (robot.mobile_base->state->xd_platform[0] < 0 &&
-    //          robot.mobile_base->state->xd_platform[0] < -plat_vel_setpoint)
-    //   computeEqualityError(robot.mobile_base->state->xd_platform[0], -plat_vel_setpoint,
-    //                        plat_vel_error[0]);
-    // else
-    //   plat_vel_error[0] = 0.0;
-
-    // if (robot.mobile_base->state->xd_platform[1] > 0 &&
-    //     robot.mobile_base->state->xd_platform[1] > plat_vel_setpoint)
-    //   computeEqualityError(robot.mobile_base->state->xd_platform[1], plat_vel_setpoint,
-    //                        plat_vel_error[1]);
-    // else if (robot.mobile_base->state->xd_platform[1] < 0 &&
-    //          robot.mobile_base->state->xd_platform[1] < -plat_vel_setpoint)
-    //   computeEqualityError(robot.mobile_base->state->xd_platform[1], -plat_vel_setpoint,
-    //                        plat_vel_error[1]);
-    // else
-    //   plat_vel_error[1] = 0.0;
-
-    // if (robot.mobile_base->state->xd_platform[2] > 0 &&
-    //     robot.mobile_base->state->xd_platform[2] > plat_vel_setpoint)
-    //   computeEqualityError(robot.mobile_base->state->xd_platform[2], plat_vel_setpoint,
-    //                        plat_vel_error[2]);
-    // else if (robot.mobile_base->state->xd_platform[2] < 0 &&
-    //          robot.mobile_base->state->xd_platform[2] < -plat_vel_setpoint)
-    //   computeEqualityError(robot.mobile_base->state->xd_platform[2], -plat_vel_setpoint,
-    //                        plat_vel_error[2]);
-    // else
-    //   plat_vel_error[2] = 0.0;
-
-    // // check if the velocity is within the tube
-    // for (size_t i = 0; i < 3; i++)
-    // {
-    //   if (plat_vel_error[i] < plat_vel_damping_tube && plat_vel_error[i] >
-    //   -plat_vel_damping_tube)
-    //   {
-    //     plat_vel_damping_force[i] = 0.0;
-    //   }
-    // }
-    // pidController(plat_vel_error[0], plat_vel_xy_pid_controller_kp,
-    // plat_vel_xy_pid_controller_ki,
-    //               plat_vel_xy_pid_controller_kd, *control_loop_dt, plat_vel_x_error_sum, 5.0,
-    //               plat_vel_x_prev_error, plat_vel_damping_force[0]);
-    // pidController(plat_vel_error[1], plat_vel_xy_pid_controller_kp,
-    // plat_vel_xy_pid_controller_ki,
-    //               plat_vel_xy_pid_controller_kd, *control_loop_dt, plat_vel_y_error_sum, 5.0,
-    //               plat_vel_y_prev_error, plat_vel_damping_force[1]);
-    // pidController(plat_vel_error[2], plat_vel_ang_pid_controller_kp,
-    //               plat_vel_ang_pid_controller_ki, plat_vel_ang_pid_controller_kd,
-    //               *control_loop_dt, plat_vel_ang_error_sum, 5.0, plat_vel_ang_prev_error,
-    //               plat_vel_damping_force[2]);
-
-    // for (size_t i = 0; i < 3; i++)
-    // {
-    //   if (plat_force[i] > plat_clip_force || plat_force[i] < -plat_clip_force)
-    //   {
-    //     plat_force[i] += plat_vel_damping_force[i];
-    //   }
-    // }
-
-    for (size_t i = 0; i < 3; i++)
-    {
+      // if (plat_force[i] < plat_clip_force && plat_force[i] > -plat_clip_force)
+      // {
+      //   plat_force[i] = 0.0;
+      // }
+      // else
       if (plat_force[i] > plat_sat_force)
       {
         plat_force[i] = plat_sat_force;
@@ -1231,67 +1121,8 @@ int main(int argc, char **argv)
       }
     }
 
-    std::cout << "plat_force_d: ";
+    std::cout << "plat_force: ";
     print_array(plat_force, 3);
-
-    // double lin_offsets[robot.mobile_base->mediator->kelo_base_config->nWheels];
-    // double ang_offsets[robot.mobile_base->mediator->kelo_base_config->nWheels];
-    // get_pivot_alignment_offsets(&robot, plat_force, lin_offsets, ang_offsets);
-
-    // double base_w1_lin_signal, base_w2_lin_signal, base_w3_lin_signal, base_w4_lin_signal = 0.0;
-    // double base_w1_ang_signal, base_w2_ang_signal, base_w3_ang_signal, base_w4_ang_signal = 0.0;
-
-    // double base_wheel_alignment_controller_kp[4] = {
-    //     base_wheel_alignment_controller_Kp, base_wheel_alignment_controller_Kp,
-    //     base_wheel_alignment_controller_Kp, base_wheel_alignment_controller_Kp};
-    // double base_wheel_alignment_controller_ki[4] = {
-    //     base_wheel_alignment_controller_Ki, base_wheel_alignment_controller_Ki,
-    //     base_wheel_alignment_controller_Ki, base_wheel_alignment_controller_Ki};
-    // double base_wheel_alignment_controller_kd[4] = {
-    //     base_wheel_alignment_controller_Kd, base_wheel_alignment_controller_Kd,
-    //     base_wheel_alignment_controller_Kd, base_wheel_alignment_controller_Kd};
-
-    // pidController(lin_offsets[0], base_wheel_alignment_controller_kp[0],
-    //               base_wheel_alignment_controller_ki[0], base_wheel_alignment_controller_kd[0],
-    //               *control_loop_dt, base_w1_lin_error_sum, 5.0, base_w1_lin_prev_error,
-    //               base_w1_lin_signal);
-    // pidController(lin_offsets[1], base_wheel_alignment_controller_kp[1],
-    //               base_wheel_alignment_controller_ki[1], base_wheel_alignment_controller_kd[1],
-    //               *control_loop_dt, base_w2_lin_error_sum, 5.0, base_w2_lin_prev_error,
-    //               base_w2_lin_signal);
-    // pidController(lin_offsets[2], base_wheel_alignment_controller_kp[2],
-    //               base_wheel_alignment_controller_ki[2], base_wheel_alignment_controller_kd[2],
-    //               *control_loop_dt, base_w3_lin_error_sum, 5.0, base_w3_lin_prev_error,
-    //               base_w3_lin_signal);
-    // pidController(lin_offsets[3], base_wheel_alignment_controller_kp[3],
-    //               base_wheel_alignment_controller_ki[3], base_wheel_alignment_controller_kd[3],
-    //               *control_loop_dt, base_w4_lin_error_sum, 5.0, base_w4_lin_prev_error,
-    //               base_w4_lin_signal);
-
-    // pidController(ang_offsets[0], base_wheel_alignment_controller_kp[0],
-    //               base_wheel_alignment_controller_ki[0], base_wheel_alignment_controller_kd[0],
-    //               *control_loop_dt, base_w1_ang_error_sum, 5.0, base_w1_ang_prev_error,
-    //               base_w1_ang_signal);
-    // pidController(ang_offsets[1], base_wheel_alignment_controller_kp[1],
-    //               base_wheel_alignment_controller_ki[1], base_wheel_alignment_controller_kd[1],
-    //               *control_loop_dt, base_w2_ang_error_sum, 5.0, base_w2_ang_prev_error,
-    //               base_w2_ang_signal);
-    // pidController(ang_offsets[2], base_wheel_alignment_controller_kp[2],
-    //               base_wheel_alignment_controller_ki[2], base_wheel_alignment_controller_kd[2],
-    //               *control_loop_dt, base_w3_ang_error_sum, 5.0, base_w3_ang_prev_error,
-    //               base_w3_ang_signal);
-    // pidController(ang_offsets[3], base_wheel_alignment_controller_kp[3],
-    //               base_wheel_alignment_controller_ki[3], base_wheel_alignment_controller_kd[3],
-    //               *control_loop_dt, base_w4_ang_error_sum, 5.0, base_w4_ang_prev_error,
-    //               base_w4_ang_signal);
-
-    // double wheel_alignment_lin_signals[4] = {base_w1_lin_signal, base_w2_lin_signal,
-    //                                          base_w3_lin_signal, base_w4_lin_signal};
-    // double wheel_alignment_ang_signals[4] = {base_w1_ang_signal, base_w2_ang_signal,
-    //                                          base_w3_ang_signal, base_w4_ang_signal};
-
-    // base_fd_solver_with_alignment(&robot, plat_force, wheel_alignment_lin_signals,
-    //                               wheel_alignment_ang_signals, fd_solver_robile_output_torques);
 
     // ---------- hddc2b solver for base --------------
     // Force composition matrix (from drive forces to platform force)
@@ -1319,10 +1150,6 @@ int main(int argc, char **argv)
       f_drive_ref[2 * i + 1] = drive_align_dsts[2 * i + 1];
     }
 
-    //
-    // Force distribution to wheels ...
-    //
-
     hddc2b_pltf_frc_comp_mat(NUM_DRV,
                              robot.mobile_base->mediator->kelo_base_config->wheel_coordinates,
                              robot.mobile_base->state->pivot_angles, g);
@@ -1337,7 +1164,7 @@ int main(int argc, char **argv)
     double f_scale_factor = INFINITY;
     for (int i = 0; i < NUM_DRV; i++)
     {
-      if (fabs(f_null[1 + i * NUM_DRV_COORD]) < 0.2)
+      if (fabs(f_null[1 + i * NUM_DRV_COORD]) < 0.1)
       {
         continue;
       }
